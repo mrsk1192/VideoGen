@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ROCm VideoGen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="backdrop"></div>
+  <main class="shell">
+    <header class="top">
+      <div>
+        <h1 data-i18n="appTitle">ROCm VideoGen Studio</h1>
+        <p data-i18n="appSubtitle">Text-to-Video / Image-to-Video with server-side model search & download</p>
+      </div>
+      <div class="top-right">
+        <label class="lang-picker">
+          <span data-i18n="languageLabel">Language</span>
+          <select id="languageSelect">
+            <option value="en">English</option>
+            <option value="ja">日本語</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+            <option value="it">Italiano</option>
+            <option value="pt">Português</option>
+            <option value="ru">Русский</option>
+            <option value="ar">العربية</option>
+          </select>
+        </label>
+        <div id="runtimeInfo" class="runtime" data-i18n="runtimeLoading">runtime: loading...</div>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="text" data-i18n="tabTextToVideo">Text to Video</button>
+      <button class="tab" data-tab="image" data-i18n="tabImageToVideo">Image to Video</button>
+      <button class="tab" data-tab="models" data-i18n="tabModels">Models</button>
+      <button class="tab" data-tab="settings" data-i18n="tabSettings">Settings</button>
+    </nav>
+
+    <section class="panel active" id="panel-text">
+      <form id="text2videoForm" class="form">
+        <label>
+          <span data-i18n="labelPrompt">Prompt</span>
+          <textarea id="t2vPrompt" required data-i18n-placeholder="placeholderT2VPrompt" placeholder="A cinematic drone shot above neon city..."></textarea>
+        </label>
+        <label>
+          <span data-i18n="labelNegativePrompt">Negative Prompt</span>
+          <textarea id="t2vNegative" data-i18n-placeholder="placeholderNegativePrompt" placeholder="low quality, blurry"></textarea>
+        </label>
+        <label>
+          <span data-i18n="labelModelSelect">Model Selection</span>
+          <div class="input-actions">
+            <select id="t2vModelSelect"></select>
+            <button id="refreshT2VModels" type="button" data-i18n="btnRefreshModels">Refresh</button>
+          </div>
+        </label>
+        <div id="t2vModelPreview" class="model-picked-preview"></div>
+        <div class="grid">
+          <label><span data-i18n="labelSteps">Steps</span> <input id="t2vSteps" type="number" min="1" max="120" value="30" /></label>
+          <label><span data-i18n="labelFrames">Frames</span> <input id="t2vFrames" type="number" min="8" max="128" value="16" /></label>
+          <label><span data-i18n="labelGuidance">Guidance</span> <input id="t2vGuidance" type="number" min="0" max="30" step="0.1" value="9.0" /></label>
+          <label><span data-i18n="labelFps">FPS</span> <input id="t2vFps" type="number" min="1" max="60" value="8" /></label>
+          <label><span data-i18n="labelSeed">Seed</span> <input id="t2vSeed" type="number" min="0" data-i18n-placeholder="placeholderSeed" placeholder="random if empty" /></label>
+        </div>
+        <button type="submit" class="primary" data-i18n="btnGenerateTextVideo">Generate Text Video</button>
+      </form>
+    </section>
+
+    <section class="panel" id="panel-image">
+      <form id="image2videoForm" class="form">
+        <label>
+          <span data-i18n="labelInputImage">Input Image</span>
+          <input id="i2vImage" type="file" accept="image/*" required />
+        </label>
+        <label>
+          <span data-i18n="labelPrompt">Prompt</span>
+          <textarea id="i2vPrompt" required data-i18n-placeholder="placeholderI2VPrompt" placeholder="Turn this image into a smooth cinematic motion..."></textarea>
+        </label>
+        <label>
+          <span data-i18n="labelNegativePrompt">Negative Prompt</span>
+          <textarea id="i2vNegative" data-i18n-placeholder="placeholderI2VNegativePrompt" placeholder="artifact, flicker"></textarea>
+        </label>
+        <label>
+          <span data-i18n="labelModelSelect">Model Selection</span>
+          <div class="input-actions">
+            <select id="i2vModelSelect"></select>
+            <button id="refreshI2VModels" type="button" data-i18n="btnRefreshModels">Refresh</button>
+          </div>
+        </label>
+        <div id="i2vModelPreview" class="model-picked-preview"></div>
+        <div class="grid">
+          <label><span data-i18n="labelSteps">Steps</span> <input id="i2vSteps" type="number" min="1" max="120" value="30" /></label>
+          <label><span data-i18n="labelFrames">Frames</span> <input id="i2vFrames" type="number" min="8" max="128" value="16" /></label>
+          <label><span data-i18n="labelGuidance">Guidance</span> <input id="i2vGuidance" type="number" min="0" max="30" step="0.1" value="9.0" /></label>
+          <label><span data-i18n="labelFps">FPS</span> <input id="i2vFps" type="number" min="1" max="60" value="8" /></label>
+          <label><span data-i18n="labelWidth">Width</span> <input id="i2vWidth" type="number" min="128" max="2048" step="64" value="512" /></label>
+          <label><span data-i18n="labelHeight">Height</span> <input id="i2vHeight" type="number" min="128" max="2048" step="64" value="512" /></label>
+          <label><span data-i18n="labelSeed">Seed</span> <input id="i2vSeed" type="number" min="0" data-i18n-placeholder="placeholderSeed" placeholder="random if empty" /></label>
+        </div>
+        <button type="submit" class="primary" data-i18n="btnGenerateImageVideo">Generate Image Video</button>
+      </form>
+    </section>
+
+    <section class="panel" id="panel-models">
+      <form id="searchForm" class="form compact">
+        <label>
+          <span data-i18n="labelDownloadSavePathOptional">Download Save Path (optional)</span>
+          <div class="input-actions">
+            <input id="downloadTargetDir" data-i18n-placeholder="placeholderDownloadSavePath" placeholder="empty = use Models Directory from Settings" />
+            <button id="browseDownloadTargetDir" type="button" data-i18n="btnBrowsePath">Browse</button>
+          </div>
+        </label>
+        <div class="grid">
+          <label>
+            <span data-i18n="labelTask">Task</span>
+            <select id="searchTask">
+              <option value="text-to-video">text-to-video</option>
+              <option value="image-to-video">image-to-video</option>
+            </select>
+          </label>
+          <label><span data-i18n="labelQuery">Query</span> <input id="searchQuery" data-i18n-placeholder="placeholderSearchQuery" placeholder="i2vgen, text-to-video..." /></label>
+          <label><span data-i18n="labelLimit">Limit</span> <input id="searchLimit" type="number" min="1" max="50" value="12" /></label>
+        </div>
+        <button type="submit" data-i18n="btnSearchModels">Search Models</button>
+      </form>
+      <div id="searchResults" class="list"></div>
+      <h3 data-i18n="headingLocalModels">Local Models</h3>
+      <button id="refreshLocalModels" type="button" data-i18n="btnRefreshLocalList">Refresh Local List</button>
+      <div id="localModels" class="list"></div>
+    </section>
+
+    <section class="panel" id="panel-settings">
+      <form id="settingsForm" class="form">
+        <div class="grid">
+          <label>
+            <span data-i18n="labelModelsDirectory">Models Directory</span>
+            <div class="input-actions">
+              <input id="cfgModelsDir" />
+              <button id="browseCfgModelsDir" type="button" data-i18n="btnBrowsePath">Browse</button>
+            </div>
+          </label>
+          <label><span data-i18n="labelOutputsDirectory">Outputs Directory</span> <input id="cfgOutputsDir" /></label>
+          <label><span data-i18n="labelTempDirectory">Temp Directory</span> <input id="cfgTmpDir" /></label>
+          <label><span data-i18n="labelHfToken">HF Token</span> <input id="cfgToken" type="password" data-i18n-placeholder="placeholderOptional" placeholder="optional" /></label>
+          <label><span data-i18n="labelDefaultTextModel">Default Text Model</span> <input id="cfgTextModel" /></label>
+          <label><span data-i18n="labelDefaultImageModel">Default Image Model</span> <input id="cfgImageModel" /></label>
+          <label><span data-i18n="labelDefaultSteps">Default Steps</span> <input id="cfgSteps" type="number" min="1" max="120" /></label>
+          <label><span data-i18n="labelDefaultFrames">Default Frames</span> <input id="cfgFrames" type="number" min="8" max="128" /></label>
+          <label><span data-i18n="labelDefaultGuidance">Default Guidance</span> <input id="cfgGuidance" type="number" min="0" max="30" step="0.1" /></label>
+          <label><span data-i18n="labelDefaultFps">Default FPS</span> <input id="cfgFps" type="number" min="1" max="60" /></label>
+          <label><span data-i18n="labelDefaultWidth">Default Width</span> <input id="cfgWidth" type="number" min="128" max="2048" step="64" /></label>
+          <label><span data-i18n="labelDefaultHeight">Default Height</span> <input id="cfgHeight" type="number" min="128" max="2048" step="64" /></label>
+        </div>
+        <button type="submit" class="primary" data-i18n="btnSaveSettings">Save Settings</button>
+      </form>
+    </section>
+
+    <section id="pathBrowser" class="panel path-browser">
+      <div class="path-browser-head">
+        <h3 data-i18n="headingPathBrowser">Folder Browser</h3>
+        <button id="pathBrowserClose" type="button" data-i18n="btnClosePathBrowser">Close</button>
+      </div>
+      <div class="path-browser-current">
+        <strong data-i18n="labelCurrentPath">Current Path</strong>
+        <code id="pathBrowserCurrentPath">-</code>
+      </div>
+      <div class="path-browser-actions">
+        <button id="pathBrowserRoots" type="button" data-i18n="btnRoots">Roots</button>
+        <button id="pathBrowserUp" type="button" data-i18n="btnUpFolder">Up</button>
+        <button id="pathBrowserUse" type="button" class="primary" data-i18n="btnUseThisPath">Use This Path</button>
+      </div>
+      <div id="pathBrowserRootsList" class="path-browser-roots"></div>
+      <div id="pathBrowserList" class="list"></div>
+    </section>
+
+    <section class="status">
+      <div id="taskStatus" data-i18n="statusNoTask">No task running.</div>
+      <video id="preview" controls></video>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>
