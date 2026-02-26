@@ -1,1 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="9.821" timestamp="2026-02-24T05:52:16.058812+09:00" hostname="PC-2025-T2"><testcase classname="tests.system.test_ui_e2e" name="test_local_models_filter_and_model_thumbnail" time="9.712" /></testsuite></testsuites>

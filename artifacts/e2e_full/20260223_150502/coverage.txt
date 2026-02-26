@@ -1,6 +1,0 @@
-
-ERROR: usage: __main__.py [options] [file_or_dir] [file_or_dir] [...]
-__main__.py: error: unrecognized arguments: --cov=main --cov-report=term-missing --cov-report=xml:C:\AI\VideoGen\artifacts\e2e_full\20260223_150502\coverage.xml
-  inifile: C:\AI\VideoGen\pytest.ini
-  rootdir: C:\AI\VideoGen
-

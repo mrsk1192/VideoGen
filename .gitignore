@@ -7,3 +7,7 @@ models/
 outputs/
 tmp/
 data/settings.json
+logs/
+artifacts/
+.coverage
+coverage.xml

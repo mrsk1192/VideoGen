@@ -1,2 +1,0 @@
-2026-02-27 08:21:18,689 | INFO | MainThread | logger initialized file=C:\AI\VideoGen\logs\20260227_082118_videogen_pid13432.log level=DEBUG
-2026-02-27 08:21:18,738 | WARNING | MainThread | startup preload skipped on ROCm for stability. Set VIDEOGEN_ALLOW_ROCM_STARTUP_PRELOAD=1 to force.
