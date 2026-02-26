@@ -1,0 +1,219 @@
+{
+  "started_at": "2026-02-23T06:07:01.683262+00:00",
+  "steps": [
+    {
+      "name": "Model Search (empty query / source switch)",
+      "status": "passed",
+      "started_at": "2026-02-23T06:07:10.461979+00:00",
+      "ended_at": "2026-02-23T06:07:17.450182+00:00",
+      "duration_sec": 6.988461599998118,
+      "error": "",
+      "details": {
+        "result_counts": {
+          "huggingface": 0,
+          "civitai": 30,
+          "all": 30
+        },
+        "thumbnail_count": 0
+      }
+    },
+    {
+      "name": "Settings persistence",
+      "status": "passed",
+      "started_at": "2026-02-23T06:07:17.450182+00:00",
+      "ended_at": "2026-02-23T06:07:19.977051+00:00",
+      "duration_sec": 2.527038899999752,
+      "error": "",
+      "details": {
+        "guidance_before": "9",
+        "guidance_after_reload": "8.7",
+        "persisted": true
+      }
+    },
+    {
+      "name": "Prepare local models",
+      "status": "passed",
+      "started_at": "2026-02-23T06:07:19.977051+00:00",
+      "ended_at": "2026-02-23T06:07:20.511166+00:00",
+      "duration_sec": 0.5344156999999541,
+      "error": "",
+      "details": {
+        "downloaded": [],
+        "skipped": [
+          "image-to-video model skipped: ali-vilab/i2vgen-xl size=27.74GB > 10.0GB"
+        ]
+      }
+    },
+    {
+      "name": "Local models UI",
+      "status": "passed",
+      "started_at": "2026-02-23T06:07:20.532781+00:00",
+      "ended_at": "2026-02-23T06:07:21.974203+00:00",
+      "duration_sec": 1.4412192000017967,
+      "error": "",
+      "details": {
+        "rows": 6,
+        "thumbnail_rows": 0
+      }
+    },
+    {
+      "name": "Generate Text-to-Image (LoRA/VAE off)",
+      "status": "passed",
+      "started_at": "2026-02-23T06:07:21.974203+00:00",
+      "ended_at": "2026-02-23T06:07:38.902286+00:00",
+      "duration_sec": 16.928456699999515,
+      "error": "",
+      "details": {
+        "task_id": "9d935715-e7d2-4cfd-a887-af0181888697",
+        "image_file": "text2image_9d935715-e7d2-4cfd-a887-af0181888697.png",
+        "quality": {
+          "width": 512,
+          "height": 512,
+          "mean_rgb": [
+            133.877,
+            122.163,
+            122.082
+          ],
+          "stddev_rgb": [
+            119.21,
+            120.914,
+            120.919
+          ],
+          "edge_mean": 19.63
+        }
+      }
+    },
+    {
+      "name": "Generate Text-to-Image (LoRA/VAE on)",
+      "status": "failed",
+      "started_at": "2026-02-23T06:07:38.902286+00:00",
+      "ended_at": "2026-02-23T06:07:39.924207+00:00",
+      "duration_sec": 1.0227306000015233,
+      "error": "task failed: id=4db760c5-8725-4e93-afb0-d5878df7acea error=PEFT backend is required for this method.\nTraceback (most recent call last):\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 360, in add_step\n    details = fn() or {}\n              ^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 412, in <lambda>\n    lambda: _step_generate_t2i(driver, wait, base_url, t2i_model, \"first\", \"first\", suffix=\"lora_vae\"),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 620, in _step_generate_t2i\n    task = _run_generation_wait(driver, base_url, prev_task=prev, timeout_sec=5400)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 593, in _run_generation_wait\n    raise RuntimeError(f\"task failed: id={task_id} error={task.get('error')}\")\nRuntimeError: task failed: id=4db760c5-8725-4e93-afb0-d5878df7acea error=PEFT backend is required for this method.\n",
+      "details": {}
+    },
+    {
+      "name": "Generate Image-to-Image (LoRA/VAE off)",
+      "status": "passed",
+      "started_at": "2026-02-23T06:07:39.925208+00:00",
+      "ended_at": "2026-02-23T06:07:50.435700+00:00",
+      "duration_sec": 10.511144500000228,
+      "error": "",
+      "details": {
+        "task_id": "f2ae0c57-9577-4297-90d6-3e867d14da69",
+        "image_file": "image2image_f2ae0c57-9577-4297-90d6-3e867d14da69.png",
+        "quality": {
+          "width": 512,
+          "height": 512,
+          "mean_rgb": [
+            100.917,
+            133.431,
+            69.817
+          ],
+          "stddev_rgb": [
+            46.382,
+            39.821,
+            24.077
+          ],
+          "edge_mean": 3.505
+        }
+      }
+    },
+    {
+      "name": "Generate Image-to-Image (LoRA/VAE on)",
+      "status": "failed",
+      "started_at": "2026-02-23T06:07:50.435700+00:00",
+      "ended_at": "2026-02-23T06:07:51.520415+00:00",
+      "duration_sec": 1.0849113000003854,
+      "error": "task failed: id=35c2760f-a783-4e9f-b9bc-91b978e8b367 error=PEFT backend is required for this method.\nTraceback (most recent call last):\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 360, in add_step\n    details = fn() or {}\n              ^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 420, in <lambda>\n    lambda: _step_generate_i2i(driver, wait, base_url, i2i_model, \"first\", \"first\", suffix=\"lora_vae\"),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 654, in _step_generate_i2i\n    task = _run_generation_wait(driver, base_url, prev_task=prev, timeout_sec=5400)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 593, in _run_generation_wait\n    raise RuntimeError(f\"task failed: id={task_id} error={task.get('error')}\")\nRuntimeError: task failed: id=35c2760f-a783-4e9f-b9bc-91b978e8b367 error=PEFT backend is required for this method.\n",
+      "details": {}
+    },
+    {
+      "name": "Generate Text-to-Video",
+      "status": "passed",
+      "started_at": "2026-02-23T06:07:51.521417+00:00",
+      "ended_at": "2026-02-23T06:08:47.697702+00:00",
+      "duration_sec": 56.17908560000069,
+      "error": "",
+      "details": {
+        "task_id": "9e2c16b7-58b7-4100-8eb2-5805e5308bdf",
+        "video_file": "text2video_9e2c16b7-58b7-4100-8eb2-5805e5308bdf.mp4",
+        "quality": {
+          "size_mb": 0.047,
+          "first_frame_shape": [
+            256,
+            256,
+            3
+          ],
+          "first_frame_std": 26.95
+        }
+      }
+    },
+    {
+      "name": "Generate Image-to-Video",
+      "status": "failed",
+      "started_at": "2026-02-23T06:08:47.697702+00:00",
+      "ended_at": "2026-02-23T06:08:47.697702+00:00",
+      "duration_sec": 6.900001608300954e-06,
+      "error": "No local image-to-video model (skipped)\nTraceback (most recent call last):\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 360, in add_step\n    details = fn() or {}\n              ^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 423, in <lambda>\n    add_step(\"Generate Image-to-Video\", lambda: _step_generate_i2v(driver, wait, base_url, i2v_model))\n                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 684, in _step_generate_i2v\n    raise RuntimeError(\"No local image-to-video model (skipped)\")\nRuntimeError: No local image-to-video model (skipped)\n",
+      "details": {}
+    },
+    {
+      "name": "Outputs UI view/delete",
+      "status": "passed",
+      "started_at": "2026-02-23T06:08:47.698697+00:00",
+      "ended_at": "2026-02-23T06:08:50.640955+00:00",
+      "duration_sec": 2.94275899999775,
+      "error": "",
+      "details": {
+        "count_before": 5,
+        "count_after": 4,
+        "deleted_candidate": "text2video_9e2c16b7-58b7-4100-8eb2-5805e5308bdf.mp4 サイズ=47.7 KB | 更新日時=2026/2/23 15:08:47 | タグ=動画"
+      }
+    },
+    {
+      "name": "GPU usage evidence",
+      "status": "passed",
+      "started_at": "2026-02-23T06:08:50.640955+00:00",
+      "ended_at": "2026-02-23T06:08:50.703507+00:00",
+      "duration_sec": 0.06221840000216616,
+      "error": "",
+      "details": {
+        "device": "cuda",
+        "cuda_available": true,
+        "rocm_available": true,
+        "has_pipeline_load_log": true,
+        "has_cuda_log": true
+      }
+    }
+  ],
+  "notes": [],
+  "prompt": "A whale is flying in the sky.",
+  "negative_prompt": "low quality, blurry, jpeg artifacts, deformed, watermark, text, bad anatomy",
+  "runtime_info": {
+    "diffusers_ready": true,
+    "cuda_available": true,
+    "rocm_available": true,
+    "device": "cuda",
+    "torch_version": "2.9.1+rocmsdk20260116",
+    "import_error": null
+  },
+  "driver_mode": "edge-headful",
+  "paths": {
+    "models_dir": "C:\\AI\\VideoGen\\models",
+    "outputs_dir": "C:\\AI\\VideoGen\\outputs"
+  },
+  "model_prepare": {
+    "downloaded": [],
+    "skipped": [
+      "image-to-video model skipped: ali-vilab/i2vgen-xl size=27.74GB > 10.0GB"
+    ]
+  },
+  "selected_models": {
+    "text_to_image": "C:\\AI\\VideoGen\\models\\stabilityai--stable-diffusion-xl-base-1.0",
+    "image_to_image": "C:\\AI\\VideoGen\\models\\stabilityai--stable-diffusion-xl-base-1.0",
+    "text_to_video": "C:\\AI\\VideoGen\\models\\ali-vilab--text-to-video-ms-1.7b",
+    "image_to_video": null
+  },
+  "ended_at": "2026-02-23T06:09:13.481484+00:00"
+}

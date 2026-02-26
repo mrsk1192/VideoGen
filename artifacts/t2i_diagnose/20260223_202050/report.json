@@ -1,0 +1,1545 @@
+{
+  "started_at": "2026-02-23T11:20:50.746414+00:00",
+  "recommended_model": "SG161222/RealVisXL_V5.0",
+  "base_url": "http://127.0.0.1:64504",
+  "runtime": {
+    "diffusers_ready": true,
+    "cuda_available": true,
+    "rocm_available": true,
+    "device": "cuda",
+    "torch_version": "2.9.1+rocmsdk20260116",
+    "import_error": null
+  },
+  "models_dir": "C:\\AI\\VideoGen\\models",
+  "log_level": "DEBUG",
+  "download": {
+    "downloaded": false,
+    "already_local": true
+  },
+  "model_value": "C:\\AI\\VideoGen\\models\\SG161222--RealVisXL_V5.0",
+  "task_id": "659e3d21-2ecc-412c-a7cb-a819489850ae",
+  "uvicorn_pid": 5244,
+  "task_final": {
+    "id": "659e3d21-2ecc-412c-a7cb-a819489850ae",
+    "task_type": "text2image",
+    "status": "completed",
+    "progress": 1.0,
+    "message": "Done",
+    "created_at": "2026-02-23T11:21:01Z",
+    "updated_at": "2026-02-23T11:32:45Z",
+    "started_at": "2026-02-23T11:21:01Z",
+    "finished_at": "2026-02-23T11:32:45Z",
+    "result": {
+      "image_file": "text2image_659e3d21-2ecc-412c-a7cb-a819489850ae.png",
+      "model": "C:\\AI\\VideoGen\\models\\SG161222--RealVisXL_V5.0",
+      "loras": [],
+      "vae": null
+    },
+    "error": null,
+    "downloaded_bytes": null,
+    "total_bytes": null
+  },
+  "runtime_info": "device=cuda | cuda=true | rocm=true | diffusers=true | torch=2.9.1+rocmsdk20260116",
+  "monitor_summary": {
+    "first_progress_90": "2026-02-23T11:32:02.909134+00:00",
+    "first_progress_92": "2026-02-23T11:32:02.909134+00:00",
+    "first_progress_96": "2026-02-23T11:32:46.794582+00:00",
+    "first_progress_98": "2026-02-23T11:32:46.794582+00:00",
+    "completed_at": "2026-02-23T11:32:46.794582+00:00",
+    "sec_90_to_92": 0.0,
+    "sec_90_to_96": 43.885448,
+    "sec_90_to_98": 43.885448,
+    "sec_90_to_done": 43.885448,
+    "server_cpu_percent_max": 1527.6,
+    "server_cpu_percent_avg": 109.60606060606061,
+    "server_rss_bytes_max": 16451354624
+  },
+  "monitor_rows": [
+    {
+      "ts": "2026-02-23T11:21:01.890572+00:00",
+      "status": "running",
+      "progress": 0.05,
+      "message": "Loading model",
+      "server_cpu_percent": 0.0,
+      "server_rss_bytes": 3649851392,
+      "system_cpu_percent": 10.0
+    },
+    {
+      "ts": "2026-02-23T11:21:02.897108+00:00",
+      "status": "running",
+      "progress": 0.05,
+      "message": "Loading model",
+      "server_cpu_percent": 710.9,
+      "server_rss_bytes": 3368435712,
+      "system_cpu_percent": 64.4
+    },
+    {
+      "ts": "2026-02-23T11:21:03.930601+00:00",
+      "status": "running",
+      "progress": 0.05,
+      "message": "Loading model",
+      "server_cpu_percent": 1373.2,
+      "server_rss_bytes": 8918138880,
+      "system_cpu_percent": 88.2
+    },
+    {
+      "ts": "2026-02-23T11:21:04.956494+00:00",
+      "status": "running",
+      "progress": 0.05,
+      "message": "Loading model",
+      "server_cpu_percent": 1527.6,
+      "server_rss_bytes": 13448880128,
+      "system_cpu_percent": 93.0
+    },
+    {
+      "ts": "2026-02-23T11:21:05.981992+00:00",
+      "status": "running",
+      "progress": 0.05,
+      "message": "Loading model",
+      "server_cpu_percent": 1202.3,
+      "server_rss_bytes": 16451354624,
+      "system_cpu_percent": 77.5
+    },
+    {
+      "ts": "2026-02-23T11:21:06.997482+00:00",
+      "status": "running",
+      "progress": 0.05,
+      "message": "Loading model",
+      "server_cpu_percent": 259.9,
+      "server_rss_bytes": 11341639680,
+      "system_cpu_percent": 34.8
+    },
+    {
+      "ts": "2026-02-23T11:21:08.027303+00:00",
+      "status": "running",
+      "progress": 0.05,
+      "message": "Loading model",
+      "server_cpu_percent": 286.4,
+      "server_rss_bytes": 7136448512,
+      "system_cpu_percent": 32.8
+    },
+    {
+      "ts": "2026-02-23T11:21:09.031953+00:00",
+      "status": "running",
+      "progress": 0.05,
+      "message": "Loading model",
+      "server_cpu_percent": 732.0,
+      "server_rss_bytes": 6751510528,
+      "system_cpu_percent": 32.7
+    },
+    {
+      "ts": "2026-02-23T11:21:10.050057+00:00",
+      "status": "running",
+      "progress": 0.05,
+      "message": "Loading model",
+      "server_cpu_percent": 132.3,
+      "server_rss_bytes": 4455333888,
+      "system_cpu_percent": 12.0
+    },
+    {
+      "ts": "2026-02-23T11:21:11.076224+00:00",
+      "status": "running",
+      "progress": 0.05,
+      "message": "Loading model",
+      "server_cpu_percent": 123.2,
+      "server_rss_bytes": 1812156416,
+      "system_cpu_percent": 12.3
+    },
+    {
+      "ts": "2026-02-23T11:21:12.080130+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 87.7,
+      "server_rss_bytes": 599179264,
+      "system_cpu_percent": 8.2
+    },
+    {
+      "ts": "2026-02-23T11:21:13.107117+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 69.3,
+      "server_rss_bytes": 826777600,
+      "system_cpu_percent": 8.3
+    },
+    {
+      "ts": "2026-02-23T11:21:14.125352+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 98.4,
+      "server_rss_bytes": 826839040,
+      "system_cpu_percent": 7.6
+    },
+    {
+      "ts": "2026-02-23T11:21:15.141599+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 100.1,
+      "server_rss_bytes": 826839040,
+      "system_cpu_percent": 7.2
+    },
+    {
+      "ts": "2026-02-23T11:21:16.169472+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 101.5,
+      "server_rss_bytes": 826839040,
+      "system_cpu_percent": 12.5
+    },
+    {
+      "ts": "2026-02-23T11:21:17.182788+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 826839040,
+      "system_cpu_percent": 9.4
+    },
+    {
+      "ts": "2026-02-23T11:21:18.187349+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 98.5,
+      "server_rss_bytes": 826839040,
+      "system_cpu_percent": 8.9
+    },
+    {
+      "ts": "2026-02-23T11:21:19.211189+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 101.5,
+      "server_rss_bytes": 826839040,
+      "system_cpu_percent": 8.5
+    },
+    {
+      "ts": "2026-02-23T11:21:20.232171+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 98.5,
+      "server_rss_bytes": 826839040,
+      "system_cpu_percent": 8.7
+    },
+    {
+      "ts": "2026-02-23T11:21:21.261392+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 101.5,
+      "server_rss_bytes": 826839040,
+      "system_cpu_percent": 10.2
+    },
+    {
+      "ts": "2026-02-23T11:21:22.275578+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 97.0,
+      "server_rss_bytes": 827596800,
+      "system_cpu_percent": 4.8
+    },
+    {
+      "ts": "2026-02-23T11:21:23.304924+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 1.5,
+      "server_rss_bytes": 827662336,
+      "system_cpu_percent": 4.2
+    },
+    {
+      "ts": "2026-02-23T11:21:24.319229+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 97.0,
+      "server_rss_bytes": 827727872,
+      "system_cpu_percent": 7.3
+    },
+    {
+      "ts": "2026-02-23T11:21:25.323116+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 827793408,
+      "system_cpu_percent": 8.0
+    },
+    {
+      "ts": "2026-02-23T11:21:26.346299+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 97.0,
+      "server_rss_bytes": 827797504,
+      "system_cpu_percent": 11.7
+    },
+    {
+      "ts": "2026-02-23T11:21:27.349578+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 101.6,
+      "server_rss_bytes": 827797504,
+      "system_cpu_percent": 9.2
+    },
+    {
+      "ts": "2026-02-23T11:21:28.354095+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 827797504,
+      "system_cpu_percent": 8.4
+    },
+    {
+      "ts": "2026-02-23T11:21:29.374360+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 98.4,
+      "server_rss_bytes": 827797504,
+      "system_cpu_percent": 7.1
+    },
+    {
+      "ts": "2026-02-23T11:21:30.391967+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 101.6,
+      "server_rss_bytes": 827826176,
+      "system_cpu_percent": 7.4
+    },
+    {
+      "ts": "2026-02-23T11:21:31.410240+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 98.4,
+      "server_rss_bytes": 827826176,
+      "system_cpu_percent": 8.5
+    },
+    {
+      "ts": "2026-02-23T11:21:32.428447+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 103.0,
+      "server_rss_bytes": 827826176,
+      "system_cpu_percent": 7.5
+    },
+    {
+      "ts": "2026-02-23T11:21:33.443984+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 103.1,
+      "server_rss_bytes": 827826176,
+      "system_cpu_percent": 7.8
+    },
+    {
+      "ts": "2026-02-23T11:21:34.462410+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 98.5,
+      "server_rss_bytes": 827826176,
+      "system_cpu_percent": 7.2
+    },
+    {
+      "ts": "2026-02-23T11:21:35.477773+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 101.5,
+      "server_rss_bytes": 827834368,
+      "system_cpu_percent": 9.2
+    },
+    {
+      "ts": "2026-02-23T11:21:36.498195+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 827899904,
+      "system_cpu_percent": 13.7
+    },
+    {
+      "ts": "2026-02-23T11:21:37.526748+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 829587456,
+      "system_cpu_percent": 11.6
+    },
+    {
+      "ts": "2026-02-23T11:21:38.555811+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 829587456,
+      "system_cpu_percent": 7.7
+    },
+    {
+      "ts": "2026-02-23T11:21:39.569421+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 101.6,
+      "server_rss_bytes": 829587456,
+      "system_cpu_percent": 9.9
+    },
+    {
+      "ts": "2026-02-23T11:21:40.583414+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 101.5,
+      "server_rss_bytes": 829587456,
+      "system_cpu_percent": 8.0
+    },
+    {
+      "ts": "2026-02-23T11:21:41.599688+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 101.6,
+      "server_rss_bytes": 829587456,
+      "system_cpu_percent": 7.5
+    },
+    {
+      "ts": "2026-02-23T11:21:42.619176+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 98.4,
+      "server_rss_bytes": 829587456,
+      "system_cpu_percent": 7.6
+    },
+    {
+      "ts": "2026-02-23T11:21:43.646737+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 101.6,
+      "server_rss_bytes": 829587456,
+      "system_cpu_percent": 7.9
+    },
+    {
+      "ts": "2026-02-23T11:21:44.659710+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 103.0,
+      "server_rss_bytes": 829587456,
+      "system_cpu_percent": 7.6
+    },
+    {
+      "ts": "2026-02-23T11:21:45.679280+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 98.5,
+      "server_rss_bytes": 829587456,
+      "system_cpu_percent": 8.2
+    },
+    {
+      "ts": "2026-02-23T11:21:46.706252+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 829587456,
+      "system_cpu_percent": 11.5
+    },
+    {
+      "ts": "2026-02-23T11:21:47.719623+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 100.1,
+      "server_rss_bytes": 829612032,
+      "system_cpu_percent": 7.7
+    },
+    {
+      "ts": "2026-02-23T11:21:48.748626+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 98.4,
+      "server_rss_bytes": 829612032,
+      "system_cpu_percent": 7.7
+    },
+    {
+      "ts": "2026-02-23T11:21:49.751950+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 103.1,
+      "server_rss_bytes": 829612032,
+      "system_cpu_percent": 9.6
+    },
+    {
+      "ts": "2026-02-23T11:21:50.756310+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 98.5,
+      "server_rss_bytes": 829612032,
+      "system_cpu_percent": 5.7
+    },
+    {
+      "ts": "2026-02-23T11:21:51.760752+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 829591552,
+      "system_cpu_percent": 8.5
+    },
+    {
+      "ts": "2026-02-23T11:21:52.779144+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 829591552,
+      "system_cpu_percent": 4.8
+    },
+    {
+      "ts": "2026-02-23T11:21:53.803106+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 101.5,
+      "server_rss_bytes": 829595648,
+      "system_cpu_percent": 7.3
+    },
+    {
+      "ts": "2026-02-23T11:21:54.818334+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 829595648,
+      "system_cpu_percent": 6.3
+    },
+    {
+      "ts": "2026-02-23T11:21:55.842699+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 100.1,
+      "server_rss_bytes": 829599744,
+      "system_cpu_percent": 5.6
+    },
+    {
+      "ts": "2026-02-23T11:21:56.845468+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 101.6,
+      "server_rss_bytes": 829673472,
+      "system_cpu_percent": 6.6
+    },
+    {
+      "ts": "2026-02-23T11:21:57.850565+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 98.4,
+      "server_rss_bytes": 829673472,
+      "system_cpu_percent": 5.9
+    },
+    {
+      "ts": "2026-02-23T11:21:58.855134+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 98.4,
+      "server_rss_bytes": 829677568,
+      "system_cpu_percent": 5.5
+    },
+    {
+      "ts": "2026-02-23T11:21:59.859701+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 103.1,
+      "server_rss_bytes": 829677568,
+      "system_cpu_percent": 5.2
+    },
+    {
+      "ts": "2026-02-23T11:22:00.887750+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 98.5,
+      "server_rss_bytes": 829677568,
+      "system_cpu_percent": 3.8
+    },
+    {
+      "ts": "2026-02-23T11:22:01.908535+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 101.5,
+      "server_rss_bytes": 829677568,
+      "system_cpu_percent": 10.2
+    },
+    {
+      "ts": "2026-02-23T11:22:02.935806+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 101.5,
+      "server_rss_bytes": 829677568,
+      "system_cpu_percent": 9.9
+    },
+    {
+      "ts": "2026-02-23T11:22:03.939559+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 98.4,
+      "server_rss_bytes": 829702144,
+      "system_cpu_percent": 14.5
+    },
+    {
+      "ts": "2026-02-23T11:22:04.957834+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 829702144,
+      "system_cpu_percent": 10.8
+    },
+    {
+      "ts": "2026-02-23T11:22:05.974997+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 829702144,
+      "system_cpu_percent": 11.2
+    },
+    {
+      "ts": "2026-02-23T11:22:06.995273+00:00",
+      "status": "running",
+      "progress": 0.2,
+      "message": "Generating image (0/20)",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 829702144,
+      "system_cpu_percent": 11.6
+    },
+    {
+      "ts": "2026-02-23T11:22:18.026924+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 4.8
+    },
+    {
+      "ts": "2026-02-23T11:22:29.052567+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 4.2
+    },
+    {
+      "ts": "2026-02-23T11:22:38.537626+00:00",
+      "status": "running",
+      "progress": 0.27,
+      "message": "Generating image (2/20)",
+      "server_cpu_percent": 99.9,
+      "server_rss_bytes": 901345280,
+      "system_cpu_percent": 5.4
+    },
+    {
+      "ts": "2026-02-23T11:22:49.568841+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 5.7
+    },
+    {
+      "ts": "2026-02-23T11:23:00.590168+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 6.2
+    },
+    {
+      "ts": "2026-02-23T11:23:09.892258+00:00",
+      "status": "running",
+      "progress": 0.305,
+      "message": "Generating image (3/20)",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 902307840,
+      "system_cpu_percent": 6.5
+    },
+    {
+      "ts": "2026-02-23T11:23:20.924953+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 5.5
+    },
+    {
+      "ts": "2026-02-23T11:23:31.945678+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 5.8
+    },
+    {
+      "ts": "2026-02-23T11:23:41.264457+00:00",
+      "status": "running",
+      "progress": 0.33999999999999997,
+      "message": "Generating image (4/20)",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 902385664,
+      "system_cpu_percent": 6.2
+    },
+    {
+      "ts": "2026-02-23T11:23:52.284206+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 4.7
+    },
+    {
+      "ts": "2026-02-23T11:24:03.300032+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 4.9
+    },
+    {
+      "ts": "2026-02-23T11:24:12.401174+00:00",
+      "status": "running",
+      "progress": 0.375,
+      "message": "Generating image (5/20)",
+      "server_cpu_percent": 100.1,
+      "server_rss_bytes": 903000064,
+      "system_cpu_percent": 4.5
+    },
+    {
+      "ts": "2026-02-23T11:24:23.425033+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 5.0
+    },
+    {
+      "ts": "2026-02-23T11:24:34.463291+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 4.6
+    },
+    {
+      "ts": "2026-02-23T11:24:43.764382+00:00",
+      "status": "running",
+      "progress": 0.41000000000000003,
+      "message": "Generating image (6/20)",
+      "server_cpu_percent": 100.2,
+      "server_rss_bytes": 903352320,
+      "system_cpu_percent": 7.9
+    },
+    {
+      "ts": "2026-02-23T11:24:54.782767+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 5.3
+    },
+    {
+      "ts": "2026-02-23T11:25:05.806274+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 5.2
+    },
+    {
+      "ts": "2026-02-23T11:25:14.983411+00:00",
+      "status": "running",
+      "progress": 0.44499999999999995,
+      "message": "Generating image (7/20)",
+      "server_cpu_percent": 99.8,
+      "server_rss_bytes": 904032256,
+      "system_cpu_percent": 5.6
+    },
+    {
+      "ts": "2026-02-23T11:25:26.003211+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 5.4
+    },
+    {
+      "ts": "2026-02-23T11:25:37.014855+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 5.5
+    },
+    {
+      "ts": "2026-02-23T11:25:47.648681+00:00",
+      "status": "running",
+      "progress": 0.48,
+      "message": "Generating image (8/20)",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 904593408,
+      "system_cpu_percent": 5.5
+    },
+    {
+      "ts": "2026-02-23T11:25:58.680806+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 4.7
+    },
+    {
+      "ts": "2026-02-23T11:26:09.706952+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 5.5
+    },
+    {
+      "ts": "2026-02-23T11:26:19.049803+00:00",
+      "status": "running",
+      "progress": 0.515,
+      "message": "Generating image (9/20)",
+      "server_cpu_percent": 99.9,
+      "server_rss_bytes": 904896512,
+      "system_cpu_percent": 4.3
+    },
+    {
+      "ts": "2026-02-23T11:26:30.076799+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 4.4
+    },
+    {
+      "ts": "2026-02-23T11:26:41.108238+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 5.1
+    },
+    {
+      "ts": "2026-02-23T11:26:50.239770+00:00",
+      "status": "running",
+      "progress": 0.55,
+      "message": "Generating image (10/20)",
+      "server_cpu_percent": 99.3,
+      "server_rss_bytes": 904896512,
+      "system_cpu_percent": 8.9
+    },
+    {
+      "ts": "2026-02-23T11:27:01.265296+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 5.4
+    },
+    {
+      "ts": "2026-02-23T11:27:12.292609+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 5.4
+    },
+    {
+      "ts": "2026-02-23T11:27:21.460365+00:00",
+      "status": "running",
+      "progress": 0.585,
+      "message": "Generating image (11/20)",
+      "server_cpu_percent": 99.5,
+      "server_rss_bytes": 905428992,
+      "system_cpu_percent": 4.7
+    },
+    {
+      "ts": "2026-02-23T11:27:32.483414+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 5.8
+    },
+    {
+      "ts": "2026-02-23T11:27:43.508164+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 5.4
+    },
+    {
+      "ts": "2026-02-23T11:27:52.835034+00:00",
+      "status": "running",
+      "progress": 0.62,
+      "message": "Generating image (12/20)",
+      "server_cpu_percent": 100.3,
+      "server_rss_bytes": 905613312,
+      "system_cpu_percent": 5.7
+    },
+    {
+      "ts": "2026-02-23T11:28:03.872690+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 4.4
+    },
+    {
+      "ts": "2026-02-23T11:28:14.894016+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 4.7
+    },
+    {
+      "ts": "2026-02-23T11:28:24.028801+00:00",
+      "status": "running",
+      "progress": 0.655,
+      "message": "Generating image (13/20)",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 905928704,
+      "system_cpu_percent": 5.8
+    },
+    {
+      "ts": "2026-02-23T11:28:35.051315+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 4.7
+    },
+    {
+      "ts": "2026-02-23T11:28:46.070073+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 4.7
+    },
+    {
+      "ts": "2026-02-23T11:28:55.209124+00:00",
+      "status": "running",
+      "progress": 0.69,
+      "message": "Generating image (14/20)",
+      "server_cpu_percent": 100.1,
+      "server_rss_bytes": 905928704,
+      "system_cpu_percent": 4.5
+    },
+    {
+      "ts": "2026-02-23T11:29:06.248738+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 5.7
+    },
+    {
+      "ts": "2026-02-23T11:29:17.264710+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 6.0
+    },
+    {
+      "ts": "2026-02-23T11:29:26.537178+00:00",
+      "status": "running",
+      "progress": 0.7249999999999999,
+      "message": "Generating image (15/20)",
+      "server_cpu_percent": 99.7,
+      "server_rss_bytes": 905912320,
+      "system_cpu_percent": 7.4
+    },
+    {
+      "ts": "2026-02-23T11:29:37.556132+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 6.3
+    },
+    {
+      "ts": "2026-02-23T11:29:48.581029+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 6.0
+    },
+    {
+      "ts": "2026-02-23T11:29:57.948404+00:00",
+      "status": "running",
+      "progress": 0.76,
+      "message": "Generating image (16/20)",
+      "server_cpu_percent": 100.2,
+      "server_rss_bytes": 905928704,
+      "system_cpu_percent": 5.2
+    },
+    {
+      "ts": "2026-02-23T11:30:08.972429+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 4.6
+    },
+    {
+      "ts": "2026-02-23T11:30:20.005683+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 4.6
+    },
+    {
+      "ts": "2026-02-23T11:30:29.156874+00:00",
+      "status": "running",
+      "progress": 0.7949999999999999,
+      "message": "Generating image (17/20)",
+      "server_cpu_percent": 100.3,
+      "server_rss_bytes": 906534912,
+      "system_cpu_percent": 8.1
+    },
+    {
+      "ts": "2026-02-23T11:30:40.179796+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 4.8
+    },
+    {
+      "ts": "2026-02-23T11:30:51.202510+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 4.3
+    },
+    {
+      "ts": "2026-02-23T11:31:00.443430+00:00",
+      "status": "running",
+      "progress": 0.8300000000000001,
+      "message": "Generating image (18/20)",
+      "server_cpu_percent": 100.1,
+      "server_rss_bytes": 907186176,
+      "system_cpu_percent": 5.7
+    },
+    {
+      "ts": "2026-02-23T11:31:11.473941+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 4.3
+    },
+    {
+      "ts": "2026-02-23T11:31:22.498383+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 4.5
+    },
+    {
+      "ts": "2026-02-23T11:31:31.559793+00:00",
+      "status": "running",
+      "progress": 0.865,
+      "message": "Generating image (19/20)",
+      "server_cpu_percent": 100.1,
+      "server_rss_bytes": 907751424,
+      "system_cpu_percent": 4.4
+    },
+    {
+      "ts": "2026-02-23T11:31:42.582197+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 5.8
+    },
+    {
+      "ts": "2026-02-23T11:31:53.603034+00:00",
+      "status": "monitor_error",
+      "progress": null,
+      "message": "task poll error: HTTPConnectionPool(host='127.0.0.1', port=64504): Read timed out. (read timeout=10)",
+      "server_cpu_percent": null,
+      "server_rss_bytes": null,
+      "system_cpu_percent": 4.4
+    },
+    {
+      "ts": "2026-02-23T11:32:02.909134+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 100.1,
+      "server_rss_bytes": 908062720,
+      "system_cpu_percent": 6.8
+    },
+    {
+      "ts": "2026-02-23T11:32:03.937373+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 926957568,
+      "system_cpu_percent": 4.6
+    },
+    {
+      "ts": "2026-02-23T11:32:04.957049+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 101.5,
+      "server_rss_bytes": 926961664,
+      "system_cpu_percent": 4.3
+    },
+    {
+      "ts": "2026-02-23T11:32:05.971727+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 101.6,
+      "server_rss_bytes": 926961664,
+      "system_cpu_percent": 4.4
+    },
+    {
+      "ts": "2026-02-23T11:32:06.975741+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 98.4,
+      "server_rss_bytes": 926965760,
+      "system_cpu_percent": 4.1
+    },
+    {
+      "ts": "2026-02-23T11:32:08.003318+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 103.1,
+      "server_rss_bytes": 926965760,
+      "system_cpu_percent": 4.6
+    },
+    {
+      "ts": "2026-02-23T11:32:09.019492+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 101.5,
+      "server_rss_bytes": 926965760,
+      "system_cpu_percent": 4.4
+    },
+    {
+      "ts": "2026-02-23T11:32:10.045802+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 92.4,
+      "server_rss_bytes": 928219136,
+      "system_cpu_percent": 4.3
+    },
+    {
+      "ts": "2026-02-23T11:32:11.072374+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 89.3,
+      "server_rss_bytes": 931000320,
+      "system_cpu_percent": 5.0
+    },
+    {
+      "ts": "2026-02-23T11:32:12.098580+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 103.1,
+      "server_rss_bytes": 931000320,
+      "system_cpu_percent": 4.8
+    },
+    {
+      "ts": "2026-02-23T11:32:13.128740+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 101.5,
+      "server_rss_bytes": 930934784,
+      "system_cpu_percent": 4.8
+    },
+    {
+      "ts": "2026-02-23T11:32:14.143796+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 101.5,
+      "server_rss_bytes": 930934784,
+      "system_cpu_percent": 4.6
+    },
+    {
+      "ts": "2026-02-23T11:32:15.158337+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 103.0,
+      "server_rss_bytes": 930934784,
+      "system_cpu_percent": 4.4
+    },
+    {
+      "ts": "2026-02-23T11:32:16.185908+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 930934784,
+      "system_cpu_percent": 4.5
+    },
+    {
+      "ts": "2026-02-23T11:32:17.211565+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 103.1,
+      "server_rss_bytes": 930934784,
+      "system_cpu_percent": 4.9
+    },
+    {
+      "ts": "2026-02-23T11:32:18.228897+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 930934784,
+      "system_cpu_percent": 4.2
+    },
+    {
+      "ts": "2026-02-23T11:32:19.246642+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 100.1,
+      "server_rss_bytes": 930934784,
+      "system_cpu_percent": 4.1
+    },
+    {
+      "ts": "2026-02-23T11:32:20.264957+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 101.5,
+      "server_rss_bytes": 930934784,
+      "system_cpu_percent": 4.6
+    },
+    {
+      "ts": "2026-02-23T11:32:21.294575+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 930934784,
+      "system_cpu_percent": 4.0
+    },
+    {
+      "ts": "2026-02-23T11:32:22.320587+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 101.4,
+      "server_rss_bytes": 930934784,
+      "system_cpu_percent": 4.6
+    },
+    {
+      "ts": "2026-02-23T11:32:23.337715+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 100.1,
+      "server_rss_bytes": 930934784,
+      "system_cpu_percent": 4.5
+    },
+    {
+      "ts": "2026-02-23T11:32:24.352695+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 98.4,
+      "server_rss_bytes": 930934784,
+      "system_cpu_percent": 4.2
+    },
+    {
+      "ts": "2026-02-23T11:32:25.381308+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 930934784,
+      "system_cpu_percent": 4.4
+    },
+    {
+      "ts": "2026-02-23T11:32:26.396058+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 98.4,
+      "server_rss_bytes": 930934784,
+      "system_cpu_percent": 4.6
+    },
+    {
+      "ts": "2026-02-23T11:32:27.410565+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 98.4,
+      "server_rss_bytes": 930934784,
+      "system_cpu_percent": 4.6
+    },
+    {
+      "ts": "2026-02-23T11:32:28.425387+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 101.6,
+      "server_rss_bytes": 930934784,
+      "system_cpu_percent": 4.1
+    },
+    {
+      "ts": "2026-02-23T11:32:29.442496+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 930934784,
+      "system_cpu_percent": 4.4
+    },
+    {
+      "ts": "2026-02-23T11:32:30.471540+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 97.0,
+      "server_rss_bytes": 972369920,
+      "system_cpu_percent": 4.5
+    },
+    {
+      "ts": "2026-02-23T11:32:31.487153+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 101.5,
+      "server_rss_bytes": 972435456,
+      "system_cpu_percent": 4.4
+    },
+    {
+      "ts": "2026-02-23T11:32:32.503712+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 100.1,
+      "server_rss_bytes": 972435456,
+      "system_cpu_percent": 4.4
+    },
+    {
+      "ts": "2026-02-23T11:32:33.521728+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 98.4,
+      "server_rss_bytes": 972439552,
+      "system_cpu_percent": 4.9
+    },
+    {
+      "ts": "2026-02-23T11:32:34.540422+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 100.1,
+      "server_rss_bytes": 972451840,
+      "system_cpu_percent": 5.0
+    },
+    {
+      "ts": "2026-02-23T11:32:35.570455+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 99.9,
+      "server_rss_bytes": 972455936,
+      "system_cpu_percent": 8.0
+    },
+    {
+      "ts": "2026-02-23T11:32:36.598292+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 101.6,
+      "server_rss_bytes": 972455936,
+      "system_cpu_percent": 7.6
+    },
+    {
+      "ts": "2026-02-23T11:32:37.613837+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 972455936,
+      "system_cpu_percent": 5.4
+    },
+    {
+      "ts": "2026-02-23T11:32:38.628249+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 100.1,
+      "server_rss_bytes": 972455936,
+      "system_cpu_percent": 7.1
+    },
+    {
+      "ts": "2026-02-23T11:32:39.643129+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 972455936,
+      "system_cpu_percent": 6.3
+    },
+    {
+      "ts": "2026-02-23T11:32:40.671413+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 97.0,
+      "server_rss_bytes": 972464128,
+      "system_cpu_percent": 5.7
+    },
+    {
+      "ts": "2026-02-23T11:32:41.699016+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 99.9,
+      "server_rss_bytes": 972464128,
+      "system_cpu_percent": 4.9
+    },
+    {
+      "ts": "2026-02-23T11:32:42.712851+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 100.1,
+      "server_rss_bytes": 972476416,
+      "system_cpu_percent": 4.9
+    },
+    {
+      "ts": "2026-02-23T11:32:43.738149+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 100.0,
+      "server_rss_bytes": 972476416,
+      "system_cpu_percent": 5.9
+    },
+    {
+      "ts": "2026-02-23T11:32:44.756047+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 98.5,
+      "server_rss_bytes": 972476416,
+      "system_cpu_percent": 4.3
+    },
+    {
+      "ts": "2026-02-23T11:32:45.774359+00:00",
+      "status": "running",
+      "progress": 0.92,
+      "message": "Decoding latents",
+      "server_cpu_percent": 83.0,
+      "server_rss_bytes": 980111360,
+      "system_cpu_percent": 4.0
+    },
+    {
+      "ts": "2026-02-23T11:32:46.794582+00:00",
+      "status": "completed",
+      "progress": 1.0,
+      "message": "Done",
+      "server_cpu_percent": 295.6,
+      "server_rss_bytes": 869601280,
+      "system_cpu_percent": 11.6
+    }
+  ],
+  "ended_at": "2026-02-23T11:33:05.123209+00:00"
+}

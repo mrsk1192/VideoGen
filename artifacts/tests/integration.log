@@ -1,0 +1,38 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.9, pytest-9.0.2, pluggy-1.6.0
+rootdir: C:\AI\VideoGen
+configfile: pytest.ini
+plugins: anyio-4.12.1, cov-7.0.0
+collected 19 items
+
+tests\integration\test_api.py ...................                        [100%]
+
+============================== warnings summary ===============================
+main.py:2840
+  C:\AI\VideoGen\main.py:2840: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+venv\Lib\site-packages\fastapi\applications.py:4573
+  C:\AI\VideoGen\venv\Lib\site-packages\fastapi\applications.py:4573: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)
+
+tests/integration/test_api.py::test_text2image_task_lifecycle_and_image_endpoint
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+tests/integration/test_api.py::test_text2image_task_lifecycle_and_image_endpoint
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+-- generated xml file: C:\AI\VideoGen\artifacts\tests\integration_junit.xml ---
+======================= 19 passed, 4 warnings in 18.91s =======================
+sys:1: DeprecationWarning: builtin type swigvarlink has no __module__ attribute

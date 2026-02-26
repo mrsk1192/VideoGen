@@ -1,0 +1,175 @@
+{
+  "started_at": "2026-02-23T06:05:02.491042+00:00",
+  "steps": [
+    {
+      "name": "Model Search (empty query / source switch)",
+      "status": "passed",
+      "started_at": "2026-02-23T06:05:11.312453+00:00",
+      "ended_at": "2026-02-23T06:05:18.284909+00:00",
+      "duration_sec": 6.972684300002584,
+      "error": "",
+      "details": {
+        "result_counts": {
+          "huggingface": 0,
+          "civitai": 30,
+          "all": 30
+        },
+        "thumbnail_count": 15
+      }
+    },
+    {
+      "name": "Settings persistence",
+      "status": "passed",
+      "started_at": "2026-02-23T06:05:18.284909+00:00",
+      "ended_at": "2026-02-23T06:05:20.840202+00:00",
+      "duration_sec": 2.555866700000479,
+      "error": "",
+      "details": {
+        "guidance_before": "9",
+        "guidance_after_reload": "8.7",
+        "persisted": true
+      }
+    },
+    {
+      "name": "Prepare local models",
+      "status": "passed",
+      "started_at": "2026-02-23T06:05:20.840202+00:00",
+      "ended_at": "2026-02-23T06:05:21.354196+00:00",
+      "duration_sec": 0.5134913000001688,
+      "error": "",
+      "details": {
+        "downloaded": [
+          "madebyollin/sdxl-vae-fp16-fix:model_index_added"
+        ],
+        "skipped": [
+          "image-to-video model skipped: ali-vilab/i2vgen-xl size=27.74GB > 10.0GB"
+        ]
+      }
+    },
+    {
+      "name": "Local models UI",
+      "status": "passed",
+      "started_at": "2026-02-23T06:05:21.374816+00:00",
+      "ended_at": "2026-02-23T06:05:22.833593+00:00",
+      "duration_sec": 1.4591087000007974,
+      "error": "",
+      "details": {
+        "rows": 6,
+        "thumbnail_rows": 0
+      }
+    },
+    {
+      "name": "Generate Text-to-Image (LoRA/VAE off)",
+      "status": "failed",
+      "started_at": "2026-02-23T06:05:22.833593+00:00",
+      "ended_at": "2026-02-23T06:05:23.072392+00:00",
+      "duration_sec": 0.23930229999677977,
+      "error": "Message: Cannot locate option with value: C:\\AI\\VideoGen\\models\\stabilityai--stable-diffusion-xl-base-1.0; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception\n\nTraceback (most recent call last):\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 355, in add_step\n    details = fn() or {}\n              ^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 403, in <lambda>\n    lambda: _step_generate_t2i(driver, wait, base_url, t2i_model, None, None, suffix=\"base\"),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 596, in _step_generate_t2i\n    _select_model_with_fallback(driver, \"t2iModelSelect\", str(model.get(\"path\") or \"\"), str(model.get(\"repo_hint\") or \"\"))\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 575, in _select_model_with_fallback\n    sel.select_by_value(opt.get_attribute(\"value\"))\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\support\\select.py\", line 85, in select_by_value\n    raise NoSuchElementException(f\"Cannot locate option with value: {value}\")\nselenium.common.exceptions.NoSuchElementException: Message: Cannot locate option with value: C:\\AI\\VideoGen\\models\\stabilityai--stable-diffusion-xl-base-1.0; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception\n\n",
+      "details": {}
+    },
+    {
+      "name": "Generate Text-to-Image (LoRA/VAE on)",
+      "status": "failed",
+      "started_at": "2026-02-23T06:05:23.073393+00:00",
+      "ended_at": "2026-02-23T06:05:23.272687+00:00",
+      "duration_sec": 0.19930229999590665,
+      "error": "Message: Cannot locate option with value: C:\\AI\\VideoGen\\models\\stabilityai--stable-diffusion-xl-base-1.0; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception\n\nTraceback (most recent call last):\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 355, in add_step\n    details = fn() or {}\n              ^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 407, in <lambda>\n    lambda: _step_generate_t2i(driver, wait, base_url, t2i_model, \"first\", \"first\", suffix=\"lora_vae\"),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 596, in _step_generate_t2i\n    _select_model_with_fallback(driver, \"t2iModelSelect\", str(model.get(\"path\") or \"\"), str(model.get(\"repo_hint\") or \"\"))\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 575, in _select_model_with_fallback\n    sel.select_by_value(opt.get_attribute(\"value\"))\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\support\\select.py\", line 85, in select_by_value\n    raise NoSuchElementException(f\"Cannot locate option with value: {value}\")\nselenium.common.exceptions.NoSuchElementException: Message: Cannot locate option with value: C:\\AI\\VideoGen\\models\\stabilityai--stable-diffusion-xl-base-1.0; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception\n\n",
+      "details": {}
+    },
+    {
+      "name": "Generate Image-to-Image (LoRA/VAE off)",
+      "status": "failed",
+      "started_at": "2026-02-23T06:05:23.273687+00:00",
+      "ended_at": "2026-02-23T06:05:23.506954+00:00",
+      "duration_sec": 0.23336200000630924,
+      "error": "Message: Cannot locate option with value: C:\\AI\\VideoGen\\models\\stabilityai--stable-diffusion-xl-base-1.0; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception\n\nTraceback (most recent call last):\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 355, in add_step\n    details = fn() or {}\n              ^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 411, in <lambda>\n    lambda: _step_generate_i2i(driver, wait, base_url, i2i_model, None, None, suffix=\"base\"),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 629, in _step_generate_i2i\n    _select_model_with_fallback(driver, \"i2iModelSelect\", str(model.get(\"path\") or \"\"), str(model.get(\"repo_hint\") or \"\"))\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 575, in _select_model_with_fallback\n    sel.select_by_value(opt.get_attribute(\"value\"))\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\support\\select.py\", line 85, in select_by_value\n    raise NoSuchElementException(f\"Cannot locate option with value: {value}\")\nselenium.common.exceptions.NoSuchElementException: Message: Cannot locate option with value: C:\\AI\\VideoGen\\models\\stabilityai--stable-diffusion-xl-base-1.0; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception\n\n",
+      "details": {}
+    },
+    {
+      "name": "Generate Image-to-Image (LoRA/VAE on)",
+      "status": "failed",
+      "started_at": "2026-02-23T06:05:23.507953+00:00",
+      "ended_at": "2026-02-23T06:05:23.725967+00:00",
+      "duration_sec": 0.2183863000027486,
+      "error": "Message: Cannot locate option with value: C:\\AI\\VideoGen\\models\\stabilityai--stable-diffusion-xl-base-1.0; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception\n\nTraceback (most recent call last):\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 355, in add_step\n    details = fn() or {}\n              ^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 415, in <lambda>\n    lambda: _step_generate_i2i(driver, wait, base_url, i2i_model, \"first\", \"first\", suffix=\"lora_vae\"),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 629, in _step_generate_i2i\n    _select_model_with_fallback(driver, \"i2iModelSelect\", str(model.get(\"path\") or \"\"), str(model.get(\"repo_hint\") or \"\"))\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 575, in _select_model_with_fallback\n    sel.select_by_value(opt.get_attribute(\"value\"))\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\support\\select.py\", line 85, in select_by_value\n    raise NoSuchElementException(f\"Cannot locate option with value: {value}\")\nselenium.common.exceptions.NoSuchElementException: Message: Cannot locate option with value: C:\\AI\\VideoGen\\models\\stabilityai--stable-diffusion-xl-base-1.0; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception\n\n",
+      "details": {}
+    },
+    {
+      "name": "Generate Text-to-Video",
+      "status": "failed",
+      "started_at": "2026-02-23T06:05:23.725967+00:00",
+      "ended_at": "2026-02-23T06:05:23.949374+00:00",
+      "duration_sec": 0.22274409999954514,
+      "error": "Message: Cannot locate option with value: C:\\AI\\VideoGen\\models\\ali-vilab--text-to-video-ms-1.7b; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception\n\nTraceback (most recent call last):\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 355, in add_step\n    details = fn() or {}\n              ^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 417, in <lambda>\n    add_step(\"Generate Text-to-Video\", lambda: _step_generate_t2v(driver, wait, base_url, t2v_model))\n                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 660, in _step_generate_t2v\n    _select_model_with_fallback(driver, \"t2vModelSelect\", str(model.get(\"path\") or \"\"), str(model.get(\"repo_hint\") or \"\"))\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 575, in _select_model_with_fallback\n    sel.select_by_value(opt.get_attribute(\"value\"))\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\support\\select.py\", line 85, in select_by_value\n    raise NoSuchElementException(f\"Cannot locate option with value: {value}\")\nselenium.common.exceptions.NoSuchElementException: Message: Cannot locate option with value: C:\\AI\\VideoGen\\models\\ali-vilab--text-to-video-ms-1.7b; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception\n\n",
+      "details": {}
+    },
+    {
+      "name": "Generate Image-to-Video",
+      "status": "failed",
+      "started_at": "2026-02-23T06:05:23.949374+00:00",
+      "ended_at": "2026-02-23T06:05:23.949374+00:00",
+      "duration_sec": 4.900000931229442e-06,
+      "error": "No local image-to-video model (skipped)\nTraceback (most recent call last):\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 355, in add_step\n    details = fn() or {}\n              ^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 418, in <lambda>\n    add_step(\"Generate Image-to-Video\", lambda: _step_generate_i2v(driver, wait, base_url, i2v_model))\n                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_full_validation.py\", line 678, in _step_generate_i2v\n    raise RuntimeError(\"No local image-to-video model (skipped)\")\nRuntimeError: No local image-to-video model (skipped)\n",
+      "details": {}
+    },
+    {
+      "name": "Outputs UI view/delete",
+      "status": "passed",
+      "started_at": "2026-02-23T06:05:23.950373+00:00",
+      "ended_at": "2026-02-23T06:05:26.827578+00:00",
+      "duration_sec": 2.878310000000056,
+      "error": "",
+      "details": {
+        "count_before": 3,
+        "count_after": 2,
+        "deleted_candidate": "text2video_f7de3b53-d5f4-4cd9-a819-febaac4e051c.mp4 サイズ=129 KB | 更新日時=2026/2/23 14:23:36 | タグ=動画"
+      }
+    },
+    {
+      "name": "GPU usage evidence",
+      "status": "passed",
+      "started_at": "2026-02-23T06:05:26.828573+00:00",
+      "ended_at": "2026-02-23T06:05:26.891444+00:00",
+      "duration_sec": 0.06304439999803435,
+      "error": "",
+      "details": {
+        "device": "cuda",
+        "cuda_available": true,
+        "rocm_available": true,
+        "has_pipeline_load_log": false,
+        "has_cuda_log": false
+      }
+    }
+  ],
+  "notes": [],
+  "prompt": "A whale is flying in the sky.",
+  "negative_prompt": "low quality, blurry, jpeg artifacts, deformed, watermark, text, bad anatomy",
+  "runtime_info": {
+    "diffusers_ready": true,
+    "cuda_available": true,
+    "rocm_available": true,
+    "device": "cuda",
+    "torch_version": "2.9.1+rocmsdk20260116",
+    "import_error": null
+  },
+  "driver_mode": "edge-headful",
+  "paths": {
+    "models_dir": "C:\\AI\\VideoGen\\models",
+    "outputs_dir": "C:\\AI\\VideoGen\\outputs"
+  },
+  "model_prepare": {
+    "downloaded": [
+      "madebyollin/sdxl-vae-fp16-fix:model_index_added"
+    ],
+    "skipped": [
+      "image-to-video model skipped: ali-vilab/i2vgen-xl size=27.74GB > 10.0GB"
+    ]
+  },
+  "selected_models": {
+    "text_to_image": "C:\\AI\\VideoGen\\models\\stabilityai--stable-diffusion-xl-base-1.0",
+    "image_to_image": "C:\\AI\\VideoGen\\models\\stabilityai--stable-diffusion-xl-base-1.0",
+    "text_to_video": "C:\\AI\\VideoGen\\models\\ali-vilab--text-to-video-ms-1.7b",
+    "image_to_video": null
+  },
+  "ended_at": "2026-02-23T06:05:29.551909+00:00"
+}

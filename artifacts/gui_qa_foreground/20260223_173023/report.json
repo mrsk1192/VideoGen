@@ -1,0 +1,167 @@
+{
+  "started_at": "2026-02-23T08:30:23.583342+00:00",
+  "input_image": "C:\\AI\\VideoGen\\TestAsset\\sticker8377632396286038267.png",
+  "requirements": {
+    "gui_only": true,
+    "selenium_foreground": true,
+    "start_from_batch": true,
+    "keep_models": true,
+    "keep_outputs": true
+  },
+  "steps": [
+    {
+      "name": "01_blank_model_search",
+      "status": "passed",
+      "started_at": "2026-02-23T08:30:35.121566+00:00",
+      "ended_at": "2026-02-23T08:30:38.039942+00:00",
+      "duration_sec": 2.918765100002929,
+      "details": {
+        "rows": 0,
+        "thumbnails": 0
+      },
+      "error": ""
+    },
+    {
+      "name": "02_ensure_models_via_gui_download",
+      "status": "passed",
+      "started_at": "2026-02-23T08:30:38.039942+00:00",
+      "ended_at": "2026-02-23T08:30:54.944830+00:00",
+      "duration_sec": 16.904884800002037,
+      "details": {
+        "actions": [
+          {
+            "repo": "hf-internal-testing/tiny-stable-diffusion-pipe",
+            "status": "already_downloaded_or_not_listed"
+          },
+          {
+            "repo": "latent-consistency/lcm-lora-sdxl",
+            "status": "already_downloaded_or_not_listed"
+          },
+          {
+            "repo": "madebyollin/sdxl-vae-fp16-fix",
+            "status": "already_downloaded_or_not_listed"
+          },
+          {
+            "repo": "ali-vilab/text-to-video-ms-1.7b",
+            "status": "already_downloaded_or_not_listed"
+          },
+          {
+            "repo": "ali-vilab/i2vgen-xl",
+            "status": "already_downloaded_or_not_listed"
+          }
+        ]
+      },
+      "error": ""
+    },
+    {
+      "name": "03_apply_local_models",
+      "status": "passed",
+      "started_at": "2026-02-23T08:30:54.944830+00:00",
+      "ended_at": "2026-02-23T08:30:59.303762+00:00",
+      "duration_sec": 4.359156300000905,
+      "details": {
+        "applied": {
+          "text-to-image": true,
+          "image-to-image": true,
+          "text-to-video": true,
+          "image-to-video": true
+        }
+      },
+      "error": ""
+    },
+    {
+      "name": "04_settings_persistence",
+      "status": "passed",
+      "started_at": "2026-02-23T08:30:59.303762+00:00",
+      "ended_at": "2026-02-23T08:31:01.830244+00:00",
+      "duration_sec": 2.5270426999995834,
+      "details": {
+        "before": "9",
+        "after_reload": "8.7",
+        "persisted": true
+      },
+      "error": ""
+    },
+    {
+      "name": "05_generate_t2i_lora_vae_off",
+      "status": "failed",
+      "started_at": "2026-02-23T08:31:01.830244+00:00",
+      "ended_at": "2026-02-23T08:35:18.403003+00:00",
+      "duration_sec": 256.5832531000051,
+      "details": {},
+      "error": "Message: invalid session id: session deleted as the browser has closed the connection\nfrom disconnected: not connected to DevTools\n  (Session info: MicrosoftEdge=145.0.3800.70); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception\nStacktrace:\nSymbols not available. Dumping unresolved backtrace:\n\t0x7ff773956815\n\t0x7ff773956874\n\t0x7ff773c9ad8a\n\t0x7ff77369c5a2\n\t0x7ff7736b7e32\n\t0x7ff773718f3b\n\t0x7ff77372eabf\n\t0x7ff7736e9a1c\n\t0x7ff7736e8c76\n\t0x7ff7736e9843\n\t0x7ff7737b0474\n\t0x7ff7737ac913\n\t0x7ff7737bcfd3\n\t0x7ff773970ef8\n\t0x7ff7739797d6\n\t0x7ff77395de54\n\t0x7ff77395df99\n\t0x7ff77394bdd2\n\t0x7ffc3244e8d7\n\t0x7ffc341ac40c\n\nTraceback (most recent call last):\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 358, in step\n    details = fn() or {}\n              ^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 627, in <lambda>\n    step(\"05_generate_t2i_lora_vae_off\", lambda: run_t2i(False))\n                                                 ^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 499, in run_t2i\n    status = wait_task_done_ui(driver, timeout_sec=21600)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 245, in wait_task_done_ui\n    text = (node.text or \"\").strip()\n            ^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\webelement.py\", line 105, in text\n    return self._execute(Command.GET_ELEMENT_TEXT)[\"value\"]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\webelement.py\", line 508, in _execute\n    return self._parent.execute(command, params)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\webdriver.py\", line 446, in execute\n    self.error_handler.check_response(response)\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\errorhandler.py\", line 232, in check_response\n    raise exception_class(message, screen, stacktrace)\nselenium.common.exceptions.InvalidSessionIdException: Message: invalid session id: session deleted as the browser has closed the connection\nfrom disconnected: not connected to DevTools\n  (Session info: MicrosoftEdge=145.0.3800.70); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception\nStacktrace:\nSymbols not available. Dumping unresolved backtrace:\n\t0x7ff773956815\n\t0x7ff773956874\n\t0x7ff773c9ad8a\n\t0x7ff77369c5a2\n\t0x7ff7736b7e32\n\t0x7ff773718f3b\n\t0x7ff77372eabf\n\t0x7ff7736e9a1c\n\t0x7ff7736e8c76\n\t0x7ff7736e9843\n\t0x7ff7737b0474\n\t0x7ff7737ac913\n\t0x7ff7737bcfd3\n\t0x7ff773970ef8\n\t0x7ff7739797d6\n\t0x7ff77395de54\n\t0x7ff77395df99\n\t0x7ff77394bdd2\n\t0x7ffc3244e8d7\n\t0x7ffc341ac40c\n\n"
+    },
+    {
+      "name": "06_generate_t2i_lora_vae_on",
+      "status": "failed",
+      "started_at": "2026-02-23T08:35:18.405001+00:00",
+      "ended_at": "2026-02-23T08:35:18.450001+00:00",
+      "duration_sec": 0.045540899998741224,
+      "details": {},
+      "error": "Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception\nStacktrace:\nSymbols not available. Dumping unresolved backtrace:\n\t0x7ff773956815\n\t0x7ff773956874\n\t0x7ff7736aacee\n\t0x7ff7736e8435\n\t0x7ff773714122\n\t0x7ff7736a2807\n\t0x7ff77371066e\n\t0x7ff77370fefc\n\t0x7ff773682e95\n\t0x7ff7737b0474\n\t0x7ff7737ac913\n\t0x7ff7737bcfd3\n\t0x7ff773970ef8\n\t0x7ff7739797d6\n\t0x7ff77368182a\n\t0x7ff773ac3de8\n\t0x7ffc3244e8d7\n\t0x7ffc341ac40c\n\nTraceback (most recent call last):\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 358, in step\n    details = fn() or {}\n              ^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 628, in <lambda>\n    step(\"06_generate_t2i_lora_vae_on\", lambda: run_t2i(True))\n                                                ^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 475, in run_t2i\n    click_tab(wait, \"text-image\")\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 180, in click_tab\n    wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, f\"button.tab[data-tab='{tab}']\"))).click()\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\support\\wait.py\", line 112, in until\n    value = method(self._driver)\n            ^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\support\\expected_conditions.py\", line 514, in _predicate\n    target = driver.find_element(*target)  # grab element at locator\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\webdriver.py\", line 816, in find_element\n    return self.execute(Command.FIND_ELEMENT, {\"using\": by, \"value\": value})[\"value\"]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\webdriver.py\", line 446, in execute\n    self.error_handler.check_response(response)\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\errorhandler.py\", line 232, in check_response\n    raise exception_class(message, screen, stacktrace)\nselenium.common.exceptions.InvalidSessionIdException: Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception\nStacktrace:\nSymbols not available. Dumping unresolved backtrace:\n\t0x7ff773956815\n\t0x7ff773956874\n\t0x7ff7736aacee\n\t0x7ff7736e8435\n\t0x7ff773714122\n\t0x7ff7736a2807\n\t0x7ff77371066e\n\t0x7ff77370fefc\n\t0x7ff773682e95\n\t0x7ff7737b0474\n\t0x7ff7737ac913\n\t0x7ff7737bcfd3\n\t0x7ff773970ef8\n\t0x7ff7739797d6\n\t0x7ff77368182a\n\t0x7ff773ac3de8\n\t0x7ffc3244e8d7\n\t0x7ffc341ac40c\n\n"
+    },
+    {
+      "name": "07_generate_i2i_lora_vae_off",
+      "status": "failed",
+      "started_at": "2026-02-23T08:35:18.469000+00:00",
+      "ended_at": "2026-02-23T08:35:18.470001+00:00",
+      "duration_sec": 0.001017499998852145,
+      "details": {},
+      "error": "Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception\nStacktrace:\nSymbols not available. Dumping unresolved backtrace:\n\t0x7ff773956815\n\t0x7ff773956874\n\t0x7ff7736aacee\n\t0x7ff7736e8435\n\t0x7ff773714122\n\t0x7ff7736a2807\n\t0x7ff77371066e\n\t0x7ff77370fefc\n\t0x7ff773682e95\n\t0x7ff7737b0474\n\t0x7ff7737ac913\n\t0x7ff7737bcfd3\n\t0x7ff773970ef8\n\t0x7ff7739797d6\n\t0x7ff77368182a\n\t0x7ff773ac3de8\n\t0x7ffc3244e8d7\n\t0x7ffc341ac40c\n\nTraceback (most recent call last):\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 358, in step\n    details = fn() or {}\n              ^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 629, in <lambda>\n    step(\"07_generate_i2i_lora_vae_off\", lambda: run_i2i(False))\n                                                 ^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 512, in run_i2i\n    click_tab(wait, \"image-image\")\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 180, in click_tab\n    wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, f\"button.tab[data-tab='{tab}']\"))).click()\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\support\\wait.py\", line 112, in until\n    value = method(self._driver)\n            ^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\support\\expected_conditions.py\", line 514, in _predicate\n    target = driver.find_element(*target)  # grab element at locator\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\webdriver.py\", line 816, in find_element\n    return self.execute(Command.FIND_ELEMENT, {\"using\": by, \"value\": value})[\"value\"]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\webdriver.py\", line 446, in execute\n    self.error_handler.check_response(response)\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\errorhandler.py\", line 232, in check_response\n    raise exception_class(message, screen, stacktrace)\nselenium.common.exceptions.InvalidSessionIdException: Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception\nStacktrace:\nSymbols not available. Dumping unresolved backtrace:\n\t0x7ff773956815\n\t0x7ff773956874\n\t0x7ff7736aacee\n\t0x7ff7736e8435\n\t0x7ff773714122\n\t0x7ff7736a2807\n\t0x7ff77371066e\n\t0x7ff77370fefc\n\t0x7ff773682e95\n\t0x7ff7737b0474\n\t0x7ff7737ac913\n\t0x7ff7737bcfd3\n\t0x7ff773970ef8\n\t0x7ff7739797d6\n\t0x7ff77368182a\n\t0x7ff773ac3de8\n\t0x7ffc3244e8d7\n\t0x7ffc341ac40c\n\n"
+    },
+    {
+      "name": "08_generate_i2i_lora_vae_on",
+      "status": "failed",
+      "started_at": "2026-02-23T08:35:18.470001+00:00",
+      "ended_at": "2026-02-23T08:35:18.471000+00:00",
+      "duration_sec": 0.00045369999861577526,
+      "details": {},
+      "error": "Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception\nStacktrace:\nSymbols not available. Dumping unresolved backtrace:\n\t0x7ff773956815\n\t0x7ff773956874\n\t0x7ff7736aacee\n\t0x7ff7736e8435\n\t0x7ff773714122\n\t0x7ff7736a2807\n\t0x7ff77371066e\n\t0x7ff77370fefc\n\t0x7ff773682e95\n\t0x7ff7737b0474\n\t0x7ff7737ac913\n\t0x7ff7737bcfd3\n\t0x7ff773970ef8\n\t0x7ff7739797d6\n\t0x7ff77368182a\n\t0x7ff773ac3de8\n\t0x7ffc3244e8d7\n\t0x7ffc341ac40c\n\nTraceback (most recent call last):\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 358, in step\n    details = fn() or {}\n              ^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 630, in <lambda>\n    step(\"08_generate_i2i_lora_vae_on\", lambda: run_i2i(True))\n                                                ^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 512, in run_i2i\n    click_tab(wait, \"image-image\")\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 180, in click_tab\n    wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, f\"button.tab[data-tab='{tab}']\"))).click()\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\support\\wait.py\", line 112, in until\n    value = method(self._driver)\n            ^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\support\\expected_conditions.py\", line 514, in _predicate\n    target = driver.find_element(*target)  # grab element at locator\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\webdriver.py\", line 816, in find_element\n    return self.execute(Command.FIND_ELEMENT, {\"using\": by, \"value\": value})[\"value\"]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\webdriver.py\", line 446, in execute\n    self.error_handler.check_response(response)\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\errorhandler.py\", line 232, in check_response\n    raise exception_class(message, screen, stacktrace)\nselenium.common.exceptions.InvalidSessionIdException: Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception\nStacktrace:\nSymbols not available. Dumping unresolved backtrace:\n\t0x7ff773956815\n\t0x7ff773956874\n\t0x7ff7736aacee\n\t0x7ff7736e8435\n\t0x7ff773714122\n\t0x7ff7736a2807\n\t0x7ff77371066e\n\t0x7ff77370fefc\n\t0x7ff773682e95\n\t0x7ff7737b0474\n\t0x7ff7737ac913\n\t0x7ff7737bcfd3\n\t0x7ff773970ef8\n\t0x7ff7739797d6\n\t0x7ff77368182a\n\t0x7ff773ac3de8\n\t0x7ffc3244e8d7\n\t0x7ffc341ac40c\n\n"
+    },
+    {
+      "name": "09_generate_t2v",
+      "status": "failed",
+      "started_at": "2026-02-23T08:35:18.471000+00:00",
+      "ended_at": "2026-02-23T08:35:18.472000+00:00",
+      "duration_sec": 0.00041790000250330195,
+      "details": {},
+      "error": "Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception\nStacktrace:\nSymbols not available. Dumping unresolved backtrace:\n\t0x7ff773956815\n\t0x7ff773956874\n\t0x7ff7736aacee\n\t0x7ff7736e8435\n\t0x7ff773714122\n\t0x7ff7736a2807\n\t0x7ff77371066e\n\t0x7ff77370fefc\n\t0x7ff773682e95\n\t0x7ff7737b0474\n\t0x7ff7737ac913\n\t0x7ff7737bcfd3\n\t0x7ff773970ef8\n\t0x7ff7739797d6\n\t0x7ff77368182a\n\t0x7ff773ac3de8\n\t0x7ffc3244e8d7\n\t0x7ffc341ac40c\n\nTraceback (most recent call last):\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 358, in step\n    details = fn() or {}\n              ^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 551, in run_t2v\n    click_tab(wait, \"text\")\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 180, in click_tab\n    wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, f\"button.tab[data-tab='{tab}']\"))).click()\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\support\\wait.py\", line 112, in until\n    value = method(self._driver)\n            ^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\support\\expected_conditions.py\", line 514, in _predicate\n    target = driver.find_element(*target)  # grab element at locator\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\webdriver.py\", line 816, in find_element\n    return self.execute(Command.FIND_ELEMENT, {\"using\": by, \"value\": value})[\"value\"]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\webdriver.py\", line 446, in execute\n    self.error_handler.check_response(response)\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\errorhandler.py\", line 232, in check_response\n    raise exception_class(message, screen, stacktrace)\nselenium.common.exceptions.InvalidSessionIdException: Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception\nStacktrace:\nSymbols not available. Dumping unresolved backtrace:\n\t0x7ff773956815\n\t0x7ff773956874\n\t0x7ff7736aacee\n\t0x7ff7736e8435\n\t0x7ff773714122\n\t0x7ff7736a2807\n\t0x7ff77371066e\n\t0x7ff77370fefc\n\t0x7ff773682e95\n\t0x7ff7737b0474\n\t0x7ff7737ac913\n\t0x7ff7737bcfd3\n\t0x7ff773970ef8\n\t0x7ff7739797d6\n\t0x7ff77368182a\n\t0x7ff773ac3de8\n\t0x7ffc3244e8d7\n\t0x7ffc341ac40c\n\n"
+    },
+    {
+      "name": "10_generate_i2v",
+      "status": "failed",
+      "started_at": "2026-02-23T08:35:18.472000+00:00",
+      "ended_at": "2026-02-23T08:35:18.472000+00:00",
+      "duration_sec": 0.0003788999965763651,
+      "details": {},
+      "error": "Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception\nStacktrace:\nSymbols not available. Dumping unresolved backtrace:\n\t0x7ff773956815\n\t0x7ff773956874\n\t0x7ff7736aacee\n\t0x7ff7736e8435\n\t0x7ff773714122\n\t0x7ff7736a2807\n\t0x7ff77371066e\n\t0x7ff77370fefc\n\t0x7ff773682e95\n\t0x7ff7737b0474\n\t0x7ff7737ac913\n\t0x7ff7737bcfd3\n\t0x7ff773970ef8\n\t0x7ff7739797d6\n\t0x7ff77368182a\n\t0x7ff773ac3de8\n\t0x7ffc3244e8d7\n\t0x7ffc341ac40c\n\nTraceback (most recent call last):\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 358, in step\n    details = fn() or {}\n              ^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 577, in run_i2v\n    click_tab(wait, \"image\")\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 180, in click_tab\n    wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, f\"button.tab[data-tab='{tab}']\"))).click()\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\support\\wait.py\", line 112, in until\n    value = method(self._driver)\n            ^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\support\\expected_conditions.py\", line 514, in _predicate\n    target = driver.find_element(*target)  # grab element at locator\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\webdriver.py\", line 816, in find_element\n    return self.execute(Command.FIND_ELEMENT, {\"using\": by, \"value\": value})[\"value\"]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\webdriver.py\", line 446, in execute\n    self.error_handler.check_response(response)\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\errorhandler.py\", line 232, in check_response\n    raise exception_class(message, screen, stacktrace)\nselenium.common.exceptions.InvalidSessionIdException: Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception\nStacktrace:\nSymbols not available. Dumping unresolved backtrace:\n\t0x7ff773956815\n\t0x7ff773956874\n\t0x7ff7736aacee\n\t0x7ff7736e8435\n\t0x7ff773714122\n\t0x7ff7736a2807\n\t0x7ff77371066e\n\t0x7ff77370fefc\n\t0x7ff773682e95\n\t0x7ff7737b0474\n\t0x7ff7737ac913\n\t0x7ff7737bcfd3\n\t0x7ff773970ef8\n\t0x7ff7739797d6\n\t0x7ff77368182a\n\t0x7ff773ac3de8\n\t0x7ffc3244e8d7\n\t0x7ffc341ac40c\n\n"
+    },
+    {
+      "name": "11_outputs_view_only",
+      "status": "failed",
+      "started_at": "2026-02-23T08:35:18.472000+00:00",
+      "ended_at": "2026-02-23T08:35:18.473001+00:00",
+      "duration_sec": 0.00037620000512106344,
+      "details": {},
+      "error": "Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception\nStacktrace:\nSymbols not available. Dumping unresolved backtrace:\n\t0x7ff773956815\n\t0x7ff773956874\n\t0x7ff7736aacee\n\t0x7ff7736e8435\n\t0x7ff773714122\n\t0x7ff7736a2807\n\t0x7ff77371066e\n\t0x7ff77370fefc\n\t0x7ff773682e95\n\t0x7ff7737b0474\n\t0x7ff7737ac913\n\t0x7ff7737bcfd3\n\t0x7ff773970ef8\n\t0x7ff7739797d6\n\t0x7ff77368182a\n\t0x7ff773ac3de8\n\t0x7ffc3244e8d7\n\t0x7ffc341ac40c\n\nTraceback (most recent call last):\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 358, in step\n    details = fn() or {}\n              ^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 606, in step_outputs_view_only\n    click_tab(wait, \"outputs\")\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 180, in click_tab\n    wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, f\"button.tab[data-tab='{tab}']\"))).click()\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\support\\wait.py\", line 112, in until\n    value = method(self._driver)\n            ^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\support\\expected_conditions.py\", line 514, in _predicate\n    target = driver.find_element(*target)  # grab element at locator\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\webdriver.py\", line 816, in find_element\n    return self.execute(Command.FIND_ELEMENT, {\"using\": by, \"value\": value})[\"value\"]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\webdriver.py\", line 446, in execute\n    self.error_handler.check_response(response)\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\errorhandler.py\", line 232, in check_response\n    raise exception_class(message, screen, stacktrace)\nselenium.common.exceptions.InvalidSessionIdException: Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception\nStacktrace:\nSymbols not available. Dumping unresolved backtrace:\n\t0x7ff773956815\n\t0x7ff773956874\n\t0x7ff7736aacee\n\t0x7ff7736e8435\n\t0x7ff773714122\n\t0x7ff7736a2807\n\t0x7ff77371066e\n\t0x7ff77370fefc\n\t0x7ff773682e95\n\t0x7ff7737b0474\n\t0x7ff7737ac913\n\t0x7ff7737bcfd3\n\t0x7ff773970ef8\n\t0x7ff7739797d6\n\t0x7ff77368182a\n\t0x7ff773ac3de8\n\t0x7ffc3244e8d7\n\t0x7ffc341ac40c\n\n"
+    },
+    {
+      "name": "12_gpu_evidence",
+      "status": "failed",
+      "started_at": "2026-02-23T08:35:18.473001+00:00",
+      "ended_at": "2026-02-23T08:35:18.473001+00:00",
+      "duration_sec": 0.0003781000050366856,
+      "details": {},
+      "error": "Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception\nStacktrace:\nSymbols not available. Dumping unresolved backtrace:\n\t0x7ff773956815\n\t0x7ff773956874\n\t0x7ff7736aacee\n\t0x7ff7736e8435\n\t0x7ff773714122\n\t0x7ff7736a2807\n\t0x7ff77371066e\n\t0x7ff77370fefc\n\t0x7ff773682e95\n\t0x7ff7737b0474\n\t0x7ff7737ac913\n\t0x7ff7737bcfd3\n\t0x7ff773970ef8\n\t0x7ff7739797d6\n\t0x7ff77368182a\n\t0x7ff773ac3de8\n\t0x7ffc3244e8d7\n\t0x7ffc341ac40c\n\nTraceback (most recent call last):\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 358, in step\n    details = fn() or {}\n              ^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_gui_qa_foreground.py\", line 614, in step_gpu_evidence\n    runtime = driver.find_element(By.ID, \"runtimeInfo\").text\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\webdriver.py\", line 816, in find_element\n    return self.execute(Command.FIND_ELEMENT, {\"using\": by, \"value\": value})[\"value\"]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\webdriver.py\", line 446, in execute\n    self.error_handler.check_response(response)\n  File \"C:\\AI\\VideoGen\\venv\\Lib\\site-packages\\selenium\\webdriver\\remote\\errorhandler.py\", line 232, in check_response\n    raise exception_class(message, screen, stacktrace)\nselenium.common.exceptions.InvalidSessionIdException: Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception\nStacktrace:\nSymbols not available. Dumping unresolved backtrace:\n\t0x7ff773956815\n\t0x7ff773956874\n\t0x7ff7736aacee\n\t0x7ff7736e8435\n\t0x7ff773714122\n\t0x7ff7736a2807\n\t0x7ff77371066e\n\t0x7ff77370fefc\n\t0x7ff773682e95\n\t0x7ff7737b0474\n\t0x7ff7737ac913\n\t0x7ff7737bcfd3\n\t0x7ff773970ef8\n\t0x7ff7739797d6\n\t0x7ff77368182a\n\t0x7ff773ac3de8\n\t0x7ffc3244e8d7\n\t0x7ffc341ac40c\n\n"
+    }
+  ],
+  "base_url": "http://127.0.0.1:64096",
+  "start_bat_port": 64096,
+  "driver_mode": "edge-headful",
+  "paths": {
+    "models_dir": "C:\\AI\\VideoGen\\models",
+    "outputs_dir": "C:\\AI\\VideoGen\\outputs"
+  },
+  "runtime_info_initial": "device=cuda | cuda=true | rocm=true | diffusers=true | torch=2.9.1+rocmsdk20260116",
+  "ended_at": "2026-02-23T08:35:40.875345+00:00"
+}

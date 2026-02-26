@@ -1,0 +1,242 @@
+{
+  "started_at": "2026-02-23T06:36:50.095704+00:00",
+  "steps": [
+    {
+      "name": "Model Search (blank query)",
+      "status": "passed",
+      "started_at": "2026-02-23T06:36:55.589952+00:00",
+      "ended_at": "2026-02-23T06:36:58.039380+00:00",
+      "duration_sec": 2.449434200003452,
+      "details": {
+        "rows": 0,
+        "thumbs": 0
+      },
+      "error": ""
+    },
+    {
+      "name": "Model Download via UI",
+      "status": "passed",
+      "started_at": "2026-02-23T06:36:58.039380+00:00",
+      "ended_at": "2026-02-23T06:37:02.600309+00:00",
+      "duration_sec": 4.561728300002869,
+      "details": {
+        "downloads": [
+          {
+            "repo": "latent-consistency/lcm-lora-sdxl",
+            "status": "already_downloaded_or_not_listed"
+          },
+          {
+            "repo": "madebyollin/sdxl-vae-fp16-fix",
+            "status": "already_downloaded_or_not_listed"
+          }
+        ]
+      },
+      "error": ""
+    },
+    {
+      "name": "Settings Persistence via UI",
+      "status": "passed",
+      "started_at": "2026-02-23T06:37:02.600309+00:00",
+      "ended_at": "2026-02-23T06:37:05.135654+00:00",
+      "duration_sec": 2.536094700000831,
+      "details": {
+        "persisted": true,
+        "guidance_before": "9",
+        "guidance_after_reload": "8.7",
+        "runtime_info": "device=cuda | cuda=true | rocm=true | diffusers=true | torch=2.9.1+rocmsdk20260116"
+      },
+      "error": ""
+    },
+    {
+      "name": "Apply Local Models via UI",
+      "status": "passed",
+      "started_at": "2026-02-23T06:37:05.135654+00:00",
+      "ended_at": "2026-02-23T06:37:08.491134+00:00",
+      "duration_sec": 3.3665657000019564,
+      "details": {
+        "rows": 6,
+        "applied": {
+          "text-to-image": true,
+          "image-to-image": true,
+          "text-to-video": true,
+          "image-to-video": false
+        }
+      },
+      "error": ""
+    },
+    {
+      "name": "Generate T2I (LoRA/VAE OFF)",
+      "status": "passed",
+      "started_at": "2026-02-23T06:37:08.491134+00:00",
+      "ended_at": "2026-02-23T06:37:24.123155+00:00",
+      "duration_sec": 15.631410699999833,
+      "details": {
+        "task_id": "106a944e-f702-4e0a-abea-a92547c64f9a",
+        "status_text": "task=106a944e-f702-4e0a-abea-a92547c64f9a | type=テキスト画像 | status=完了 | 100% | 完了",
+        "image_file": "text2image_106a944e-f702-4e0a-abea-a92547c64f9a.png",
+        "quality": {
+          "width": 512,
+          "height": 512,
+          "mean_rgb": [
+            123.752,
+            132.74,
+            126.868
+          ],
+          "stddev_rgb": [
+            101.536,
+            92.208,
+            91.732
+          ],
+          "edge_mean": 39.983
+        }
+      },
+      "error": ""
+    },
+    {
+      "name": "Generate T2I (LoRA/VAE ON)",
+      "status": "passed",
+      "started_at": "2026-02-23T06:37:24.123155+00:00",
+      "ended_at": "2026-02-23T06:37:53.870385+00:00",
+      "duration_sec": 29.741672799995285,
+      "details": {
+        "task_id": "d9c3cae4-fb5b-4758-89ad-989a1146d4fd",
+        "status_text": "task=d9c3cae4-fb5b-4758-89ad-989a1146d4fd | type=テキスト画像 | status=完了 | 100% | 完了",
+        "image_file": "text2image_d9c3cae4-fb5b-4758-89ad-989a1146d4fd.png",
+        "quality": {
+          "width": 512,
+          "height": 512,
+          "mean_rgb": [
+            134.764,
+            132.833,
+            135.468
+          ],
+          "stddev_rgb": [
+            90.591,
+            90.854,
+            89.101
+          ],
+          "edge_mean": 124.461
+        }
+      },
+      "error": ""
+    },
+    {
+      "name": "Generate I2I (LoRA/VAE OFF)",
+      "status": "passed",
+      "started_at": "2026-02-23T06:37:53.870385+00:00",
+      "ended_at": "2026-02-23T06:38:03.971453+00:00",
+      "duration_sec": 10.101523899997119,
+      "details": {
+        "task_id": "1e87009b-bb77-4b34-97b8-ba591308cb14",
+        "status_text": "task=1e87009b-bb77-4b34-97b8-ba591308cb14 | type=画像画像 | status=完了 | 100% | 完了",
+        "image_file": "image2image_1e87009b-bb77-4b34-97b8-ba591308cb14.png",
+        "quality": {
+          "width": 512,
+          "height": 512,
+          "mean_rgb": [
+            129.85,
+            127.928,
+            126.869
+          ],
+          "stddev_rgb": [
+            91.814,
+            92.086,
+            91.732
+          ],
+          "edge_mean": 40.084
+        }
+      },
+      "error": ""
+    },
+    {
+      "name": "Generate I2I (LoRA/VAE ON)",
+      "status": "passed",
+      "started_at": "2026-02-23T06:38:03.971453+00:00",
+      "ended_at": "2026-02-23T06:38:07.943112+00:00",
+      "duration_sec": 3.9725918999974965,
+      "details": {
+        "task_id": "664fd210-9921-4201-aa34-a59b3a1ef130",
+        "status_text": "task=664fd210-9921-4201-aa34-a59b3a1ef130 | type=画像画像 | status=完了 | 100% | 完了",
+        "image_file": "image2image_664fd210-9921-4201-aa34-a59b3a1ef130.png",
+        "quality": {
+          "width": 512,
+          "height": 512,
+          "mean_rgb": [
+            134.764,
+            132.833,
+            135.468
+          ],
+          "stddev_rgb": [
+            90.591,
+            90.854,
+            89.101
+          ],
+          "edge_mean": 124.461
+        }
+      },
+      "error": ""
+    },
+    {
+      "name": "Generate T2V",
+      "status": "passed",
+      "started_at": "2026-02-23T06:38:07.943112+00:00",
+      "ended_at": "2026-02-23T06:38:45.092011+00:00",
+      "duration_sec": 37.151410600003146,
+      "details": {
+        "task_id": "f91ebecf-bbdb-46f4-9988-1b39a63d1a32",
+        "status_text": "task=f91ebecf-bbdb-46f4-9988-1b39a63d1a32 | type=テキスト動画 | status=完了 | 100% | 完了",
+        "video_file": "text2video_f91ebecf-bbdb-46f4-9988-1b39a63d1a32.mp4",
+        "quality": {
+          "size_mb": 0.086,
+          "first_frame_shape": [
+            256,
+            256,
+            3
+          ],
+          "first_frame_std": 75.936
+        }
+      },
+      "error": ""
+    },
+    {
+      "name": "Generate I2V",
+      "status": "failed",
+      "started_at": "2026-02-23T06:38:45.092011+00:00",
+      "ended_at": "2026-02-23T06:38:45.148818+00:00",
+      "duration_sec": 0.057301599998027086,
+      "details": {},
+      "error": "No local image-to-video model available on UI\nTraceback (most recent call last):\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_screen_only_validation.py\", line 278, in step\n    details = fn() or {}\n              ^^^^\n  File \"C:\\AI\\VideoGen\\scripts\\run_ui_screen_only_validation.py\", line 458, in step_i2v\n    raise RuntimeError(\"No local image-to-video model available on UI\")\nRuntimeError: No local image-to-video model available on UI\n"
+    },
+    {
+      "name": "Outputs View/Delete via UI",
+      "status": "passed",
+      "started_at": "2026-02-23T06:38:45.149987+00:00",
+      "ended_at": "2026-02-23T06:38:47.871035+00:00",
+      "duration_sec": 2.7295461000030627,
+      "details": {
+        "count_before": 13,
+        "count_after": 12,
+        "deleted_candidate": "text2video_f91ebecf-bbdb-46f4-9988-1b39a63d1a32.mp4 サイズ=87.7 KB | 更新日時=2026/2/23 15:38:43 | タグ=動画"
+      },
+      "error": ""
+    },
+    {
+      "name": "GPU Evidence",
+      "status": "passed",
+      "started_at": "2026-02-23T06:38:47.871035+00:00",
+      "ended_at": "2026-02-23T06:38:47.890896+00:00",
+      "duration_sec": 0.011048000000300817,
+      "details": {
+        "runtime_info_text": "device=cuda | cuda=true | rocm=true | diffusers=true | torch=2.9.1+rocmsdk20260116",
+        "runtime_has_device_cuda": true,
+        "runtime_has_rocm_true": true,
+        "server_log_has_pipeline_cuda": true
+      },
+      "error": ""
+    }
+  ],
+  "prompt": "A whale is flying in the sky.",
+  "negative_prompt": "low quality, blurry, jpeg artifacts, deformed, watermark, text, bad anatomy",
+  "driver_mode": "edge-headful",
+  "ended_at": "2026-02-23T06:38:50.355874+00:00"
+}

@@ -1,0 +1,31 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.9, pytest-9.0.2, pluggy-1.6.0
+rootdir: C:\AI\VideoGen
+configfile: pytest.ini
+plugins: anyio-4.12.1, cov-7.0.0
+collected 5 items
+
+tests\unit\test_helpers.py .....                                         [100%]
+
+============================== warnings summary ===============================
+main.py:2840
+  C:\AI\VideoGen\main.py:2840: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+venv\Lib\site-packages\fastapi\applications.py:4573
+  C:\AI\VideoGen\venv\Lib\site-packages\fastapi\applications.py:4573: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+------ generated xml file: C:\AI\VideoGen\artifacts\tests\unit_junit.xml ------
+======================== 5 passed, 2 warnings in 4.58s ========================

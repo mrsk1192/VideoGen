@@ -1,0 +1,22 @@
+﻿{
+    "id":  "6613bd96-b149-4ebc-a0e7-8f240f8681f5",
+    "task_type":  "text2video",
+    "status":  "completed",
+    "progress":  1.0,
+    "message":  "Done",
+    "created_at":  "2026-02-23T17:22:47Z",
+    "updated_at":  "2026-02-23T17:26:24Z",
+    "started_at":  "2026-02-23T17:22:47Z",
+    "finished_at":  "2026-02-23T17:26:24Z",
+    "result":  {
+                   "video_file":  "text2video_6613bd96-b149-4ebc-a0e7-8f240f8681f5.mp4",
+                   "model":  "C:\\AI\\VideoGen\\models\\ali-vilab--text-to-video-ms-1.7b",
+                   "loras":  [
+
+                             ],
+                   "encoder":  "h264_amf"
+               },
+    "error":  null,
+    "downloaded_bytes":  null,
+    "total_bytes":  null
+}

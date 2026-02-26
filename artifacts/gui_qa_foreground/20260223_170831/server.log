@@ -1,0 +1,799 @@
+The system cannot find the file specified.
+[WARN] transformers compatibility check failed. Re-installing requirements...
+Requirement already satisfied: fastapi>=0.115.0 in .\venv\Lib\site-packages (from -r requirements.txt (line 1)) (0.129.2)
+Requirement already satisfied: uvicorn>=0.30.0 in .\venv\Lib\site-packages (from uvicorn[standard]>=0.30.0->-r requirements.txt (line 2)) (0.41.0)
+Requirement already satisfied: diffusers>=0.30.0 in .\venv\Lib\site-packages (from -r requirements.txt (line 3)) (0.36.0)
+Requirement already satisfied: transformers<5,>=4.44.0 in .\venv\Lib\site-packages (from -r requirements.txt (line 4)) (4.57.6)
+Requirement already satisfied: accelerate>=0.33.0 in .\venv\Lib\site-packages (from -r requirements.txt (line 5)) (1.12.0)
+Requirement already satisfied: peft>=0.18.0 in .\venv\Lib\site-packages (from -r requirements.txt (line 6)) (0.18.1)
+Requirement already satisfied: huggingface_hub>=0.24.0 in .\venv\Lib\site-packages (from -r requirements.txt (line 7)) (0.36.2)
+Requirement already satisfied: safetensors>=0.4.0 in .\venv\Lib\site-packages (from -r requirements.txt (line 8)) (0.7.0)
+Requirement already satisfied: pillow>=10.4.0 in .\venv\Lib\site-packages (from -r requirements.txt (line 9)) (12.1.1)
+Requirement already satisfied: python-multipart>=0.0.9 in .\venv\Lib\site-packages (from -r requirements.txt (line 10)) (0.0.22)
+Requirement already satisfied: imageio>=2.35.0 in .\venv\Lib\site-packages (from -r requirements.txt (line 11)) (2.37.2)
+Requirement already satisfied: imageio-ffmpeg>=0.5.1 in .\venv\Lib\site-packages (from -r requirements.txt (line 12)) (0.6.0)
+Requirement already satisfied: sentencepiece>=0.2.0 in .\venv\Lib\site-packages (from -r requirements.txt (line 13)) (0.2.1)
+Requirement already satisfied: filelock in .\venv\Lib\site-packages (from transformers<5,>=4.44.0->-r requirements.txt (line 4)) (3.24.3)
+Requirement already satisfied: numpy>=1.17 in .\venv\Lib\site-packages (from transformers<5,>=4.44.0->-r requirements.txt (line 4)) (2.4.2)
+Requirement already satisfied: packaging>=20.0 in .\venv\Lib\site-packages (from transformers<5,>=4.44.0->-r requirements.txt (line 4)) (26.0)
+Requirement already satisfied: pyyaml>=5.1 in .\venv\Lib\site-packages (from transformers<5,>=4.44.0->-r requirements.txt (line 4)) (6.0.3)
+Requirement already satisfied: regex!=2019.12.17 in .\venv\Lib\site-packages (from transformers<5,>=4.44.0->-r requirements.txt (line 4)) (2026.2.19)
+Requirement already satisfied: requests in .\venv\Lib\site-packages (from transformers<5,>=4.44.0->-r requirements.txt (line 4)) (2.32.5)
+Requirement already satisfied: tokenizers<=0.23.0,>=0.22.0 in .\venv\Lib\site-packages (from transformers<5,>=4.44.0->-r requirements.txt (line 4)) (0.22.2)
+Requirement already satisfied: tqdm>=4.27 in .\venv\Lib\site-packages (from transformers<5,>=4.44.0->-r requirements.txt (line 4)) (4.67.3)
+Requirement already satisfied: fsspec>=2023.5.0 in .\venv\Lib\site-packages (from huggingface_hub>=0.24.0->-r requirements.txt (line 7)) (2026.2.0)
+Requirement already satisfied: typing-extensions>=3.7.4.3 in .\venv\Lib\site-packages (from huggingface_hub>=0.24.0->-r requirements.txt (line 7)) (4.15.0)
+Requirement already satisfied: starlette<1.0.0,>=0.40.0 in .\venv\Lib\site-packages (from fastapi>=0.115.0->-r requirements.txt (line 1)) (0.52.1)
+Requirement already satisfied: pydantic>=2.7.0 in .\venv\Lib\site-packages (from fastapi>=0.115.0->-r requirements.txt (line 1)) (2.12.5)
+Requirement already satisfied: typing-inspection>=0.4.2 in .\venv\Lib\site-packages (from fastapi>=0.115.0->-r requirements.txt (line 1)) (0.4.2)
+Requirement already satisfied: annotated-doc>=0.0.2 in .\venv\Lib\site-packages (from fastapi>=0.115.0->-r requirements.txt (line 1)) (0.0.4)
+Requirement already satisfied: anyio<5,>=3.6.2 in .\venv\Lib\site-packages (from starlette<1.0.0,>=0.40.0->fastapi>=0.115.0->-r requirements.txt (line 1)) (4.12.1)
+Requirement already satisfied: idna>=2.8 in .\venv\Lib\site-packages (from anyio<5,>=3.6.2->starlette<1.0.0,>=0.40.0->fastapi>=0.115.0->-r requirements.txt (line 1)) (3.11)
+Requirement already satisfied: click>=7.0 in .\venv\Lib\site-packages (from uvicorn>=0.30.0->uvicorn[standard]>=0.30.0->-r requirements.txt (line 2)) (8.3.1)
+Requirement already satisfied: h11>=0.8 in .\venv\Lib\site-packages (from uvicorn>=0.30.0->uvicorn[standard]>=0.30.0->-r requirements.txt (line 2)) (0.16.0)
+Requirement already satisfied: importlib_metadata in .\venv\Lib\site-packages (from diffusers>=0.30.0->-r requirements.txt (line 3)) (8.7.1)
+Requirement already satisfied: httpx<1.0.0 in .\venv\Lib\site-packages (from diffusers>=0.30.0->-r requirements.txt (line 3)) (0.28.1)
+Requirement already satisfied: certifi in .\venv\Lib\site-packages (from httpx<1.0.0->diffusers>=0.30.0->-r requirements.txt (line 3)) (2026.1.4)
+Requirement already satisfied: httpcore==1.* in .\venv\Lib\site-packages (from httpx<1.0.0->diffusers>=0.30.0->-r requirements.txt (line 3)) (1.0.9)
+Requirement already satisfied: psutil in .\venv\Lib\site-packages (from accelerate>=0.33.0->-r requirements.txt (line 5)) (7.2.2)
+Requirement already satisfied: torch>=2.0.0 in .\venv\Lib\site-packages (from accelerate>=0.33.0->-r requirements.txt (line 5)) (2.9.1+rocmsdk20260116)
+Requirement already satisfied: colorama in .\venv\Lib\site-packages (from click>=7.0->uvicorn>=0.30.0->uvicorn[standard]>=0.30.0->-r requirements.txt (line 2)) (0.4.6)
+Requirement already satisfied: annotated-types>=0.6.0 in .\venv\Lib\site-packages (from pydantic>=2.7.0->fastapi>=0.115.0->-r requirements.txt (line 1)) (0.7.0)
+Requirement already satisfied: pydantic-core==2.41.5 in .\venv\Lib\site-packages (from pydantic>=2.7.0->fastapi>=0.115.0->-r requirements.txt (line 1)) (2.41.5)
+Requirement already satisfied: setuptools in .\venv\Lib\site-packages (from torch>=2.0.0->accelerate>=0.33.0->-r requirements.txt (line 5)) (82.0.0)
+Requirement already satisfied: sympy>=1.13.3 in .\venv\Lib\site-packages (from torch>=2.0.0->accelerate>=0.33.0->-r requirements.txt (line 5)) (1.14.0)
+Requirement already satisfied: networkx>=2.5.1 in .\venv\Lib\site-packages (from torch>=2.0.0->accelerate>=0.33.0->-r requirements.txt (line 5)) (3.6.1)
+Requirement already satisfied: jinja2 in .\venv\Lib\site-packages (from torch>=2.0.0->accelerate>=0.33.0->-r requirements.txt (line 5)) (3.1.6)
+Requirement already satisfied: rocm==7.2.0.dev0 in .\venv\Lib\site-packages (from rocm[libraries]==7.2.0.dev0->torch>=2.0.0->accelerate>=0.33.0->-r requirements.txt (line 5)) (7.2.0.dev0)
+Requirement already satisfied: rocm-sdk-core==7.2.0.dev0 in .\venv\Lib\site-packages (from rocm==7.2.0.dev0->rocm[libraries]==7.2.0.dev0->torch>=2.0.0->accelerate>=0.33.0->-r requirements.txt (line 5)) (7.2.0.dev0)
+Requirement already satisfied: rocm-sdk-libraries-custom==7.2.0.dev0 in .\venv\Lib\site-packages (from rocm[libraries]==7.2.0.dev0->torch>=2.0.0->accelerate>=0.33.0->-r requirements.txt (line 5)) (7.2.0.dev0)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in .\venv\Lib\site-packages (from sympy>=1.13.3->torch>=2.0.0->accelerate>=0.33.0->-r requirements.txt (line 5)) (1.3.0)
+Requirement already satisfied: httptools>=0.6.3 in .\venv\Lib\site-packages (from uvicorn[standard]>=0.30.0->-r requirements.txt (line 2)) (0.7.1)
+Requirement already satisfied: python-dotenv>=0.13 in .\venv\Lib\site-packages (from uvicorn[standard]>=0.30.0->-r requirements.txt (line 2)) (1.2.1)
+Requirement already satisfied: watchfiles>=0.20 in .\venv\Lib\site-packages (from uvicorn[standard]>=0.30.0->-r requirements.txt (line 2)) (1.1.1)
+Requirement already satisfied: websockets>=10.4 in .\venv\Lib\site-packages (from uvicorn[standard]>=0.30.0->-r requirements.txt (line 2)) (16.0)
+Requirement already satisfied: zipp>=3.20 in .\venv\Lib\site-packages (from importlib_metadata->diffusers>=0.30.0->-r requirements.txt (line 3)) (3.23.0)
+Requirement already satisfied: MarkupSafe>=2.0 in .\venv\Lib\site-packages (from jinja2->torch>=2.0.0->accelerate>=0.33.0->-r requirements.txt (line 5)) (3.0.3)
+Requirement already satisfied: charset_normalizer<4,>=2 in .\venv\Lib\site-packages (from requests->transformers<5,>=4.44.0->-r requirements.txt (line 4)) (3.4.4)
+Requirement already satisfied: urllib3<3,>=1.21.1 in .\venv\Lib\site-packages (from requests->transformers<5,>=4.44.0->-r requirements.txt (line 4)) (2.6.3)
+[WARN] ROCm was not detected in this Python environment.
+[INFO] Starting server at http://localhost:60273
+[INFO] QA coverage mode enabled.
+2026-02-23 17:08:36,930 | INFO | MainThread | logger initialized file=C:\AI\VideoGen\logs\videogen.log
+INFO:     Started server process [8112]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:60273 (Press CTRL+C to quit)
+INFO:     127.0.0.1:59388 - "GET /api/system/info HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56711 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64806 - "GET /static/app.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56711 - "GET /static/styles.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64806 - "GET /api/system/info HTTP/1.1" 200 OK
+2026-02-23 17:08:43,851 | INFO | MainThread | request method=GET path=/api/settings query= status=200 elapsed_ms=2.6
+INFO:     127.0.0.1:65196 - "GET /api/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53100 - "GET /api/system/info HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56711 - "GET /api/models/local HTTP/1.1" 200 OK
+2026-02-23 17:08:43,884 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:08:43,884 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:08:43,884 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:08:43,885 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:08:43,885 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:08:43,886 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:08:43,886 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:08:43,886 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:08:43,886 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:08:43,887 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:08:43,887 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:08:43,888 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:08:43,888 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:08:43,888 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:08:43,888 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:08:43,889 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:08:43,889 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:08:43,889 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:08:43,890 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:08:43,890 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:08:43,891 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:08:43,891 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:08:43,892 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+2026-02-23 17:08:43,892 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+INFO:     127.0.0.1:65196 - "GET /api/models/catalog?task=text-to-video&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56711 - "GET /api/models/catalog?task=text-to-image&limit=40 HTTP/1.1" 200 OK
+2026-02-23 17:08:43,895 | INFO | MainThread | request method=GET path=/favicon.ico query= status=404 elapsed_ms=1.2
+INFO:     127.0.0.1:52203 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53100 - "GET /api/models/catalog?task=image-to-image&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64806 - "GET /api/models/catalog?task=image-to-video&limit=40 HTTP/1.1" 200 OK
+2026-02-23 17:08:43,919 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b status=200 elapsed_ms=16.2
+INFO:     127.0.0.1:56711 - "GET /api/models/loras/catalog?task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b HTTP/1.1" 200 OK
+2026-02-23 17:08:43,921 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=15.4
+INFO:     127.0.0.1:52203 - "GET /api/models/loras/catalog?task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 17:08:43,928 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=15.9
+INFO:     127.0.0.1:64806 - "GET /api/models/loras/catalog?task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 17:08:43,928 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-video&limit=200&model_ref=example-org%2Fexample-model status=200 elapsed_ms=16.0
+INFO:     127.0.0.1:53100 - "GET /api/models/loras/catalog?task=image-to-video&limit=200&model_ref=example-org%2Fexample-model HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52203 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52203 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53100 - "GET /api/outputs?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52203 - "GET /api/models/local?dir=C%3A%5CAI%5CVideoGen%5Cmodels HTTP/1.1" 200 OK
+2026-02-23 17:08:43,954 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+INFO:     127.0.0.1:53100 - "GET /api/videos/image2video_3006ae28-72a5-4ae9-b186-ec234a5dd0e6.mp4 HTTP/1.1" 206 Partial Content
+2026-02-23 17:08:43,955 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:08:43,956 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:08:43,956 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+INFO:     127.0.0.1:64806 - "GET /api/videos/text2video_29dee242-41c4-4e72-806b-b19be716aff7.mp4 HTTP/1.1" 206 Partial Content
+2026-02-23 17:08:43,957 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:08:43,958 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:08:43,959 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:08:43,959 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:08:43,960 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:08:43,960 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:08:43,961 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:08:43,962 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:08:43,963 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:08:43,963 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:08:43,965 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:08:43,966 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:08:43,966 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:08:43,967 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:08:43,967 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:08:43,968 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:08:43,968 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:08:43,969 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+INFO:     127.0.0.1:64806 - "GET /api/videos/image2video_3006ae28-72a5-4ae9-b186-ec234a5dd0e6.mp4 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:65196 - "GET /api/models/catalog?task=text-to-video&limit=40 HTTP/1.1" 200 OK
+2026-02-23 17:08:43,971 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:08:43,973 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+INFO:     127.0.0.1:59514 - "GET /api/models/catalog?task=image-to-video&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52203 - "GET /api/models/catalog?task=text-to-image&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56711 - "GET /api/models/catalog?task=image-to-image&limit=40 HTTP/1.1" 200 OK
+2026-02-23 17:08:43,991 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b status=200 elapsed_ms=17.4
+INFO:     127.0.0.1:65196 - "GET /api/models/loras/catalog?task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b HTTP/1.1" 200 OK
+2026-02-23 17:08:43,993 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-video&limit=200&model_ref=example-org%2Fexample-model status=200 elapsed_ms=16.2
+INFO:     127.0.0.1:59514 - "GET /api/models/loras/catalog?task=image-to-video&limit=200&model_ref=example-org%2Fexample-model HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65196 - "GET /api/videos/image2video_3006ae28-72a5-4ae9-b186-ec234a5dd0e6.mp4 HTTP/1.1" 206 Partial Content
+2026-02-23 17:08:43,998 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=18.4
+INFO:     127.0.0.1:56711 - "GET /api/models/loras/catalog?task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 17:08:43,999 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=18.7
+INFO:     127.0.0.1:52203 - "GET /api/models/loras/catalog?task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65196 - "GET /api/videos/image2video_3006ae28-72a5-4ae9-b186-ec234a5dd0e6.mp4 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:52203 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52203 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52203 - "GET /api/models/search?task=text-to-image&source=all&query=&limit=30 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56711 - "GET /api/models/search?task=text-to-image&source=huggingface&query=hf-internal-testing%2Ftiny-stable-diffusion-pipe&limit=30 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52203 - "GET /api/models/search?task=text-to-image&source=all&query=&limit=30 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65196 - "GET /api/models/search?task=text-to-image&source=huggingface&query=&limit=30 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65196 - "GET /api/models/search?task=text-to-image&source=huggingface&query=latent-consistency%2Flcm-lora-sdxl&limit=30 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65196 - "GET /api/models/search?task=text-to-image&source=huggingface&query=madebyollin%2Fsdxl-vae-fp16-fix&limit=30 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65196 - "GET /api/models/search?task=text-to-video&source=huggingface&query=madebyollin%2Fsdxl-vae-fp16-fix&limit=30 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61996 - "GET /api/models/search?task=text-to-video&source=huggingface&query=ali-vilab%2Ftext-to-video-ms-1.7b&limit=30 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61996 - "GET /api/models/search?task=image-to-video&source=huggingface&query=ali-vilab%2Ftext-to-video-ms-1.7b&limit=30 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65196 - "GET /api/models/search?task=image-to-video&source=huggingface&query=ali-vilab%2Fi2vgen-xl&limit=30 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65196 - "GET /api/models/local?dir=C%3A%5CAI%5CVideoGen%5Cmodels HTTP/1.1" 200 OK
+2026-02-23 17:09:06,198 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cstabilityai--stable-diffusion-xl-base-1.0 status=200 elapsed_ms=3.9
+INFO:     127.0.0.1:65196 - "GET /api/models/loras/catalog?task=text-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cstabilityai--stable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65196 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+2026-02-23 17:09:06,741 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cstabilityai--stable-diffusion-xl-base-1.0 status=200 elapsed_ms=3.9
+INFO:     127.0.0.1:65196 - "GET /api/models/loras/catalog?task=image-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cstabilityai--stable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65196 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+2026-02-23 17:09:07,267 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-video&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cali-vilab--text-to-video-ms-1.7b status=200 elapsed_ms=4.4
+INFO:     127.0.0.1:65196 - "GET /api/models/loras/catalog?task=text-to-video&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cali-vilab--text-to-video-ms-1.7b HTTP/1.1" 200 OK
+2026-02-23 17:09:07,805 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-video&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cali-vilab--i2vgen-xl status=200 elapsed_ms=4.1
+INFO:     127.0.0.1:65196 - "GET /api/models/loras/catalog?task=image-to-video&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cali-vilab--i2vgen-xl HTTP/1.1" 200 OK
+2026-02-23 17:09:08,586 | INFO | AnyIO worker thread | settings updated models_dir=C:\AI\VideoGen\models outputs_dir=C:\AI\VideoGen\outputs tmp_dir=C:\AI\VideoGen\outputs\tmp logs_dir=logs
+2026-02-23 17:09:08,586 | INFO | MainThread | request method=PUT path=/api/settings query= status=200 elapsed_ms=4.5
+INFO:     127.0.0.1:65196 - "PUT /api/settings HTTP/1.1" 200 OK
+2026-02-23 17:09:08,597 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:09:08,597 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:09:08,598 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:09:08,599 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:09:08,599 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:09:08,600 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:08,600 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:08,600 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:08,601 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:08,601 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:08,602 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:08,603 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:08,603 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:08,603 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:08,604 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:08,604 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:08,604 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:09:08,605 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:08,606 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:08,606 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:08,606 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:08,607 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+2026-02-23 17:09:08,608 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+INFO:     127.0.0.1:64052 - "GET /api/models/catalog?task=text-to-video&limit=40 HTTP/1.1" 200 OK
+2026-02-23 17:09:08,609 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+INFO:     127.0.0.1:62727 - "GET /api/models/catalog?task=image-to-video&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65196 - "GET /api/models/catalog?task=text-to-image&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55863 - "GET /api/models/catalog?task=image-to-image&limit=40 HTTP/1.1" 200 OK
+2026-02-23 17:09:08,636 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-video&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cali-vilab--i2vgen-xl status=200 elapsed_ms=21.8
+INFO:     127.0.0.1:65196 - "GET /api/models/loras/catalog?task=image-to-video&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cali-vilab--i2vgen-xl HTTP/1.1" 200 OK
+2026-02-23 17:09:08,637 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cstabilityai--stable-diffusion-xl-base-1.0 status=200 elapsed_ms=22.4
+INFO:     127.0.0.1:62727 - "GET /api/models/loras/catalog?task=text-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cstabilityai--stable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 17:09:08,637 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-video&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cali-vilab--text-to-video-ms-1.7b status=200 elapsed_ms=24.5
+INFO:     127.0.0.1:64052 - "GET /api/models/loras/catalog?task=text-to-video&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cali-vilab--text-to-video-ms-1.7b HTTP/1.1" 200 OK
+2026-02-23 17:09:08,638 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cstabilityai--stable-diffusion-xl-base-1.0 status=200 elapsed_ms=20.7
+INFO:     127.0.0.1:55863 - "GET /api/models/loras/catalog?task=image-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cstabilityai--stable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57499 - "GET /api/models/local?dir=C%3A%5CAI%5CVideoGen%5Cmodels HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55863 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55863 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+2026-02-23 17:09:08,653 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:09:08,654 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:09:08,654 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:09:08,655 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:09:08,655 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:08,655 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:08,656 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:09:08,656 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:08,656 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:08,657 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:08,657 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:08,657 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:08,658 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:08,658 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:08,658 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:08,658 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:09:08,658 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:08,659 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:08,659 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:08,659 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:08,660 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:08,660 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:08,660 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+INFO:     127.0.0.1:64052 - "GET /api/models/catalog?task=text-to-video&limit=40 HTTP/1.1" 200 OK
+2026-02-23 17:09:08,662 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+INFO:     127.0.0.1:55863 - "GET /api/models/catalog?task=text-to-image&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62727 - "GET /api/models/catalog?task=image-to-video&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57499 - "GET /api/models/catalog?task=image-to-image&limit=40 HTTP/1.1" 200 OK
+2026-02-23 17:09:08,679 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cstabilityai--stable-diffusion-xl-base-1.0 status=200 elapsed_ms=14.1
+INFO:     127.0.0.1:62727 - "GET /api/models/loras/catalog?task=text-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cstabilityai--stable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 17:09:08,681 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-video&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cali-vilab--text-to-video-ms-1.7b status=200 elapsed_ms=16.3
+INFO:     127.0.0.1:55863 - "GET /api/models/loras/catalog?task=text-to-video&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cali-vilab--text-to-video-ms-1.7b HTTP/1.1" 200 OK
+2026-02-23 17:09:08,682 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cstabilityai--stable-diffusion-xl-base-1.0 status=200 elapsed_ms=15.4
+INFO:     127.0.0.1:64052 - "GET /api/models/loras/catalog?task=image-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cstabilityai--stable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 17:09:08,682 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-video&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cali-vilab--i2vgen-xl status=200 elapsed_ms=16.9
+INFO:     127.0.0.1:57499 - "GET /api/models/loras/catalog?task=image-to-video&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cali-vilab--i2vgen-xl HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55863 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55863 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+2026-02-23 17:09:10,103 | INFO | MainThread | request method=GET path=/api/settings query= status=200 elapsed_ms=2.3
+INFO:     127.0.0.1:55863 - "GET /api/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57499 - "GET /api/system/info HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62727 - "GET /api/system/info HTTP/1.1" 200 OK
+2026-02-23 17:09:10,112 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:09:10,112 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:09:10,112 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:09:10,113 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:09:10,113 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:09:10,113 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:10,114 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:10,114 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:10,114 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:10,115 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:10,115 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:10,115 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:09:10,116 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:10,116 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:10,116 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:10,116 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:10,117 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:10,117 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:10,117 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:10,118 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:10,118 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:10,119 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:10,119 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+INFO:     127.0.0.1:62727 - "GET /api/models/catalog?task=image-to-video&limit=40 HTTP/1.1" 200 OK
+2026-02-23 17:09:10,121 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+INFO:     127.0.0.1:65196 - "GET /api/models/catalog?task=text-to-video&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57499 - "GET /api/models/catalog?task=text-to-image&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55863 - "GET /api/models/catalog?task=image-to-image&limit=40 HTTP/1.1" 200 OK
+2026-02-23 17:09:10,142 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-video&limit=200&model_ref=example-org%2Fexample-model status=200 elapsed_ms=18.2
+INFO:     127.0.0.1:65196 - "GET /api/models/loras/catalog?task=image-to-video&limit=200&model_ref=example-org%2Fexample-model HTTP/1.1" 200 OK
+2026-02-23 17:09:10,143 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b status=200 elapsed_ms=18.7
+INFO:     127.0.0.1:62727 - "GET /api/models/loras/catalog?task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b HTTP/1.1" 200 OK
+2026-02-23 17:09:10,145 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=18.2
+INFO:     127.0.0.1:57499 - "GET /api/models/loras/catalog?task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 17:09:10,146 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=19.2
+INFO:     127.0.0.1:55863 - "GET /api/models/loras/catalog?task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64052 - "GET /api/models/local HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57499 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57499 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64052 - "GET /api/outputs?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57499 - "GET /api/models/local?dir=C%3A%5CAI%5CVideoGen%5Cmodels HTTP/1.1" 200 OK
+2026-02-23 17:09:10,171 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:09:10,171 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:09:10,171 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:09:10,172 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:09:10,172 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:10,172 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:10,172 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:09:10,173 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:10,173 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:10,173 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:10,173 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:10,174 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:10,174 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:09:10,174 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:10,175 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:10,175 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:10,175 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:10,175 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:10,175 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:10,175 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:10,176 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:10,176 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:10,177 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+2026-02-23 17:09:10,177 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+INFO:     127.0.0.1:55863 - "GET /api/models/catalog?task=text-to-video&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64052 - "GET /api/models/catalog?task=image-to-image&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62727 - "GET /api/models/catalog?task=image-to-video&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57499 - "GET /api/models/catalog?task=text-to-image&limit=40 HTTP/1.1" 200 OK
+2026-02-23 17:09:10,192 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b status=200 elapsed_ms=12.0
+INFO:     127.0.0.1:55863 - "GET /api/models/loras/catalog?task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b HTTP/1.1" 200 OK
+2026-02-23 17:09:10,195 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=13.2
+INFO:     127.0.0.1:64052 - "GET /api/models/loras/catalog?task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 17:09:10,196 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-video&limit=200&model_ref=example-org%2Fexample-model status=200 elapsed_ms=14.3
+INFO:     127.0.0.1:62727 - "GET /api/models/loras/catalog?task=image-to-video&limit=200&model_ref=example-org%2Fexample-model HTTP/1.1" 200 OK
+2026-02-23 17:09:10,198 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=15.8
+INFO:     127.0.0.1:57499 - "GET /api/models/loras/catalog?task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64052 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64052 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+2026-02-23 17:09:11,249 | INFO | AnyIO worker thread | settings updated models_dir=C:\AI\VideoGen\models outputs_dir=C:\AI\VideoGen\outputs tmp_dir=C:\AI\VideoGen\outputs\tmp logs_dir=logs
+2026-02-23 17:09:11,250 | INFO | MainThread | request method=PUT path=/api/settings query= status=200 elapsed_ms=4.7
+INFO:     127.0.0.1:57499 - "PUT /api/settings HTTP/1.1" 200 OK
+2026-02-23 17:09:11,257 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:09:11,257 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:09:11,258 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:09:11,259 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:09:11,259 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:09:11,259 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:11,260 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:11,260 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:11,260 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:11,260 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:09:11,260 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:11,260 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:11,261 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:11,261 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:11,261 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:11,262 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:11,262 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:11,262 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:11,262 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:11,262 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:11,263 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:11,263 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:11,264 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+2026-02-23 17:09:11,264 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+INFO:     127.0.0.1:55863 - "GET /api/models/catalog?task=text-to-video&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65196 - "GET /api/models/catalog?task=image-to-video&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62727 - "GET /api/models/catalog?task=image-to-image&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57499 - "GET /api/models/catalog?task=text-to-image&limit=40 HTTP/1.1" 200 OK
+2026-02-23 17:09:11,289 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=18.5
+INFO:     127.0.0.1:55863 - "GET /api/models/loras/catalog?task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 17:09:11,290 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b status=200 elapsed_ms=21.5
+INFO:     127.0.0.1:65196 - "GET /api/models/loras/catalog?task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b HTTP/1.1" 200 OK
+2026-02-23 17:09:11,291 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=19.4
+INFO:     127.0.0.1:57499 - "GET /api/models/loras/catalog?task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 17:09:11,293 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-video&limit=200&model_ref=example-org%2Fexample-model status=200 elapsed_ms=23.5
+INFO:     127.0.0.1:62727 - "GET /api/models/loras/catalog?task=image-to-video&limit=200&model_ref=example-org%2Fexample-model HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59442 - "GET /api/models/local?dir=C%3A%5CAI%5CVideoGen%5Cmodels HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65196 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65196 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+2026-02-23 17:09:11,307 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:09:11,308 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:09:11,308 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 17:09:11,309 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:09:11,309 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:11,309 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:09:11,309 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:11,310 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:11,310 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:11,310 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:11,310 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:11,311 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:11,311 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 17:09:11,311 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:11,312 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:11,312 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 17:09:11,312 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:11,312 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 17:09:11,312 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:11,312 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 17:09:11,313 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:11,313 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 17:09:11,314 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+2026-02-23 17:09:11,315 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+INFO:     127.0.0.1:62727 - "GET /api/models/catalog?task=text-to-video&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57499 - "GET /api/models/catalog?task=image-to-video&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65196 - "GET /api/models/catalog?task=text-to-image&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59442 - "GET /api/models/catalog?task=image-to-image&limit=40 HTTP/1.1" 200 OK
+2026-02-23 17:09:11,335 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b status=200 elapsed_ms=17.4
+INFO:     127.0.0.1:57499 - "GET /api/models/loras/catalog?task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b HTTP/1.1" 200 OK
+2026-02-23 17:09:11,335 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-video&limit=200&model_ref=example-org%2Fexample-model status=200 elapsed_ms=17.1
+INFO:     127.0.0.1:62727 - "GET /api/models/loras/catalog?task=image-to-video&limit=200&model_ref=example-org%2Fexample-model HTTP/1.1" 200 OK
+2026-02-23 17:09:11,336 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=16.3
+INFO:     127.0.0.1:65196 - "GET /api/models/loras/catalog?task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 17:09:11,337 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=14.4
+INFO:     127.0.0.1:59442 - "GET /api/models/loras/catalog?task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59442 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59442 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64052 - "GET /api/models/search?task=text-to-image&source=all&query=&limit=30 HTTP/1.1" 200 OK
+2026-02-23 17:09:11,665 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cstabilityai--stable-diffusion-xl-base-1.0 status=200 elapsed_ms=4.4
+INFO:     127.0.0.1:64052 - "GET /api/models/loras/catalog?task=text-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cstabilityai--stable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64052 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+2026-02-23 17:09:11,887 | INFO | AnyIO worker thread | task created id=08ade3ee-c44e-41f3-82fe-3c000174fdc3 type=text2image message=Generation queued
+2026-02-23 17:09:11,888 | INFO | AnyIO worker thread | text2image requested task_id=08ade3ee-c44e-41f3-82fe-3c000174fdc3 model=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0 loras=(none) lora_scale=1.0 vae=(none) prompt_len=70 negative_len=56 steps=8 guidance=7.5 size=512x512 seed=None
+2026-02-23 17:09:11,889 | INFO | MainThread | request method=POST path=/api/generate/text2image query= status=200 elapsed_ms=3.1
+INFO:     127.0.0.1:64052 - "POST /api/generate/text2image HTTP/1.1" 200 OK
+2026-02-23 17:09:11,890 | INFO | Thread-1 (text2image_worker) | text2image start task_id=08ade3ee-c44e-41f3-82fe-3c000174fdc3 model=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0 loras=(none) lora_scale=1.0 vae=(none) steps=8 guidance=7.5 size=512x512 seed=None
+2026-02-23 17:09:11,890 | INFO | Thread-1 (text2image_worker) | task status id=08ade3ee-c44e-41f3-82fe-3c000174fdc3 type=text2image queued->running progress=0.050 message=Loading model
+2026-02-23 17:09:11,891 | INFO | Thread-1 (text2image_worker) | pipeline load start kind=text-to-image model_ref=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0 source=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0 device=cuda dtype=torch.float16
+
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]INFO:     127.0.0.1:64052 - "GET /api/tasks/08ade3ee-c44e-41f3-82fe-3c000174fdc3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64052 - "GET /api/tasks/08ade3ee-c44e-41f3-82fe-3c000174fdc3 HTTP/1.1" 200 OK
+
+Loading pipeline components...:  14%|█▍        | 1/7 [00:04<00:26,  4.45s/it]`torch_dtype` is deprecated! Use `dtype` instead!
+
+Loading pipeline components...:  43%|████▎     | 3/7 [00:05<00:06,  1.64s/it]INFO:     127.0.0.1:64052 - "GET /api/tasks/08ade3ee-c44e-41f3-82fe-3c000174fdc3 HTTP/1.1" 200 OK
+
+Loading pipeline components...:  71%|███████▏  | 5/7 [00:06<00:01,  1.12it/s]
+Loading pipeline components...: 100%|██████████| 7/7 [00:06<00:00,  1.75it/s]
+Loading pipeline components...: 100%|██████████| 7/7 [00:06<00:00,  1.09it/s]
+2026-02-23 17:09:20,702 | INFO | Thread-1 (text2image_worker) | pipeline load done kind=text-to-image source=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0 elapsed_ms=8812.3
+INFO:     127.0.0.1:64052 - "GET /api/tasks/08ade3ee-c44e-41f3-82fe-3c000174fdc3 HTTP/1.1" 200 OK
+C:\AI\VideoGen\venv\Lib\site-packages\transformers\integrations\sdpa_attention.py:96: UserWarning: Mem Efficient attention on Current AMD GPU is still experimental. Enable it with TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=1. (Triggered internally at C:\b\pytorch\aten\src\ATen\native\transformers\hip\sdp_utils.cpp:361.)
+  attn_output = torch.nn.functional.scaled_dot_product_attention(
+
+  0%|          | 0/8 [00:00<?, ?it/s]
+ 12%|█▎        | 1/8 [00:01<00:07,  1.09s/it]
+ 25%|██▌       | 2/8 [00:01<00:03,  1.91it/s]
+ 50%|█████     | 4/8 [00:01<00:01,  3.99it/s]
+ 75%|███████▌  | 6/8 [00:01<00:00,  5.71it/s]
+100%|██████████| 8/8 [00:01<00:00,  6.96it/s]
+100%|██████████| 8/8 [00:01<00:00,  4.52it/s]
+C:\AI\VideoGen\venv\Lib\site-packages\diffusers\pipelines\stable_diffusion_xl\pipeline_stable_diffusion_xl.py:748: FutureWarning: `upcast_vae` is deprecated and will be removed in version 1.0.0. `upcast_vae` is deprecated. Please use `pipe.vae.to(torch.float32)`. For more details, please refer to: https://github.com/huggingface/diffusers/pull/12619#issue-3606633695.
+  deprecate(
+INFO:     127.0.0.1:64052 - "GET /api/tasks/08ade3ee-c44e-41f3-82fe-3c000174fdc3 HTTP/1.1" 200 OK
+2026-02-23 17:09:24,778 | INFO | Thread-1 (text2image_worker) | task status id=08ade3ee-c44e-41f3-82fe-3c000174fdc3 type=text2image running->completed progress=1.000 message=Done
+2026-02-23 17:09:24,778 | INFO | Thread-1 (text2image_worker) | text2image done task_id=08ade3ee-c44e-41f3-82fe-3c000174fdc3 output=C:\AI\VideoGen\outputs\text2image_08ade3ee-c44e-41f3-82fe-3c000174fdc3.png
+INFO:     127.0.0.1:64052 - "GET /api/tasks/08ade3ee-c44e-41f3-82fe-3c000174fdc3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64052 - "GET /api/images/text2image_08ade3ee-c44e-41f3-82fe-3c000174fdc3.png?t=1771834166916 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53106 - "GET /api/outputs?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53106 - "GET /api/videos/image2video_3006ae28-72a5-4ae9-b186-ec234a5dd0e6.mp4 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:54825 - "GET /api/videos/text2video_29dee242-41c4-4e72-806b-b19be716aff7.mp4 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:54825 - "GET /api/videos/image2video_3006ae28-72a5-4ae9-b186-ec234a5dd0e6.mp4 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:54825 - "GET /api/videos/image2video_3006ae28-72a5-4ae9-b186-ec234a5dd0e6.mp4 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:54825 - "GET /api/videos/image2video_3006ae28-72a5-4ae9-b186-ec234a5dd0e6.mp4 HTTP/1.1" 206 Partial Content
+2026-02-23 17:09:27,768 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cstabilityai--stable-diffusion-xl-base-1.0 status=200 elapsed_ms=5.7
+INFO:     127.0.0.1:54825 - "GET /api/models/loras/catalog?task=text-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cstabilityai--stable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54825 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+2026-02-23 17:09:28,018 | INFO | AnyIO worker thread | task created id=65a0d049-4d43-48d2-8f16-591aa478a45a type=text2image message=Generation queued
+2026-02-23 17:09:28,019 | INFO | AnyIO worker thread | text2image requested task_id=65a0d049-4d43-48d2-8f16-591aa478a45a model=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0 loras=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl lora_scale=0.8 vae=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix prompt_len=70 negative_len=56 steps=8 guidance=7.5 size=512x512 seed=None
+2026-02-23 17:09:28,020 | INFO | MainThread | request method=POST path=/api/generate/text2image query= status=200 elapsed_ms=2.7
+INFO:     127.0.0.1:54825 - "POST /api/generate/text2image HTTP/1.1" 200 OK
+2026-02-23 17:09:28,021 | INFO | Thread-3 (text2image_worker) | text2image start task_id=65a0d049-4d43-48d2-8f16-591aa478a45a model=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0 loras=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl lora_scale=0.8 vae=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix steps=8 guidance=7.5 size=512x512 seed=None
+2026-02-23 17:09:28,021 | INFO | Thread-3 (text2image_worker) | task status id=65a0d049-4d43-48d2-8f16-591aa478a45a type=text2image queued->running progress=0.050 message=Loading model
+2026-02-23 17:09:28,021 | INFO | Thread-3 (text2image_worker) | pipeline cache hit kind=text-to-image source=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+INFO:     127.0.0.1:54825 - "GET /api/tasks/65a0d049-4d43-48d2-8f16-591aa478a45a HTTP/1.1" 200 OK
+No LoRA keys associated to CLIPTextModel found with the prefix='text_encoder'. This is safe to ignore if LoRA state dict didn't originally have any CLIPTextModel related params. You can also try specifying `prefix=None` to resolve the warning. Otherwise, open an issue if you think it's unexpected: https://github.com/huggingface/diffusers/issues/new
+No LoRA keys associated to CLIPTextModelWithProjection found with the prefix='text_encoder_2'. This is safe to ignore if LoRA state dict didn't originally have any CLIPTextModelWithProjection related params. You can also try specifying `prefix=None` to resolve the warning. Otherwise, open an issue if you think it's unexpected: https://github.com/huggingface/diffusers/issues/new
+INFO:     127.0.0.1:54825 - "GET /api/tasks/65a0d049-4d43-48d2-8f16-591aa478a45a HTTP/1.1" 200 OK
+
+  0%|          | 0/8 [00:00<?, ?it/s]
+ 12%|█▎        | 1/8 [00:00<00:03,  2.02it/s]
+ 25%|██▌       | 2/8 [00:00<00:02,  2.93it/s]
+ 38%|███▊      | 3/8 [00:00<00:01,  3.46it/s]
+ 50%|█████     | 4/8 [00:01<00:01,  3.87it/s]
+ 62%|██████▎   | 5/8 [00:01<00:00,  4.22it/s]
+ 75%|███████▌  | 6/8 [00:01<00:00,  3.94it/s]
+ 88%|████████▊ | 7/8 [00:02<00:00,  2.93it/s]
+100%|██████████| 8/8 [00:02<00:00,  2.73it/s]
+100%|██████████| 8/8 [00:02<00:00,  3.08it/s]
+INFO:     127.0.0.1:54825 - "GET /api/tasks/65a0d049-4d43-48d2-8f16-591aa478a45a HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54825 - "GET /api/tasks/65a0d049-4d43-48d2-8f16-591aa478a45a HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54825 - "GET /api/tasks/65a0d049-4d43-48d2-8f16-591aa478a45a HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54825 - "GET /api/tasks/65a0d049-4d43-48d2-8f16-591aa478a45a HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54825 - "GET /api/tasks/65a0d049-4d43-48d2-8f16-591aa478a45a HTTP/1.1" 200 OK
+2026-02-23 17:09:47,721 | INFO | Thread-3 (text2image_worker) | task status id=65a0d049-4d43-48d2-8f16-591aa478a45a type=text2image running->completed progress=1.000 message=Done
+2026-02-23 17:09:47,721 | INFO | Thread-3 (text2image_worker) | text2image done task_id=65a0d049-4d43-48d2-8f16-591aa478a45a output=C:\AI\VideoGen\outputs\text2image_65a0d049-4d43-48d2-8f16-591aa478a45a.png
+INFO:     127.0.0.1:54825 - "GET /api/tasks/65a0d049-4d43-48d2-8f16-591aa478a45a HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54825 - "GET /api/images/text2image_65a0d049-4d43-48d2-8f16-591aa478a45a.png?t=1771834189042 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54507 - "GET /api/outputs?limit=500 HTTP/1.1" 200 OK
+2026-02-23 17:09:50,081 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cstabilityai--stable-diffusion-xl-base-1.0 status=200 elapsed_ms=4.5
+INFO:     127.0.0.1:54825 - "GET /api/models/loras/catalog?task=image-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cstabilityai--stable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54825 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+2026-02-23 17:09:50,358 | INFO | MainThread | task created id=15d853dd-3343-4612-adc1-c2e6bb8aa936 type=image2image message=Generation queued
+2026-02-23 17:09:50,358 | INFO | MainThread | image2image requested task_id=15d853dd-3343-4612-adc1-c2e6bb8aa936 model=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0 loras=(none) lora_scale=1.0 vae=(none) file=sticker8377632396286038267.png steps=8 guidance=7.0 strength=0.55 size=512x512 seed=None
+2026-02-23 17:09:50,359 | INFO | MainThread | request method=POST path=/api/generate/image2image query= status=200 elapsed_ms=10.2
+INFO:     127.0.0.1:54825 - "POST /api/generate/image2image HTTP/1.1" 200 OK
+2026-02-23 17:09:50,361 | INFO | Thread-4 (image2image_worker) | image2image start task_id=15d853dd-3343-4612-adc1-c2e6bb8aa936 model=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0 loras=(none) lora_scale=1.0 vae=(none) image=C:\AI\VideoGen\outputs\tmp\f839a55d-0335-487a-a111-8430a3c1e1ca.png steps=8 guidance=7.0 strength=0.55 size=512x512 seed=None
+2026-02-23 17:09:50,361 | INFO | Thread-4 (image2image_worker) | task status id=15d853dd-3343-4612-adc1-c2e6bb8aa936 type=image2image queued->running progress=0.050 message=Loading model
+2026-02-23 17:09:50,361 | INFO | Thread-4 (image2image_worker) | pipeline load start kind=image-to-image model_ref=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0 source=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0 device=cuda dtype=torch.float16
+INFO:     127.0.0.1:54825 - "GET /api/tasks/15d853dd-3343-4612-adc1-c2e6bb8aa936 HTTP/1.1" 200 OK
+
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]INFO:     127.0.0.1:54825 - "GET /api/tasks/15d853dd-3343-4612-adc1-c2e6bb8aa936 HTTP/1.1" 200 OK
+
+Loading pipeline components...:  14%|█▍        | 1/7 [00:04<00:25,  4.24s/it]
+Loading pipeline components...:  43%|████▎     | 3/7 [00:05<00:06,  1.54s/it]
+Loading pipeline components...:  71%|███████▏  | 5/7 [00:05<00:01,  1.19it/s]INFO:     127.0.0.1:54825 - "GET /api/tasks/15d853dd-3343-4612-adc1-c2e6bb8aa936 HTTP/1.1" 200 OK
+
+Loading pipeline components...: 100%|██████████| 7/7 [00:06<00:00,  1.84it/s]
+Loading pipeline components...: 100%|██████████| 7/7 [00:06<00:00,  1.15it/s]
+2026-02-23 17:09:58,437 | INFO | Thread-4 (image2image_worker) | pipeline load done kind=image-to-image source=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0 elapsed_ms=8075.9
+C:\AI\VideoGen\venv\Lib\site-packages\PIL\Image.py:1034: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
+  warnings.warn(
+
+  0%|          | 0/4 [00:00<?, ?it/s]INFO:     127.0.0.1:54825 - "GET /api/tasks/15d853dd-3343-4612-adc1-c2e6bb8aa936 HTTP/1.1" 200 OK
+
+ 25%|██▌       | 1/4 [00:00<00:00,  4.81it/s]
+ 50%|█████     | 2/4 [00:00<00:00,  4.12it/s]
+ 75%|███████▌  | 3/4 [00:00<00:00,  3.84it/s]
+100%|██████████| 4/4 [00:01<00:00,  3.70it/s]
+100%|██████████| 4/4 [00:01<00:00,  3.84it/s]
+C:\AI\VideoGen\venv\Lib\site-packages\diffusers\pipelines\stable_diffusion_xl\pipeline_stable_diffusion_xl_img2img.py:896: FutureWarning: `upcast_vae` is deprecated and will be removed in version 1.0.0. `upcast_vae` is deprecated. Please use `pipe.vae.to(torch.float32)`. For more details, please refer to: https://github.com/huggingface/diffusers/pull/12619#issue-3606633695.
+  deprecate(
+2026-02-23 17:10:00,760 | INFO | Thread-4 (image2image_worker) | task status id=15d853dd-3343-4612-adc1-c2e6bb8aa936 type=image2image running->completed progress=1.000 message=Done
+2026-02-23 17:10:00,761 | INFO | Thread-4 (image2image_worker) | image2image done task_id=15d853dd-3343-4612-adc1-c2e6bb8aa936 output=C:\AI\VideoGen\outputs\image2image_15d853dd-3343-4612-adc1-c2e6bb8aa936.png
+INFO:     127.0.0.1:54825 - "GET /api/tasks/15d853dd-3343-4612-adc1-c2e6bb8aa936 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54825 - "GET /api/images/image2image_15d853dd-3343-4612-adc1-c2e6bb8aa936.png?t=1771834202377 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53974 - "GET /api/outputs?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53974 - "GET /api/videos/image2video_3006ae28-72a5-4ae9-b186-ec234a5dd0e6.mp4 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:60163 - "GET /api/videos/text2video_29dee242-41c4-4e72-806b-b19be716aff7.mp4 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:49996 - "GET /api/videos/image2video_3006ae28-72a5-4ae9-b186-ec234a5dd0e6.mp4 HTTP/1.1" 206 Partial Content
+2026-02-23 17:10:03,198 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cstabilityai--stable-diffusion-xl-base-1.0 status=200 elapsed_ms=5.3
+INFO:     127.0.0.1:49996 - "GET /api/models/loras/catalog?task=image-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cstabilityai--stable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+2026-02-23 17:10:03,514 | INFO | MainThread | task created id=6531a6fc-0724-4873-8c89-11031f625629 type=image2image message=Generation queued
+2026-02-23 17:10:03,514 | INFO | MainThread | image2image requested task_id=6531a6fc-0724-4873-8c89-11031f625629 model=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0 loras=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl lora_scale=0.8 vae=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix file=sticker8377632396286038267.png steps=8 guidance=7.0 strength=0.55 size=512x512 seed=None
+2026-02-23 17:10:03,515 | INFO | MainThread | request method=POST path=/api/generate/image2image query= status=200 elapsed_ms=9.6
+INFO:     127.0.0.1:49996 - "POST /api/generate/image2image HTTP/1.1" 200 OK
+2026-02-23 17:10:03,516 | INFO | Thread-5 (image2image_worker) | image2image start task_id=6531a6fc-0724-4873-8c89-11031f625629 model=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0 loras=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl lora_scale=0.8 vae=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix image=C:\AI\VideoGen\outputs\tmp\72465937-5106-47ec-8d88-93d90f50c054.png steps=8 guidance=7.0 strength=0.55 size=512x512 seed=None
+2026-02-23 17:10:03,516 | INFO | Thread-5 (image2image_worker) | task status id=6531a6fc-0724-4873-8c89-11031f625629 type=image2image queued->running progress=0.050 message=Loading model
+2026-02-23 17:10:03,516 | INFO | Thread-5 (image2image_worker) | pipeline cache hit kind=image-to-image source=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+INFO:     127.0.0.1:49996 - "GET /api/tasks/6531a6fc-0724-4873-8c89-11031f625629 HTTP/1.1" 200 OK
+No LoRA keys associated to CLIPTextModel found with the prefix='text_encoder'. This is safe to ignore if LoRA state dict didn't originally have any CLIPTextModel related params. You can also try specifying `prefix=None` to resolve the warning. Otherwise, open an issue if you think it's unexpected: https://github.com/huggingface/diffusers/issues/new
+No LoRA keys associated to CLIPTextModelWithProjection found with the prefix='text_encoder_2'. This is safe to ignore if LoRA state dict didn't originally have any CLIPTextModelWithProjection related params. You can also try specifying `prefix=None` to resolve the warning. Otherwise, open an issue if you think it's unexpected: https://github.com/huggingface/diffusers/issues/new
+INFO:     127.0.0.1:49996 - "GET /api/tasks/6531a6fc-0724-4873-8c89-11031f625629 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/6531a6fc-0724-4873-8c89-11031f625629 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/6531a6fc-0724-4873-8c89-11031f625629 HTTP/1.1" 200 OK
+
+  0%|          | 0/4 [00:00<?, ?it/s]
+ 25%|██▌       | 1/4 [00:00<00:01,  2.12it/s]
+ 50%|█████     | 2/4 [00:00<00:00,  2.19it/s]
+ 75%|███████▌  | 3/4 [00:01<00:00,  2.23it/s]
+100%|██████████| 4/4 [00:01<00:00,  2.25it/s]
+100%|██████████| 4/4 [00:01<00:00,  2.23it/s]
+INFO:     127.0.0.1:49996 - "GET /api/tasks/6531a6fc-0724-4873-8c89-11031f625629 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/6531a6fc-0724-4873-8c89-11031f625629 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/6531a6fc-0724-4873-8c89-11031f625629 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/6531a6fc-0724-4873-8c89-11031f625629 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/6531a6fc-0724-4873-8c89-11031f625629 HTTP/1.1" 200 OK
+2026-02-23 17:10:29,213 | INFO | Thread-5 (image2image_worker) | task status id=6531a6fc-0724-4873-8c89-11031f625629 type=image2image running->completed progress=1.000 message=Done
+2026-02-23 17:10:29,213 | INFO | Thread-5 (image2image_worker) | image2image done task_id=6531a6fc-0724-4873-8c89-11031f625629 output=C:\AI\VideoGen\outputs\image2image_6531a6fc-0724-4873-8c89-11031f625629.png
+INFO:     127.0.0.1:49996 - "GET /api/tasks/6531a6fc-0724-4873-8c89-11031f625629 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/images/image2image_6531a6fc-0724-4873-8c89-11031f625629.png?t=1771834230533 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49670 - "GET /api/outputs?limit=500 HTTP/1.1" 200 OK
+2026-02-23 17:10:31,583 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-video&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cali-vilab--text-to-video-ms-1.7b status=200 elapsed_ms=5.6
+INFO:     127.0.0.1:49996 - "GET /api/models/loras/catalog?task=text-to-video&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cali-vilab--text-to-video-ms-1.7b HTTP/1.1" 200 OK
+2026-02-23 17:10:31,790 | INFO | AnyIO worker thread | task created id=bd3f75a5-78e9-4748-9669-4ce9143891cf type=text2video message=Generation queued
+2026-02-23 17:10:31,790 | INFO | AnyIO worker thread | text2video requested task_id=bd3f75a5-78e9-4748-9669-4ce9143891cf model=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b loras=(none) lora_scale=1.0 prompt_len=66 negative_len=49 steps=8 frames=8 guidance=8.0 fps=6 seed=None
+2026-02-23 17:10:31,791 | INFO | MainThread | request method=POST path=/api/generate/text2video query= status=200 elapsed_ms=3.7
+INFO:     127.0.0.1:49996 - "POST /api/generate/text2video HTTP/1.1" 200 OK
+2026-02-23 17:10:31,793 | INFO | Thread-6 (text2video_worker) | text2video start task_id=bd3f75a5-78e9-4748-9669-4ce9143891cf model=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b loras=(none) lora_scale=1.0 steps=8 frames=8 guidance=8.0 fps=6 seed=None
+2026-02-23 17:10:31,793 | INFO | Thread-6 (text2video_worker) | task status id=bd3f75a5-78e9-4748-9669-4ce9143891cf type=text2video queued->running progress=0.050 message=Loading model
+2026-02-23 17:10:31,793 | INFO | Thread-6 (text2video_worker) | pipeline load start kind=text-to-video model_ref=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b source=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b device=cuda dtype=torch.float16
+
+Loading pipeline components...:   0%|          | 0/5 [00:00<?, ?it/s]INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+
+Loading pipeline components...:  20%|██        | 1/5 [00:02<00:10,  2.74s/it]INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+
+Loading pipeline components...:  80%|████████  | 4/5 [00:03<00:00,  1.31it/s]
+Loading pipeline components...: 100%|██████████| 5/5 [00:03<00:00,  1.63it/s]
+Loading pipeline components...: 100%|██████████| 5/5 [00:03<00:00,  1.29it/s]
+The TextToVideoSDPipeline has been deprecated and will not receive bug fixes or feature updates after Diffusers version 0.33.1. 
+2026-02-23 17:10:36,600 | INFO | Thread-6 (text2video_worker) | pipeline load done kind=text-to-video source=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b elapsed_ms=4807.5
+2026-02-23 17:10:36,600 | WARNING | Thread-6 (text2video_worker) | unload_lora_weights failed; continuing
+Traceback (most recent call last):
+  File "C:\AI\VideoGen\main.py", line 661, in apply_loras_to_pipeline
+    pipe.unload_lora_weights()
+  File "C:\AI\VideoGen\venv\Lib\site-packages\diffusers\loaders\lora_base.py", line 532, in unload_lora_weights
+    model.unload_lora()
+    ^^^^^^^^^^^^^^^^^
+  File "C:\AI\VideoGen\venv\Lib\site-packages\diffusers\models\modeling_utils.py", line 277, in __getattr__
+    return super().__getattr__(name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\AI\VideoGen\venv\Lib\site-packages\torch\nn\modules\module.py", line 1964, in __getattr__
+    raise AttributeError(
+AttributeError: 'UNet3DConditionModel' object has no attribute 'unload_lora'
+
+  0%|          | 0/8 [00:00<?, ?it/s]INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+
+ 12%|█▎        | 1/8 [00:33<03:54, 33.51s/it]INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+
+ 25%|██▌       | 2/8 [00:41<01:50, 18.40s/it]INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+
+ 38%|███▊      | 3/8 [00:45<00:59, 11.94s/it]INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+
+ 50%|█████     | 4/8 [00:48<00:34,  8.55s/it]INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+
+ 62%|██████▎   | 5/8 [00:54<00:21,  7.33s/it]INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+
+ 75%|███████▌  | 6/8 [01:01<00:15,  7.51s/it]INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+
+ 88%|████████▊ | 7/8 [01:10<00:07,  7.73s/it]INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+
+100%|██████████| 8/8 [01:15<00:00,  7.05s/it]
+100%|██████████| 8/8 [01:15<00:00,  9.47s/it]
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+C:\AI\VideoGen\venv\Lib\site-packages\diffusers\utils\export_utils.py:198: RuntimeWarning: overflow encountered in multiply
+  video_frames = [(frame * 255).astype(np.uint8) for frame in video_frames]
+C:\AI\VideoGen\venv\Lib\site-packages\diffusers\utils\export_utils.py:198: RuntimeWarning: invalid value encountered in multiply
+  video_frames = [(frame * 255).astype(np.uint8) for frame in video_frames]
+C:\AI\VideoGen\venv\Lib\site-packages\diffusers\utils\export_utils.py:198: RuntimeWarning: invalid value encountered in cast
+  video_frames = [(frame * 255).astype(np.uint8) for frame in video_frames]
+2026-02-23 17:15:33,126 | INFO | Thread-6 (text2video_worker) | task status id=bd3f75a5-78e9-4748-9669-4ce9143891cf type=text2video running->completed progress=1.000 message=Done
+2026-02-23 17:15:33,126 | INFO | Thread-6 (text2video_worker) | text2video done task_id=bd3f75a5-78e9-4748-9669-4ce9143891cf output=C:\AI\VideoGen\outputs\text2video_bd3f75a5-78e9-4748-9669-4ce9143891cf.mp4
+INFO:     127.0.0.1:50275 - "GET /api/tasks/bd3f75a5-78e9-4748-9669-4ce9143891cf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50275 - "GET /api/outputs?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57722 - "GET /api/videos/text2video_bd3f75a5-78e9-4748-9669-4ce9143891cf.mp4?t=1771834534803 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:57722 - "GET /api/videos/text2video_bd3f75a5-78e9-4748-9669-4ce9143891cf.mp4 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:58886 - "GET /api/videos/text2video_29dee242-41c4-4e72-806b-b19be716aff7.mp4 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:50275 - "GET /api/videos/image2video_3006ae28-72a5-4ae9-b186-ec234a5dd0e6.mp4 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:58886 - "GET /api/videos/image2video_3006ae28-72a5-4ae9-b186-ec234a5dd0e6.mp4 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:58886 - "GET /api/videos/image2video_3006ae28-72a5-4ae9-b186-ec234a5dd0e6.mp4 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:58886 - "GET /api/videos/image2video_3006ae28-72a5-4ae9-b186-ec234a5dd0e6.mp4 HTTP/1.1" 206 Partial Content
+2026-02-23 17:15:35,385 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-video&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cali-vilab--i2vgen-xl status=200 elapsed_ms=5.3
+INFO:     127.0.0.1:58886 - "GET /api/models/loras/catalog?task=image-to-video&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5Cali-vilab--i2vgen-xl HTTP/1.1" 200 OK
+2026-02-23 17:15:35,857 | INFO | MainThread | task created id=abeaf0f5-d681-4628-9341-a0df2490e360 type=image2video message=Generation queued
+2026-02-23 17:15:35,857 | INFO | MainThread | image2video requested task_id=abeaf0f5-d681-4628-9341-a0df2490e360 model=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl loras=(none) lora_scale=1.0 file=sticker8377632396286038267.png steps=8 frames=8 guidance=8.0 fps=6 size=512x512 seed=None
+2026-02-23 17:15:35,858 | INFO | MainThread | request method=POST path=/api/generate/image2video query= status=200 elapsed_ms=14.0
+INFO:     127.0.0.1:58886 - "POST /api/generate/image2video HTTP/1.1" 200 OK
+2026-02-23 17:15:35,860 | INFO | Thread-11 (image2video_worker) | image2video start task_id=abeaf0f5-d681-4628-9341-a0df2490e360 model=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl loras=(none) lora_scale=1.0 image=C:\AI\VideoGen\outputs\tmp\6ed611f2-58c3-436a-90f3-49b8da9666de.png steps=8 frames=8 guidance=8.0 fps=6 size=512x512 seed=None
+2026-02-23 17:15:35,861 | INFO | Thread-11 (image2video_worker) | task status id=abeaf0f5-d681-4628-9341-a0df2490e360 type=image2video queued->running progress=0.050 message=Loading model
+2026-02-23 17:15:35,861 | INFO | Thread-11 (image2video_worker) | pipeline load start kind=image-to-video model_ref=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl source=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl device=cuda dtype=torch.float16
+INFO:     127.0.0.1:58886 - "GET /api/tasks/abeaf0f5-d681-4628-9341-a0df2490e360 HTTP/1.1" 200 OK
+
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]
+Loading pipeline components...:  14%|█▍        | 1/7 [00:02<00:15,  2.52s/it]INFO:     127.0.0.1:58886 - "GET /api/tasks/abeaf0f5-d681-4628-9341-a0df2490e360 HTTP/1.1" 200 OK
+
+Loading pipeline components...:  43%|████▎     | 3/7 [00:03<00:04,  1.07s/it]
+Loading pipeline components...:  86%|████████▌ | 6/7 [00:04<00:00,  1.74it/s]
+Loading pipeline components...: 100%|██████████| 7/7 [00:04<00:00,  2.06it/s]
+Loading pipeline components...: 100%|██████████| 7/7 [00:04<00:00,  1.52it/s]
+The I2VGenXLPipeline has been deprecated and will not receive bug fixes or feature updates after Diffusers version 0.33.1. 
+2026-02-23 17:15:41,167 | INFO | Thread-11 (image2video_worker) | pipeline load done kind=image-to-video source=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl elapsed_ms=5306.3
+C:\AI\VideoGen\venv\Lib\site-packages\transformers\integrations\sdpa_attention.py:96: UserWarning: Flash Efficient attention on Current AMD GPU is still experimental. Enable it with TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=1. (Triggered internally at C:\b\pytorch\aten\src\ATen\native\transformers\hip\sdp_utils.cpp:310.)
+  attn_output = torch.nn.functional.scaled_dot_product_attention(
+
+  0%|          | 0/8 [00:00<?, ?it/s]
+ 12%|█▎        | 1/8 [00:00<00:03,  1.79it/s]INFO:     127.0.0.1:58886 - "GET /api/tasks/abeaf0f5-d681-4628-9341-a0df2490e360 HTTP/1.1" 200 OK
+
+ 25%|██▌       | 2/8 [00:00<00:01,  3.33it/s]
+ 50%|█████     | 4/8 [00:00<00:00,  6.14it/s]
+ 75%|███████▌  | 6/8 [00:00<00:00,  8.30it/s]
+100%|██████████| 8/8 [00:01<00:00,  9.62it/s]
+100%|██████████| 8/8 [00:01<00:00,  6.98it/s]
+C:\AI\VideoGen\venv\Lib\site-packages\diffusers\image_processor.py:148: RuntimeWarning: overflow encountered in multiply
+  images = (images * 255).round().astype("uint8")
+C:\AI\VideoGen\venv\Lib\site-packages\diffusers\image_processor.py:148: RuntimeWarning: invalid value encountered in multiply
+  images = (images * 255).round().astype("uint8")
+C:\AI\VideoGen\venv\Lib\site-packages\diffusers\image_processor.py:148: RuntimeWarning: invalid value encountered in cast
+  images = (images * 255).round().astype("uint8")
+2026-02-23 17:15:42,545 | INFO | Thread-11 (image2video_worker) | task status id=abeaf0f5-d681-4628-9341-a0df2490e360 type=image2video running->completed progress=1.000 message=Done
+2026-02-23 17:15:42,546 | INFO | Thread-11 (image2video_worker) | image2video done task_id=abeaf0f5-d681-4628-9341-a0df2490e360 output=C:\AI\VideoGen\outputs\image2video_abeaf0f5-d681-4628-9341-a0df2490e360.mp4
+INFO:     127.0.0.1:58886 - "GET /api/tasks/abeaf0f5-d681-4628-9341-a0df2490e360 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60614 - "GET /api/videos/image2video_abeaf0f5-d681-4628-9341-a0df2490e360.mp4?t=1771834544876 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:58886 - "GET /api/outputs?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60614 - "GET /api/videos/image2video_abeaf0f5-d681-4628-9341-a0df2490e360.mp4 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:58886 - "GET /api/videos/image2video_abeaf0f5-d681-4628-9341-a0df2490e360.mp4 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:58886 - "GET /api/videos/image2video_abeaf0f5-d681-4628-9341-a0df2490e360.mp4 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:58886 - "GET /api/videos/image2video_abeaf0f5-d681-4628-9341-a0df2490e360.mp4 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:61855 - "GET /api/images/image2image_15d853dd-3343-4612-adc1-c2e6bb8aa936.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58886 - "GET /api/images/image2image_6531a6fc-0724-4873-8c89-11031f625629.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58544 - "GET /api/images/text2image_65a0d049-4d43-48d2-8f16-591aa478a45a.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61049 - "GET /api/images/text2image_08ade3ee-c44e-41f3-82fe-3c000174fdc3.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54028 - "GET /api/images/image2image_3665ae80-1417-41d3-a911-49a57c568450.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55326 - "GET /api/images/image2image_1e5580a7-586a-49c5-b24a-59eaf72cc522.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61855 - "GET /api/images/text2image_47dd9b57-9aeb-454f-8539-766466d4a8c6.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58886 - "GET /api/images/text2image_80b9e8e3-ceff-4207-9ac7-fa086025fba1.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54028 - "GET /api/videos/image2video_abeaf0f5-d681-4628-9341-a0df2490e360.mp4 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:58886 - "GET /api/outputs?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61855 - "GET /api/videos/image2video_3006ae28-72a5-4ae9-b186-ec234a5dd0e6.mp4 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:58886 - "GET /api/videos/text2video_bd3f75a5-78e9-4748-9669-4ce9143891cf.mp4 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:54028 - "GET /api/videos/text2video_29dee242-41c4-4e72-806b-b19be716aff7.mp4 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:58886 - "GET /api/videos/image2video_3006ae28-72a5-4ae9-b186-ec234a5dd0e6.mp4 HTTP/1.1" 206 Partial Content

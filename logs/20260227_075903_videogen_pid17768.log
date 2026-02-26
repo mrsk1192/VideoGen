@@ -1,0 +1,196 @@
+2026-02-27 07:59:03,228 | INFO | MainThread | logger initialized file=C:\AI\VideoGen\logs\20260227_075903_videogen_pid17768.log level=DEBUG
+2026-02-27 07:59:03,259 | WARNING | MainThread | startup preload skipped on ROCm for stability. Set VIDEOGEN_ALLOW_ROCM_STARTUP_PRELOAD=1 to force.
+2026-02-27 07:59:03,342 | DEBUG | MainThread | request method=GET path=/ query= status=200 elapsed_ms=22.5
+2026-02-27 07:59:03,766 | INFO | MainThread | request method=GET path=/api/settings query= status=200 elapsed_ms=1.6
+2026-02-27 07:59:03,774 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-27 07:59:03,786 | DEBUG | MainThread | request method=GET path=/api/models/local query= status=200 elapsed_ms=51.3
+2026-02-27 07:59:03,885 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-27 07:59:03,886 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-27 07:59:03,886 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-27 07:59:03,887 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-27 07:59:03,888 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-27 07:59:03,888 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-27 07:59:03,888 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-27 07:59:03,889 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-27 07:59:03,889 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-27 07:59:03,890 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-27 07:59:03,891 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-27 07:59:03,893 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=text-to-image&limit=40 status=200 elapsed_ms=123.1
+2026-02-27 07:59:03,895 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-27 07:59:03,896 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=image-to-image&limit=40 status=200 elapsed_ms=10.4
+2026-02-27 07:59:03,898 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-27 07:59:03,899 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-27 07:59:03,899 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\hf-internal-testing--tiny-stable-diffusion-pipe
+2026-02-27 07:59:03,899 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-27 07:59:03,900 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-27 07:59:03,900 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-27 07:59:03,900 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0
+2026-02-27 07:59:03,901 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-27 07:59:03,901 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-27 07:59:03,901 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+2026-02-27 07:59:03,901 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\hf-internal-testing--tiny-stable-diffusion-pipe
+2026-02-27 07:59:03,901 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=text-to-video&limit=40 status=200 elapsed_ms=7.1
+2026-02-27 07:59:03,902 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-27 07:59:03,903 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-27 07:59:03,904 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0
+2026-02-27 07:59:03,906 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+2026-02-27 07:59:03,906 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=image-to-video&limit=40 status=200 elapsed_ms=8.4
+2026-02-27 07:59:03,914 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=SG161222%2FRealVisXL_V5.0 status=200 elapsed_ms=11.2
+2026-02-27 07:59:03,916 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=10.0
+2026-02-27 07:59:03,921 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-video&limit=200&model_ref=damo-vilab%2Ftext-to-video-ms-1.7b status=200 elapsed_ms=6.1
+2026-02-27 07:59:03,927 | DEBUG | MainThread | request method=GET path=/api/models/vaes/catalog query=limit=200 status=200 elapsed_ms=5.5
+2026-02-27 07:59:03,928 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-video&limit=200&model_ref=ali-vilab%2Fi2vgen-xl status=200 elapsed_ms=10.8
+2026-02-27 07:59:03,933 | DEBUG | MainThread | request method=GET path=/api/models/vaes/catalog query=limit=200 status=200 elapsed_ms=4.4
+2026-02-27 07:59:06,089 | DEBUG | MainThread | request method=GET path=/api/system/info query= status=200 elapsed_ms=2354.1
+2026-02-27 07:59:06,092 | DEBUG | MainThread | request method=GET path=/api/system/info query= status=200 elapsed_ms=0.7
+2026-02-27 07:59:06,098 | DEBUG | MainThread | request method=GET path=/api/outputs query=limit=500 status=200 elapsed_ms=3.1
+2026-02-27 07:59:06,103 | DEBUG | MainThread | request method=GET path=/api/models/local query=dir=models status=200 elapsed_ms=9.0
+2026-02-27 07:59:06,106 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-27 07:59:06,106 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-27 07:59:06,106 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-27 07:59:06,106 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-27 07:59:06,106 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-27 07:59:06,106 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-27 07:59:06,106 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-27 07:59:06,106 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-27 07:59:06,106 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-27 07:59:06,106 | DEBUG | MainThread | request method=GET path=/api/videos/text2video_dfd1dc08-1a88-4864-8e9c-52608064b0d8.mp4 query= status=206 elapsed_ms=4.6
+2026-02-27 07:59:06,106 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-27 07:59:06,106 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-27 07:59:06,106 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-27 07:59:06,106 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-27 07:59:06,106 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-27 07:59:06,106 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-27 07:59:06,106 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\hf-internal-testing--tiny-stable-diffusion-pipe
+2026-02-27 07:59:06,106 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-27 07:59:06,106 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\hf-internal-testing--tiny-stable-diffusion-pipe
+2026-02-27 07:59:06,106 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-27 07:59:06,106 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-27 07:59:06,106 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-27 07:59:06,106 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-27 07:59:06,119 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-27 07:59:06,119 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-27 07:59:06,119 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0
+2026-02-27 07:59:06,119 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0
+2026-02-27 07:59:06,119 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+2026-02-27 07:59:06,119 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+2026-02-27 07:59:06,119 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=image-to-video&limit=40 status=200 elapsed_ms=13.3
+2026-02-27 07:59:06,119 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=text-to-video&limit=40 status=200 elapsed_ms=14.2
+2026-02-27 07:59:06,123 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=text-to-image&limit=40 status=200 elapsed_ms=16.0
+2026-02-27 07:59:06,125 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=image-to-image&limit=40 status=200 elapsed_ms=17.5
+2026-02-27 07:59:06,129 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-video&limit=200&model_ref=damo-vilab%2Ftext-to-video-ms-1.7b status=200 elapsed_ms=4.5
+2026-02-27 07:59:06,130 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-video&limit=200&model_ref=ali-vilab%2Fi2vgen-xl status=200 elapsed_ms=6.1
+2026-02-27 07:59:06,143 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=SG161222%2FRealVisXL_V5.0 status=200 elapsed_ms=6.1
+2026-02-27 07:59:06,145 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=6.5
+2026-02-27 07:59:06,147 | DEBUG | MainThread | request method=GET path=/api/models/vaes/catalog query=limit=200 status=200 elapsed_ms=1.3
+2026-02-27 07:59:06,149 | DEBUG | MainThread | request method=GET path=/api/models/vaes/catalog query=limit=200 status=200 elapsed_ms=1.3
+2026-02-27 07:59:10,845 | DEBUG | MainThread | request method=GET path=/api/models/search query=task=text-to-image&source=all&query=&limit=30 status=200 elapsed_ms=4707.7
+2026-02-27 07:59:10,864 | INFO | MainThread | request method=GET path=/api/tasks/e1934de3-436a-452b-a123-119b98e8920a query= status=404 elapsed_ms=0.6
+2026-02-27 07:59:20,722 | INFO | AnyIO worker thread | task created id=93b3f716-e322-468a-ad8a-b01f7796fb65 type=text2image message=Generation queued
+2026-02-27 07:59:20,722 | INFO | AnyIO worker thread | text2image requested task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 model=(default) loras=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl lora_scale=1.0 vae=(none) prompt_len=186 negative_len=0 steps=30 guidance=9.0 size=512x512 seed=None
+2026-02-27 07:59:20,724 | INFO | MainThread | request method=POST path=/api/generate/text2image query= status=200 elapsed_ms=2.9
+2026-02-27 07:59:20,724 | INFO | Thread-1 (text2image_worker) | text2image start task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 model=SG161222/RealVisXL_V5.0 loras=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl lora_scale=1.0 vae=(none) steps=30 guidance=9.0 size=512x512 seed=None
+2026-02-27 07:59:20,724 | INFO | Thread-1 (text2image_worker) | task status id=93b3f716-e322-468a-ad8a-b01f7796fb65 type=text2image queued->running progress=0.050 message=Loading model
+2026-02-27 07:59:20,725 | INFO | Thread-1 (text2image_worker) | pipeline load start kind=text-to-image model_ref=SG161222/RealVisXL_V5.0 source=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0 device=cuda dtype=torch.float16
+2026-02-27 07:59:29,701 | INFO | Thread-1 (text2image_worker) | pipeline load done kind=text-to-image source=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0 elapsed_ms=8977.5
+2026-02-27 07:59:31,511 | DEBUG | Thread-1 (text2image_worker) | step callback mode task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 mode=callback_on_step_end
+2026-02-27 07:59:31,511 | INFO | Thread-1 (text2image_worker) | text2image inference start task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 model=SG161222/RealVisXL_V5.0 steps=30 guidance=9.0 size=512x512 callback_keys=callback_on_step_end
+2026-02-27 07:59:31,512 | DEBUG | Thread-1 (text2image_worker) | pipeline call kwargs pipe=StableDiffusionXLPipeline accept_var_kwargs=True provided=10 passed=8 dropped=['negative_prompt', 'generator']
+2026-02-27 07:59:35,218 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=1 total=30 progress=0.2233
+2026-02-27 07:59:35,437 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=2 total=30 progress=0.2467
+2026-02-27 07:59:35,646 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=3 total=30 progress=0.2700
+2026-02-27 07:59:35,845 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=4 total=30 progress=0.2933
+2026-02-27 07:59:36,063 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=5 total=30 progress=0.3167
+2026-02-27 07:59:36,265 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=6 total=30 progress=0.3400
+2026-02-27 07:59:36,467 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=7 total=30 progress=0.3633
+2026-02-27 07:59:36,686 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=8 total=30 progress=0.3867
+2026-02-27 07:59:36,899 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=9 total=30 progress=0.4100
+2026-02-27 07:59:37,094 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=10 total=30 progress=0.4333
+2026-02-27 07:59:37,311 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=11 total=30 progress=0.4567
+2026-02-27 07:59:37,514 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=12 total=30 progress=0.4800
+2026-02-27 07:59:37,717 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=13 total=30 progress=0.5033
+2026-02-27 07:59:37,937 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=14 total=30 progress=0.5267
+2026-02-27 07:59:38,141 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=15 total=30 progress=0.5500
+2026-02-27 07:59:38,344 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=16 total=30 progress=0.5733
+2026-02-27 07:59:38,545 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=17 total=30 progress=0.5967
+2026-02-27 07:59:38,749 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=18 total=30 progress=0.6200
+2026-02-27 07:59:38,967 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=19 total=30 progress=0.6433
+2026-02-27 07:59:39,171 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=20 total=30 progress=0.6667
+2026-02-27 07:59:39,374 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=21 total=30 progress=0.6900
+2026-02-27 07:59:39,592 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=22 total=30 progress=0.7133
+2026-02-27 07:59:39,801 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=23 total=30 progress=0.7367
+2026-02-27 07:59:40,009 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=24 total=30 progress=0.7600
+2026-02-27 07:59:40,216 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=25 total=30 progress=0.7833
+2026-02-27 07:59:40,419 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=26 total=30 progress=0.8067
+2026-02-27 07:59:40,624 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=27 total=30 progress=0.8300
+2026-02-27 07:59:40,826 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=28 total=30 progress=0.8533
+2026-02-27 07:59:41,038 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=29 total=30 progress=0.8767
+2026-02-27 07:59:41,243 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 message=Generating image step=30 total=30 progress=0.9000
+2026-02-27 07:59:42,407 | INFO | Thread-1 (text2image_worker) | text2image inference done task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 elapsed_ms=10899.4
+2026-02-27 07:59:42,436 | INFO | Thread-1 (text2image_worker) | task status id=93b3f716-e322-468a-ad8a-b01f7796fb65 type=text2image running->completed progress=1.000 message=Done
+2026-02-27 07:59:42,436 | INFO | Thread-1 (text2image_worker) | text2image done task_id=93b3f716-e322-468a-ad8a-b01f7796fb65 output=C:\AI\VideoGen\outputs\text2image_93b3f716-e322-468a-ad8a-b01f7796fb65.png
+2026-02-27 07:59:42,760 | DEBUG | MainThread | request method=GET path=/api/images/text2image_93b3f716-e322-468a-ad8a-b01f7796fb65.png query=t=1772146782757 status=200 elapsed_ms=1.2
+2026-02-27 07:59:42,769 | DEBUG | MainThread | request method=GET path=/api/outputs query=limit=500 status=200 elapsed_ms=1.4
+2026-02-27 08:00:11,299 | INFO | AnyIO worker thread | task created id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 type=text2video message=Generation queued
+2026-02-27 08:00:11,299 | INFO | AnyIO worker thread | text2video requested task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 model=(default) backend=cuda requested_backend=auto loras=(none) lora_scale=1.0 prompt_len=186 negative_len=0 steps=30 frames=32 guidance=9.0 fps=16 seed=None
+2026-02-27 08:00:11,301 | INFO | MainThread | request method=POST path=/api/generate/text2video query= status=200 elapsed_ms=5.4
+2026-02-27 08:00:11,303 | INFO | Thread-3 (text2video_worker) | text2video start task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 model=damo-vilab/text-to-video-ms-1.7b backend=cuda requested_backend=auto loras=(none) lora_scale=1.0 steps=30 frames=32 guidance=9.0 fps=16 seed=None
+2026-02-27 08:00:11,303 | INFO | Thread-3 (text2video_worker) | task status id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 type=text2video queued->running progress=0.050 message=Loading model
+2026-02-27 08:00:11,304 | INFO | Thread-3 (text2video_worker) | pipeline load start kind=text-to-video model_ref=damo-vilab/text-to-video-ms-1.7b source=damo-vilab/text-to-video-ms-1.7b device=cuda dtype=torch.float16
+2026-02-27 08:00:17,123 | INFO | Thread-3 (text2video_worker) | pipeline load done kind=text-to-video source=damo-vilab/text-to-video-ms-1.7b elapsed_ms=5832.0
+2026-02-27 08:00:17,123 | DEBUG | Thread-3 (text2video_worker) | step callback mode task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 mode=callback
+2026-02-27 08:00:17,123 | INFO | Thread-3 (text2video_worker) | text2video inference start task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 model=damo-vilab/text-to-video-ms-1.7b steps=30 frames=32 guidance=9.0 callback_keys=callback,callback_steps
+2026-02-27 08:00:17,123 | DEBUG | Thread-3 (text2video_worker) | pipeline call kwargs pipe=TextToVideoSDPipeline accept_var_kwargs=False provided=9 passed=6 dropped=['negative_prompt', 'generator', 'cross_attention_kwargs']
+2026-02-27 08:06:33,764 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=1 total=30 progress=0.3677
+2026-02-27 08:06:33,856 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=2 total=30 progress=0.3853
+2026-02-27 08:06:33,892 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=3 total=30 progress=0.4030
+2026-02-27 08:06:33,923 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=4 total=30 progress=0.4207
+2026-02-27 08:06:33,955 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=5 total=30 progress=0.4383
+2026-02-27 08:06:33,987 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=6 total=30 progress=0.4560
+2026-02-27 08:06:34,020 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=7 total=30 progress=0.4737
+2026-02-27 08:06:34,052 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=8 total=30 progress=0.4913
+2026-02-27 08:06:34,083 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=9 total=30 progress=0.5090
+2026-02-27 08:06:34,116 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=10 total=30 progress=0.5267
+2026-02-27 08:06:34,149 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=11 total=30 progress=0.5443
+2026-02-27 08:06:34,184 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=12 total=30 progress=0.5620
+2026-02-27 08:06:34,219 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=13 total=30 progress=0.5797
+2026-02-27 08:06:34,254 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=14 total=30 progress=0.5973
+2026-02-27 08:06:34,287 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=15 total=30 progress=0.6150
+2026-02-27 08:06:34,317 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=16 total=30 progress=0.6327
+2026-02-27 08:06:34,358 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=17 total=30 progress=0.6503
+2026-02-27 08:06:34,394 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=18 total=30 progress=0.6680
+2026-02-27 08:06:34,444 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=19 total=30 progress=0.6857
+2026-02-27 08:06:34,480 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=20 total=30 progress=0.7033
+2026-02-27 08:06:34,514 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=21 total=30 progress=0.7210
+2026-02-27 08:06:34,546 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=22 total=30 progress=0.7387
+2026-02-27 08:06:34,567 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=23 total=30 progress=0.7563
+2026-02-27 08:06:34,611 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=24 total=30 progress=0.7740
+2026-02-27 08:06:34,628 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=25 total=30 progress=0.7917
+2026-02-27 08:06:34,676 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=26 total=30 progress=0.8093
+2026-02-27 08:06:34,708 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=27 total=30 progress=0.8270
+2026-02-27 08:06:34,740 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=28 total=30 progress=0.8447
+2026-02-27 08:06:34,774 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=29 total=30 progress=0.8623
+2026-02-27 08:06:34,814 | DEBUG | Thread-3 (text2video_worker) | task progress step task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 message=Generating frames step=30 total=30 progress=0.8800
+2026-02-27 08:11:55,501 | INFO | Thread-3 (text2video_worker) | text2video frame generation done task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 elapsed_ms=698461.0
+2026-02-27 08:11:55,501 | INFO | Thread-3 (text2video_worker) | text2video encoding start task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 frames=32 fps=16 output=C:\AI\VideoGen\outputs\text2video_1569d2a4-6023-4f3f-8f24-301e1e744cf1.mp4
+2026-02-27 08:11:56,180 | INFO | Thread-3 (text2video_worker) | video encoded with hardware codec=h264_amf path=C:\AI\VideoGen\outputs\text2video_1569d2a4-6023-4f3f-8f24-301e1e744cf1.mp4 frames=32 fps=16 sample_shape=(256, 256, 3) sample_dtype=uint8
+2026-02-27 08:11:56,181 | INFO | Thread-3 (text2video_worker) | text2video encoding done task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 encoder=h264_amf elapsed_ms=672.5
+2026-02-27 08:11:56,181 | INFO | Thread-3 (text2video_worker) | task status id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 type=text2video running->completed progress=1.000 message=Done
+2026-02-27 08:11:56,181 | INFO | Thread-3 (text2video_worker) | text2video done task_id=1569d2a4-6023-4f3f-8f24-301e1e744cf1 backend=cuda output=C:\AI\VideoGen\outputs\text2video_1569d2a4-6023-4f3f-8f24-301e1e744cf1.mp4
+2026-02-27 08:11:56,419 | DEBUG | MainThread | request method=GET path=/api/outputs query=limit=500 status=200 elapsed_ms=1.8
+2026-02-27 08:14:32,005 | DEBUG | MainThread | request method=GET path=/api/videos/text2video_1569d2a4-6023-4f3f-8f24-301e1e744cf1.mp4 query=t=1772147516417 status=206 elapsed_ms=3.8
+2026-02-27 08:14:32,007 | DEBUG | MainThread | request method=GET path=/api/videos/text2video_1569d2a4-6023-4f3f-8f24-301e1e744cf1.mp4 query= status=206 elapsed_ms=5.0
+2026-02-27 08:14:32,015 | DEBUG | MainThread | request method=GET path=/api/videos/text2video_1569d2a4-6023-4f3f-8f24-301e1e744cf1.mp4 query=t=1772147516417 status=206 elapsed_ms=4.0
+2026-02-27 08:14:32,015 | DEBUG | MainThread | request method=GET path=/api/videos/text2video_1569d2a4-6023-4f3f-8f24-301e1e744cf1.mp4 query= status=206 elapsed_ms=1.1
+2026-02-27 08:14:32,015 | DEBUG | MainThread | request method=GET path=/api/videos/text2video_1569d2a4-6023-4f3f-8f24-301e1e744cf1.mp4 query=t=1772147516417 status=206 elapsed_ms=0.8
+2026-02-27 08:14:32,015 | DEBUG | MainThread | request method=GET path=/api/videos/text2video_1569d2a4-6023-4f3f-8f24-301e1e744cf1.mp4 query= status=206 elapsed_ms=0.8
+2026-02-27 08:14:32,015 | DEBUG | MainThread | request method=GET path=/api/videos/text2video_1569d2a4-6023-4f3f-8f24-301e1e744cf1.mp4 query=t=1772147516417 status=206 elapsed_ms=0.8
+2026-02-27 08:14:32,034 | DEBUG | MainThread | request method=GET path=/api/videos/text2video_1569d2a4-6023-4f3f-8f24-301e1e744cf1.mp4 query= status=206 elapsed_ms=1.6
+2026-02-27 08:14:56,693 | DEBUG | MainThread | request method=GET path=/api/models/search query=task=text-to-video&source=all&query=&limit=30 status=200 elapsed_ms=7195.8
+2026-02-27 08:14:57,095 | DEBUG | MainThread | request method=GET path=/api/models/search query=task=text-to-video&source=all&query=&limit=30 status=200 elapsed_ms=399.1
+2026-02-27 08:14:57,606 | DEBUG | MainThread | request method=GET path=/api/models/search query=task=text-to-video&source=all&query=&limit=30 status=200 elapsed_ms=509.4
+2026-02-27 08:15:41,892 | INFO | AnyIO worker thread | task created id=1794f6a8-0604-4861-891c-7f61a7cf85e2 type=download message=Download queued
+2026-02-27 08:15:41,892 | INFO | AnyIO worker thread | download requested task_id=1794f6a8-0604-4861-891c-7f61a7cf85e2 repo=Wan-AI/Wan2.2-T2V-A14B-Diffusers revision=None target_dir=models
+2026-02-27 08:15:41,892 | INFO | MainThread | request method=POST path=/api/models/download query= status=200 elapsed_ms=3.2
+2026-02-27 08:15:41,892 | INFO | Thread-4 (download_model_worker) | download start task_id=1794f6a8-0604-4861-891c-7f61a7cf85e2 repo=Wan-AI/Wan2.2-T2V-A14B-Diffusers revision=main target=C:\AI\VideoGen\models\Wan-AI--Wan2.2-T2V-A14B-Diffusers
+2026-02-27 08:15:41,892 | INFO | Thread-4 (download_model_worker) | task status id=1794f6a8-0604-4861-891c-7f61a7cf85e2 type=download queued->running progress=0.000 message=Preparing download Wan-AI/Wan2.2-T2V-A14B-Diffusers

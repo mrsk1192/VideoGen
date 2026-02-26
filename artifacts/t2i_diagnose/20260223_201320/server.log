@@ -1,0 +1,343 @@
+The system cannot find the file specified.
+[WARN] transformers compatibility check failed. Current environment may be partially incompatible.
+[WARN] ROCm/GPU backend was not detected in this Python environment.
+[INFO] Starting server at http://localhost:51132
+2026-02-23 20:13:22,606 | INFO | MainThread | logger initialized file=C:\AI\VideoGen\logs\videogen.log level=DEBUG
+INFO:     Started server process [7144]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:51132 (Press CTRL+C to quit)
+2026-02-23 20:13:25,165 | DEBUG | MainThread | request method=GET path=/api/system/info query= status=200 elapsed_ms=2461.1
+2026-02-23 20:13:25,215 | DEBUG | MainThread | request method=GET path=/api/system/info query= status=200 elapsed_ms=1.1
+INFO:     127.0.0.1:51138 - "GET /api/system/info HTTP/1.1" 200 OK
+2026-02-23 20:13:25,230 | DEBUG | MainThread | request method=GET path=/api/system/info query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:51139 - "GET /api/system/info HTTP/1.1" 200 OK
+2026-02-23 20:13:26,387 | DEBUG | MainThread | request method=GET path=/ query= status=200 elapsed_ms=27.5
+INFO:     127.0.0.1:65039 - "GET / HTTP/1.1" 200 OK
+2026-02-23 20:13:26,395 | DEBUG | MainThread | request method=GET path=/static/styles.css query= status=200 elapsed_ms=1.5
+INFO:     127.0.0.1:65039 - "GET /static/styles.css HTTP/1.1" 200 OK
+2026-02-23 20:13:26,395 | DEBUG | MainThread | request method=GET path=/static/app.js query= status=200 elapsed_ms=1.7
+INFO:     127.0.0.1:50856 - "GET /static/app.js HTTP/1.1" 200 OK
+2026-02-23 20:13:26,474 | DEBUG | MainThread | request method=GET path=/api/system/info query= status=200 elapsed_ms=2.6
+INFO:     127.0.0.1:50856 - "GET /api/system/info HTTP/1.1" 200 OK
+2026-02-23 20:13:26,475 | INFO | MainThread | request method=GET path=/api/settings query= status=200 elapsed_ms=1.8
+INFO:     127.0.0.1:59637 - "GET /api/settings HTTP/1.1" 200 OK
+2026-02-23 20:13:26,476 | DEBUG | MainThread | request method=GET path=/api/system/info query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:50856 - "GET /api/system/info HTTP/1.1" 200 OK
+2026-02-23 20:13:26,483 | DEBUG | MainThread | request method=GET path=/api/models/local query= status=200 elapsed_ms=11.3
+INFO:     127.0.0.1:65039 - "GET /api/models/local HTTP/1.1" 200 OK
+2026-02-23 20:13:26,511 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 20:13:26,511 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 20:13:26,511 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 20:13:26,512 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 20:13:26,512 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 20:13:26,512 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 20:13:26,513 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 20:13:26,513 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 20:13:26,513 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 20:13:26,514 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 20:13:26,514 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 20:13:26,515 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 20:13:26,515 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 20:13:26,515 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 20:13:26,515 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\hf-internal-testing--tiny-stable-diffusion-pipe
+2026-02-23 20:13:26,516 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 20:13:26,516 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\hf-internal-testing--tiny-stable-diffusion-pipe
+2026-02-23 20:13:26,516 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 20:13:26,516 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 20:13:26,516 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 20:13:26,517 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 20:13:26,517 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 20:13:26,517 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 20:13:26,517 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 20:13:26,517 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0
+2026-02-23 20:13:26,518 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+2026-02-23 20:13:26,518 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0
+2026-02-23 20:13:26,519 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=text-to-video&limit=40 status=200 elapsed_ms=10.6
+INFO:     127.0.0.1:59637 - "GET /api/models/catalog?task=text-to-video&limit=40 HTTP/1.1" 200 OK
+2026-02-23 20:13:26,520 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+2026-02-23 20:13:26,521 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=image-to-video&limit=40 status=200 elapsed_ms=12.1
+INFO:     127.0.0.1:65109 - "GET /api/models/catalog?task=image-to-video&limit=40 HTTP/1.1" 200 OK
+2026-02-23 20:13:26,523 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=text-to-image&limit=40 status=200 elapsed_ms=15.0
+INFO:     127.0.0.1:65039 - "GET /api/models/catalog?task=text-to-image&limit=40 HTTP/1.1" 200 OK
+2026-02-23 20:13:26,523 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=image-to-image&limit=40 status=200 elapsed_ms=14.6
+INFO:     127.0.0.1:50856 - "GET /api/models/catalog?task=image-to-image&limit=40 HTTP/1.1" 200 OK
+2026-02-23 20:13:26,527 | INFO | MainThread | request method=GET path=/favicon.ico query= status=404 elapsed_ms=0.2
+INFO:     127.0.0.1:64225 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+2026-02-23 20:13:26,540 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b status=200 elapsed_ms=13.9
+INFO:     127.0.0.1:65109 - "GET /api/models/loras/catalog?task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b HTTP/1.1" 200 OK
+2026-02-23 20:13:26,541 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=13.1
+INFO:     127.0.0.1:65039 - "GET /api/models/loras/catalog?task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 20:13:26,542 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=13.7
+INFO:     127.0.0.1:50856 - "GET /api/models/loras/catalog?task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 20:13:26,542 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-video&limit=200&model_ref=example-org%2Fexample-model status=200 elapsed_ms=15.8
+INFO:     127.0.0.1:59637 - "GET /api/models/loras/catalog?task=image-to-video&limit=200&model_ref=example-org%2Fexample-model HTTP/1.1" 200 OK
+2026-02-23 20:13:26,547 | DEBUG | MainThread | request method=GET path=/api/models/vaes/catalog query=limit=200 status=200 elapsed_ms=2.0
+INFO:     127.0.0.1:50856 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+2026-02-23 20:13:26,549 | DEBUG | MainThread | request method=GET path=/api/models/vaes/catalog query=limit=200 status=200 elapsed_ms=1.9
+INFO:     127.0.0.1:50856 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+2026-02-23 20:13:26,553 | DEBUG | MainThread | request method=GET path=/api/outputs query=limit=500 status=200 elapsed_ms=1.7
+INFO:     127.0.0.1:59637 - "GET /api/outputs?limit=500 HTTP/1.1" 200 OK
+2026-02-23 20:13:26,559 | DEBUG | MainThread | request method=GET path=/api/models/local query=dir=C%3A%5CAI%5CVideoGen%5Cmodels status=200 elapsed_ms=7.3
+INFO:     127.0.0.1:50856 - "GET /api/models/local?dir=C%3A%5CAI%5CVideoGen%5Cmodels HTTP/1.1" 200 OK
+2026-02-23 20:13:26,563 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 20:13:26,564 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 20:13:26,564 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 20:13:26,564 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 20:13:26,565 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 20:13:26,565 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 20:13:26,565 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 20:13:26,565 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 20:13:26,566 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 20:13:26,566 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 20:13:26,566 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 20:13:26,567 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 20:13:26,567 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 20:13:26,567 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 20:13:26,567 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\hf-internal-testing--tiny-stable-diffusion-pipe
+2026-02-23 20:13:26,568 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 20:13:26,568 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 20:13:26,568 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\hf-internal-testing--tiny-stable-diffusion-pipe
+2026-02-23 20:13:26,568 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 20:13:26,568 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 20:13:26,568 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 20:13:26,568 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 20:13:26,569 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 20:13:26,569 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 20:13:26,569 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0
+2026-02-23 20:13:26,570 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0
+2026-02-23 20:13:26,570 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+2026-02-23 20:13:26,570 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+2026-02-23 20:13:26,571 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=image-to-video&limit=40 status=200 elapsed_ms=10.2
+INFO:     127.0.0.1:65109 - "GET /api/models/catalog?task=image-to-video&limit=40 HTTP/1.1" 200 OK
+2026-02-23 20:13:26,572 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=text-to-video&limit=40 status=200 elapsed_ms=10.8
+INFO:     127.0.0.1:65039 - "GET /api/models/catalog?task=text-to-video&limit=40 HTTP/1.1" 200 OK
+2026-02-23 20:13:26,576 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=image-to-image&limit=40 status=200 elapsed_ms=14.7
+INFO:     127.0.0.1:59637 - "GET /api/models/catalog?task=image-to-image&limit=40 HTTP/1.1" 200 OK
+2026-02-23 20:13:26,577 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=text-to-image&limit=40 status=200 elapsed_ms=16.2
+INFO:     127.0.0.1:50856 - "GET /api/models/catalog?task=text-to-image&limit=40 HTTP/1.1" 200 OK
+2026-02-23 20:13:26,586 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b status=200 elapsed_ms=12.2
+INFO:     127.0.0.1:65109 - "GET /api/models/loras/catalog?task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b HTTP/1.1" 200 OK
+2026-02-23 20:13:26,587 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-video&limit=200&model_ref=example-org%2Fexample-model status=200 elapsed_ms=13.1
+INFO:     127.0.0.1:65039 - "GET /api/models/loras/catalog?task=image-to-video&limit=200&model_ref=example-org%2Fexample-model HTTP/1.1" 200 OK
+2026-02-23 20:13:26,589 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=10.5
+INFO:     127.0.0.1:59637 - "GET /api/models/loras/catalog?task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 20:13:26,590 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=10.5
+INFO:     127.0.0.1:50856 - "GET /api/models/loras/catalog?task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 20:13:26,592 | DEBUG | MainThread | request method=GET path=/api/models/vaes/catalog query=limit=200 status=200 elapsed_ms=1.5
+INFO:     127.0.0.1:59637 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+2026-02-23 20:13:26,595 | DEBUG | MainThread | request method=GET path=/api/models/vaes/catalog query=limit=200 status=200 elapsed_ms=1.7
+INFO:     127.0.0.1:59637 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+2026-02-23 20:13:29,833 | DEBUG | MainThread | request method=GET path=/api/models/search query=task=text-to-image&source=huggingface&query=RealVisXL_V5.0&limit=30 status=200 elapsed_ms=2617.1
+INFO:     127.0.0.1:65039 - "GET /api/models/search?task=text-to-image&source=huggingface&query=RealVisXL_V5.0&limit=30 HTTP/1.1" 200 OK
+2026-02-23 20:13:30,448 | DEBUG | MainThread | request method=GET path=/api/models/search query=task=text-to-image&source=all&query=&limit=30 status=200 elapsed_ms=3851.9
+INFO:     127.0.0.1:59637 - "GET /api/models/search?task=text-to-image&source=all&query=&limit=30 HTTP/1.1" 200 OK
+2026-02-23 20:13:30,828 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 20:13:30,828 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 20:13:30,828 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 20:13:30,828 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 20:13:30,829 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 20:13:30,829 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 20:13:30,831 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=text-to-image&limit=40 status=200 elapsed_ms=4.1
+INFO:     127.0.0.1:59637 - "GET /api/models/catalog?task=text-to-image&limit=40 HTTP/1.1" 200 OK
+2026-02-23 20:13:30,836 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=3.1
+INFO:     127.0.0.1:59637 - "GET /api/models/loras/catalog?task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 20:13:30,841 | DEBUG | MainThread | request method=GET path=/api/models/vaes/catalog query=limit=200 status=200 elapsed_ms=2.6
+INFO:     127.0.0.1:59637 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+2026-02-23 20:13:30,844 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5CSG161222--RealVisXL_V5.0 status=200 elapsed_ms=3.3
+INFO:     127.0.0.1:65039 - "GET /api/models/loras/catalog?task=text-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5CSG161222--RealVisXL_V5.0 HTTP/1.1" 200 OK
+2026-02-23 20:13:30,848 | DEBUG | MainThread | request method=GET path=/api/models/vaes/catalog query=limit=200 status=200 elapsed_ms=1.8
+INFO:     127.0.0.1:65039 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+2026-02-23 20:13:31,047 | INFO | AnyIO worker thread | task created id=77fa3d6c-2421-4ab1-b542-3c71bd1b57cf type=text2image message=Generation queued
+2026-02-23 20:13:31,047 | INFO | AnyIO worker thread | text2image requested task_id=77fa3d6c-2421-4ab1-b542-3c71bd1b57cf model=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0 loras=(none) lora_scale=1.0 vae=(none) prompt_len=114 negative_len=84 steps=20 guidance=8.5 size=640x640 seed=42
+2026-02-23 20:13:31,048 | INFO | MainThread | request method=POST path=/api/generate/text2image query= status=200 elapsed_ms=2.2
+INFO:     127.0.0.1:65039 - "POST /api/generate/text2image HTTP/1.1" 200 OK
+2026-02-23 20:13:31,049 | INFO | Thread-1 (text2image_worker) | text2image start task_id=77fa3d6c-2421-4ab1-b542-3c71bd1b57cf model=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0 loras=(none) lora_scale=1.0 vae=(none) steps=20 guidance=8.5 size=640x640 seed=42
+2026-02-23 20:13:31,049 | INFO | Thread-1 (text2image_worker) | task status id=77fa3d6c-2421-4ab1-b542-3c71bd1b57cf type=text2image queued->running progress=0.050 message=Loading model
+2026-02-23 20:13:31,050 | INFO | Thread-1 (text2image_worker) | pipeline load start kind=text-to-image model_ref=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0 source=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0 device=cuda dtype=torch.float16
+2026-02-23 20:13:31,051 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:65039 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A2026-02-23 20:13:31,472 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=1.7
+INFO:     127.0.0.1:56415 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:32,055 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=2.0
+INFO:     127.0.0.1:65039 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:32,479 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=1.7
+INFO:     127.0.0.1:60719 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:32,524 | DEBUG | MainThread | request method=GET path=/api/models/search query=task=text-to-image&source=huggingface&query=&limit=30 status=200 elapsed_ms=5431.8
+INFO:     127.0.0.1:50856 - "GET /api/models/search?task=text-to-image&source=huggingface&query=&limit=30 HTTP/1.1" 200 OK
+2026-02-23 20:13:33,058 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:33,502 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:60720 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:34,052 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:03<00:03,  3.21s/it][A
+Loading checkpoint shards: 100%|██████████| 2/2 [00:03<00:00,  1.65s/it]
+
+Loading pipeline components...:  14%|█▍        | 1/7 [00:03<00:20,  3.35s/it]2026-02-23 20:13:34,508 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=1.2
+INFO:     127.0.0.1:60721 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+
+Loading pipeline components...:  29%|██▊       | 2/7 [00:03<00:07,  1.46s/it]`torch_dtype` is deprecated! Use `dtype` instead!
+2026-02-23 20:13:35,472 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=1.2
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+
+Loading pipeline components...:  57%|█████▋    | 4/7 [00:04<00:02,  1.19it/s]2026-02-23 20:13:35,532 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=1.4
+INFO:     127.0.0.1:61753 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+
+Loading pipeline components...: 100%|██████████| 7/7 [00:04<00:00,  2.45it/s]
+Loading pipeline components...: 100%|██████████| 7/7 [00:04<00:00,  1.49it/s]
+C:\AI\VideoGen\venv\Lib\site-packages\torch\nn\modules\module.py:1357: UserWarning: expandable_segments not supported on this platform (Triggered internally at C:\b\pytorch\c10/hip/HIPAllocatorConfig.h:36.)
+  return t.to(
+2026-02-23 20:13:36,053 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:36,555 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:61754 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:37,057 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:37,573 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=1.0
+INFO:     127.0.0.1:61755 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:38,057 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:38,166 | INFO | Thread-1 (text2image_worker) | pipeline load done kind=text-to-image source=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0 elapsed_ms=7117.4
+2026-02-23 20:13:38,167 | DEBUG | Thread-1 (text2image_worker) | step callback mode task_id=77fa3d6c-2421-4ab1-b542-3c71bd1b57cf mode=callback_on_step_end
+2026-02-23 20:13:38,167 | INFO | Thread-1 (text2image_worker) | text2image inference start task_id=77fa3d6c-2421-4ab1-b542-3c71bd1b57cf model=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0 steps=20 guidance=8.5 size=640x640 callback_keys=callback_on_step_end,callback_on_step_end_tensor_inputs
+2026-02-23 20:13:38,167 | DEBUG | Thread-1 (text2image_worker) | pipeline call kwargs pipe=StableDiffusionXLPipeline accept_var_kwargs=True provided=11 passed=10 dropped=['cross_attention_kwargs']
+2026-02-23 20:13:38,594 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:61756 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+
+  0%|          | 0/20 [00:00<?, ?it/s]2026-02-23 20:13:39,053 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:39,623 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:61757 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:40,055 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:40,640 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:61758 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:41,056 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:41,668 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=1.2
+INFO:     127.0.0.1:61763 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:42,053 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:42,689 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:61764 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:43,057 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:43,710 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=1.4
+INFO:     127.0.0.1:61765 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:44,060 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:44,727 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:61766 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:45,063 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=1.0
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:45,740 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:61767 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:46,060 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:46,756 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:61768 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:47,061 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:47,762 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:61769 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:48,063 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:48,776 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:61770 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:49,061 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:49,791 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=1.2
+INFO:     127.0.0.1:61771 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:50,064 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:50,809 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:61772 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:51,066 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:51,829 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:49973 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:52,054 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=1.0
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:52,842 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:49974 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:53,051 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:53,861 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=1.0
+INFO:     127.0.0.1:49975 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:54,055 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:54,880 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:49976 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:55,055 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:55,907 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=1.0
+INFO:     127.0.0.1:49977 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:56,066 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:56,934 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=1.1
+INFO:     127.0.0.1:56028 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:57,061 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:57,963 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=1.3
+INFO:     127.0.0.1:56029 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:58,059 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:58,992 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:56030 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:13:59,056 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:00,006 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=1.0
+INFO:     127.0.0.1:56031 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:00,056 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:01,034 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:56032 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:01,051 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:02,048 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=1.3
+INFO:     127.0.0.1:56033 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:02,066 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=1.0
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:03,052 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:56034 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:03,060 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:04,065 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:04,078 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:56035 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:05,063 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:05,094 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:56036 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:06,064 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=1.4
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:06,098 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:56037 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:07,053 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:07,115 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=1.3
+INFO:     127.0.0.1:56038 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:08,064 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:08,142 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:56039 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:09,063 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:09,146 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:56040 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:10,051 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:10,161 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:56041 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:11,061 | DEBUG | MainThread | request method=GET path=/api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:50856 - "GET /api/tasks/77fa3d6c-2421-4ab1-b542-3c71bd1b57cf HTTP/1.1" 200 OK
+2026-02-23 20:14:11,062 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=77fa3d6c-2421-4ab1-b542-3c71bd1b57cf message=Generating image step=1 total=20 progress=0.2350
+
+  5%|▌         | 1/20 [00:32<10:10, 32.15s/it]INFO:     Shutting down

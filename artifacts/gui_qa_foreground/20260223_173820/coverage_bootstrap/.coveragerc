@@ -1,0 +1,8 @@
+[run]
+branch = True
+parallel = True
+source = main
+data_file = C:/AI/VideoGen/artifacts/gui_qa_foreground/20260223_173820/.coverage
+
+[report]
+skip_covered = False

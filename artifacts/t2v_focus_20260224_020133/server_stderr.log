@@ -1,0 +1,20 @@
+The system cannot find the file specified.
+2026-02-24 02:01:36,260 | INFO | MainThread | logger initialized file=C:\AI\VideoGen\logs\20260224_020136_videogen_pid5768.log level=DEBUG
+INFO:     Started server process [5768]
+INFO:     Waiting for application startup.
+2026-02-24 02:01:36,311 | INFO | MainThread | startup preload scheduled: text-to-image
+INFO:     Application startup complete.
+2026-02-24 02:01:36,312 | INFO | Thread-1 (_preload_default_t2i_worker) | preload start trigger=startup task=text-to-image model=SG161222/RealVisXL_V5.0
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-02-24 02:01:37,342 | DEBUG | MainThread | request method=GET path=/api/system/info query= status=200 elapsed_ms=532.3
+2026-02-24 02:01:37,393 | DEBUG | MainThread | request method=GET path=/api/models/local query=limit=500 status=200 elapsed_ms=18.4
+2026-02-24 02:01:39,526 | INFO | Thread-1 (_preload_default_t2i_worker) | pipeline load start kind=text-to-image model_ref=SG161222/RealVisXL_V5.0 source=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0 device=cuda dtype=torch.float16
+2026-02-24 02:01:39,526 | INFO | AnyIO worker thread | task created id=e755dad8-057f-44ea-9b14-2fc2c34e2fca type=text2video message=Generation queued
+2026-02-24 02:01:39,526 | INFO | AnyIO worker thread | text2video requested task_id=e755dad8-057f-44ea-9b14-2fc2c34e2fca model=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b loras=(none) lora_scale=1.0 prompt_len=90 negative_len=78 steps=20 frames=30 guidance=9.0 fps=6 seed=42
+2026-02-24 02:01:39,528 | INFO | MainThread | request method=POST path=/api/generate/text2video query= status=200 elapsed_ms=2110.1
+2026-02-24 02:01:39,529 | INFO | Thread-2 (text2video_worker) | text2video start task_id=e755dad8-057f-44ea-9b14-2fc2c34e2fca model=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b loras=(none) lora_scale=1.0 steps=20 frames=30 guidance=9.0 fps=6 seed=42
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]2026-02-24 02:01:39,531 | INFO | Thread-2 (text2video_worker) | task status id=e755dad8-057f-44ea-9b14-2fc2c34e2fca type=text2video queued->running progress=0.050 message=Loading model
+2026-02-24 02:01:39,532 | INFO | Thread-2 (text2video_worker) | pipeline load start kind=text-to-video model_ref=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b source=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b device=cuda dtype=torch.float16
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:00,  6.50it/s]Loading pipeline components...:  57%|█████▋    | 4/7 [00:00<00:00,  7.05it/s]Loading pipeline components...:  71%|███████▏  | 5/7 [00:01<00:00,  2.22it/s]
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A

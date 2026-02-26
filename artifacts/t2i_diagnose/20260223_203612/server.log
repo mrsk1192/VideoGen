@@ -1,0 +1,1531 @@
+The system cannot find the file specified.
+[WARN] transformers compatibility check failed. Current environment may be partially incompatible.
+[WARN] ROCm/GPU backend was not detected in this Python environment.
+[INFO] Starting server at http://localhost:61227
+2026-02-23 20:36:14,449 | INFO | MainThread | logger initialized file=C:\AI\VideoGen\logs\videogen.log level=DEBUG
+INFO:     Started server process [21996]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:61227 (Press CTRL+C to quit)
+2026-02-23 20:36:18,263 | DEBUG | MainThread | request method=GET path=/api/system/info query= status=200 elapsed_ms=538.9
+INFO:     127.0.0.1:61234 - "GET /api/system/info HTTP/1.1" 200 OK
+2026-02-23 20:36:18,263 | DEBUG | MainThread | request method=GET path=/api/system/info query= status=200 elapsed_ms=3038.8
+2026-02-23 20:36:18,289 | DEBUG | MainThread | request method=GET path=/api/system/info query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:61235 - "GET /api/system/info HTTP/1.1" 200 OK
+2026-02-23 20:36:19,457 | DEBUG | MainThread | request method=GET path=/ query= status=200 elapsed_ms=30.8
+INFO:     127.0.0.1:63209 - "GET / HTTP/1.1" 200 OK
+2026-02-23 20:36:19,464 | DEBUG | MainThread | request method=GET path=/static/styles.css query= status=200 elapsed_ms=1.5
+INFO:     127.0.0.1:63209 - "GET /static/styles.css HTTP/1.1" 200 OK
+2026-02-23 20:36:19,465 | DEBUG | MainThread | request method=GET path=/static/app.js query= status=200 elapsed_ms=1.4
+INFO:     127.0.0.1:53715 - "GET /static/app.js HTTP/1.1" 200 OK
+2026-02-23 20:36:19,554 | DEBUG | MainThread | request method=GET path=/api/system/info query= status=200 elapsed_ms=2.0
+INFO:     127.0.0.1:53715 - "GET /api/system/info HTTP/1.1" 200 OK
+2026-02-23 20:36:19,555 | INFO | MainThread | request method=GET path=/api/settings query= status=200 elapsed_ms=1.5
+INFO:     127.0.0.1:64366 - "GET /api/settings HTTP/1.1" 200 OK
+2026-02-23 20:36:19,556 | DEBUG | MainThread | request method=GET path=/api/system/info query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:53715 - "GET /api/system/info HTTP/1.1" 200 OK
+2026-02-23 20:36:19,563 | DEBUG | MainThread | request method=GET path=/api/models/local query= status=200 elapsed_ms=11.1
+INFO:     127.0.0.1:63209 - "GET /api/models/local HTTP/1.1" 200 OK
+2026-02-23 20:36:19,595 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 20:36:19,595 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 20:36:19,596 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 20:36:19,596 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 20:36:19,596 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 20:36:19,597 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 20:36:19,597 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 20:36:19,597 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 20:36:19,597 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 20:36:19,599 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 20:36:19,599 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 20:36:19,599 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 20:36:19,600 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 20:36:19,600 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 20:36:19,600 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 20:36:19,600 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 20:36:19,600 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 20:36:19,600 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\hf-internal-testing--tiny-stable-diffusion-pipe
+2026-02-23 20:36:19,601 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\hf-internal-testing--tiny-stable-diffusion-pipe
+2026-02-23 20:36:19,601 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 20:36:19,601 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 20:36:19,602 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 20:36:19,602 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 20:36:19,602 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 20:36:19,603 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0
+2026-02-23 20:36:19,603 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0
+2026-02-23 20:36:19,604 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+2026-02-23 20:36:19,604 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+2026-02-23 20:36:19,605 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=text-to-video&limit=40 status=200 elapsed_ms=11.8
+INFO:     127.0.0.1:64366 - "GET /api/models/catalog?task=text-to-video&limit=40 HTTP/1.1" 200 OK
+2026-02-23 20:36:19,605 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=image-to-video&limit=40 status=200 elapsed_ms=12.3
+INFO:     127.0.0.1:56540 - "GET /api/models/catalog?task=image-to-video&limit=40 HTTP/1.1" 200 OK
+2026-02-23 20:36:19,607 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=text-to-image&limit=40 status=200 elapsed_ms=14.6
+INFO:     127.0.0.1:63209 - "GET /api/models/catalog?task=text-to-image&limit=40 HTTP/1.1" 200 OK
+2026-02-23 20:36:19,608 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=image-to-image&limit=40 status=200 elapsed_ms=14.9
+INFO:     127.0.0.1:53715 - "GET /api/models/catalog?task=image-to-image&limit=40 HTTP/1.1" 200 OK
+2026-02-23 20:36:19,612 | INFO | MainThread | request method=GET path=/favicon.ico query= status=404 elapsed_ms=0.1
+INFO:     127.0.0.1:62234 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+2026-02-23 20:36:19,622 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b status=200 elapsed_ms=11.5
+INFO:     127.0.0.1:56540 - "GET /api/models/loras/catalog?task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b HTTP/1.1" 200 OK
+2026-02-23 20:36:19,623 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-video&limit=200&model_ref=example-org%2Fexample-model status=200 elapsed_ms=12.5
+INFO:     127.0.0.1:64366 - "GET /api/models/loras/catalog?task=image-to-video&limit=200&model_ref=example-org%2Fexample-model HTTP/1.1" 200 OK
+2026-02-23 20:36:19,626 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=11.4
+INFO:     127.0.0.1:62234 - "GET /api/models/loras/catalog?task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 20:36:19,626 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=11.5
+INFO:     127.0.0.1:53715 - "GET /api/models/loras/catalog?task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 20:36:19,630 | DEBUG | MainThread | request method=GET path=/api/models/vaes/catalog query=limit=200 status=200 elapsed_ms=2.1
+INFO:     127.0.0.1:53715 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+2026-02-23 20:36:19,632 | DEBUG | MainThread | request method=GET path=/api/models/vaes/catalog query=limit=200 status=200 elapsed_ms=1.6
+INFO:     127.0.0.1:53715 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+2026-02-23 20:36:19,637 | DEBUG | MainThread | request method=GET path=/api/outputs query=limit=500 status=200 elapsed_ms=2.1
+INFO:     127.0.0.1:62234 - "GET /api/outputs?limit=500 HTTP/1.1" 200 OK
+2026-02-23 20:36:19,643 | DEBUG | MainThread | request method=GET path=/api/models/local query=dir=C%3A%5CAI%5CVideoGen%5Cmodels status=200 elapsed_ms=7.8
+INFO:     127.0.0.1:53715 - "GET /api/models/local?dir=C%3A%5CAI%5CVideoGen%5Cmodels HTTP/1.1" 200 OK
+2026-02-23 20:36:19,647 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 20:36:19,647 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 20:36:19,647 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 20:36:19,648 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 20:36:19,648 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 20:36:19,648 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 20:36:19,648 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 20:36:19,648 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 20:36:19,649 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 20:36:19,649 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 20:36:19,649 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 20:36:19,649 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 20:36:19,650 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 20:36:19,650 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 20:36:19,650 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\hf-internal-testing--tiny-stable-diffusion-pipe
+2026-02-23 20:36:19,651 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 20:36:19,651 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\hf-internal-testing--tiny-stable-diffusion-pipe
+2026-02-23 20:36:19,651 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 20:36:19,651 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 20:36:19,651 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 20:36:19,651 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 20:36:19,652 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 20:36:19,652 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 20:36:19,652 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 20:36:19,652 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0
+2026-02-23 20:36:19,653 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+2026-02-23 20:36:19,653 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0
+2026-02-23 20:36:19,654 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=image-to-video&limit=40 status=200 elapsed_ms=8.8
+INFO:     127.0.0.1:56540 - "GET /api/models/catalog?task=image-to-video&limit=40 HTTP/1.1" 200 OK
+2026-02-23 20:36:19,654 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+2026-02-23 20:36:19,655 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=text-to-video&limit=40 status=200 elapsed_ms=10.0
+INFO:     127.0.0.1:64366 - "GET /api/models/catalog?task=text-to-video&limit=40 HTTP/1.1" 200 OK
+2026-02-23 20:36:19,658 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=image-to-image&limit=40 status=200 elapsed_ms=13.4
+INFO:     127.0.0.1:62234 - "GET /api/models/catalog?task=image-to-image&limit=40 HTTP/1.1" 200 OK
+2026-02-23 20:36:19,661 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=text-to-image&limit=40 status=200 elapsed_ms=16.0
+INFO:     127.0.0.1:53715 - "GET /api/models/catalog?task=text-to-image&limit=40 HTTP/1.1" 200 OK
+2026-02-23 20:36:19,668 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-video&limit=200&model_ref=example-org%2Fexample-model status=200 elapsed_ms=12.9
+INFO:     127.0.0.1:56540 - "GET /api/models/loras/catalog?task=image-to-video&limit=200&model_ref=example-org%2Fexample-model HTTP/1.1" 200 OK
+2026-02-23 20:36:19,669 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b status=200 elapsed_ms=12.9
+INFO:     127.0.0.1:64366 - "GET /api/models/loras/catalog?task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b HTTP/1.1" 200 OK
+2026-02-23 20:36:19,671 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=11.2
+INFO:     127.0.0.1:62234 - "GET /api/models/loras/catalog?task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 20:36:19,673 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=8.7
+INFO:     127.0.0.1:53715 - "GET /api/models/loras/catalog?task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 20:36:19,675 | DEBUG | MainThread | request method=GET path=/api/models/vaes/catalog query=limit=200 status=200 elapsed_ms=1.8
+INFO:     127.0.0.1:62234 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+2026-02-23 20:36:19,677 | DEBUG | MainThread | request method=GET path=/api/models/vaes/catalog query=limit=200 status=200 elapsed_ms=1.6
+INFO:     127.0.0.1:62234 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+2026-02-23 20:36:22,814 | DEBUG | MainThread | request method=GET path=/api/models/search query=task=text-to-image&source=huggingface&query=RealVisXL_V5.0&limit=30 status=200 elapsed_ms=2472.0
+INFO:     127.0.0.1:64366 - "GET /api/models/search?task=text-to-image&source=huggingface&query=RealVisXL_V5.0&limit=30 HTTP/1.1" 200 OK
+2026-02-23 20:36:23,400 | DEBUG | MainThread | request method=GET path=/api/models/search query=task=text-to-image&source=all&query=&limit=30 status=200 elapsed_ms=3721.1
+INFO:     127.0.0.1:62234 - "GET /api/models/search?task=text-to-image&source=all&query=&limit=30 HTTP/1.1" 200 OK
+2026-02-23 20:36:24,003 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 20:36:24,003 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 20:36:24,003 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 20:36:24,003 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 20:36:24,004 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 20:36:24,004 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 20:36:24,006 | DEBUG | MainThread | request method=GET path=/api/models/catalog query=task=text-to-image&limit=40 status=200 elapsed_ms=4.2
+INFO:     127.0.0.1:62234 - "GET /api/models/catalog?task=text-to-image&limit=40 HTTP/1.1" 200 OK
+2026-02-23 20:36:24,011 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=3.2
+INFO:     127.0.0.1:62234 - "GET /api/models/loras/catalog?task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 20:36:24,014 | DEBUG | MainThread | request method=GET path=/api/models/vaes/catalog query=limit=200 status=200 elapsed_ms=1.6
+INFO:     127.0.0.1:62234 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+2026-02-23 20:36:24,017 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5CSG161222--RealVisXL_V5.0 status=200 elapsed_ms=2.7
+INFO:     127.0.0.1:64366 - "GET /api/models/loras/catalog?task=text-to-image&limit=200&model_ref=C%3A%5CAI%5CVideoGen%5Cmodels%5CSG161222--RealVisXL_V5.0 HTTP/1.1" 200 OK
+2026-02-23 20:36:24,020 | DEBUG | MainThread | request method=GET path=/api/models/vaes/catalog query=limit=200 status=200 elapsed_ms=1.7
+INFO:     127.0.0.1:64366 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+2026-02-23 20:36:24,256 | INFO | AnyIO worker thread | task created id=9f234bea-5684-4de1-a02d-5033c5e01379 type=text2image message=Generation queued
+2026-02-23 20:36:24,256 | INFO | AnyIO worker thread | text2image requested task_id=9f234bea-5684-4de1-a02d-5033c5e01379 model=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0 loras=(none) lora_scale=1.0 vae=(none) prompt_len=114 negative_len=84 steps=20 guidance=8.5 size=640x640 seed=42
+2026-02-23 20:36:24,257 | INFO | MainThread | request method=POST path=/api/generate/text2image query= status=200 elapsed_ms=2.3
+INFO:     127.0.0.1:64366 - "POST /api/generate/text2image HTTP/1.1" 200 OK
+2026-02-23 20:36:24,258 | INFO | Thread-1 (text2image_worker) | text2image start task_id=9f234bea-5684-4de1-a02d-5033c5e01379 model=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0 loras=(none) lora_scale=1.0 vae=(none) steps=20 guidance=8.5 size=640x640 seed=42
+2026-02-23 20:36:24,258 | INFO | Thread-1 (text2image_worker) | task status id=9f234bea-5684-4de1-a02d-5033c5e01379 type=text2image queued->running progress=0.050 message=Loading model
+2026-02-23 20:36:24,258 | INFO | Thread-1 (text2image_worker) | pipeline load start kind=text-to-image model_ref=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0 source=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0 device=cuda dtype=torch.float16
+2026-02-23 20:36:24,260 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.1
+INFO:     127.0.0.1:64366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A2026-02-23 20:36:24,685 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:58983 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:25,271 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:64366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:25,691 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:58984 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:25,876 | DEBUG | MainThread | request method=GET path=/api/models/search query=task=text-to-image&source=huggingface&query=&limit=30 status=200 elapsed_ms=5659.1
+INFO:     127.0.0.1:53715 - "GET /api/models/search?task=text-to-image&source=huggingface&query=&limit=30 HTTP/1.1" 200 OK
+2026-02-23 20:36:26,262 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:26,714 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:58985 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:02<00:02,  2.52s/it][A
+Loading checkpoint shards: 100%|██████████| 2/2 [00:02<00:00,  1.30s/it]
+
+Loading pipeline components...:  29%|██▊       | 2/7 [00:02<00:06,  1.34s/it]`torch_dtype` is deprecated! Use `dtype` instead!
+2026-02-23 20:36:27,266 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.0
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:27,719 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.1
+INFO:     127.0.0.1:58986 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+
+Loading pipeline components...:  57%|█████▋    | 4/7 [00:03<00:02,  1.09it/s]2026-02-23 20:36:28,277 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.1
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+
+Loading pipeline components...:  71%|███████▏  | 5/7 [00:04<00:01,  1.48it/s]
+Loading pipeline components...: 100%|██████████| 7/7 [00:04<00:00,  2.47it/s]
+Loading pipeline components...: 100%|██████████| 7/7 [00:04<00:00,  1.67it/s]
+2026-02-23 20:36:28,723 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.0
+INFO:     127.0.0.1:58987 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:29,272 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:29,767 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.2
+INFO:     127.0.0.1:58988 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:30,274 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:30,772 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.0
+INFO:     127.0.0.1:58989 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:31,207 | INFO | Thread-1 (text2image_worker) | rocm attention override applied components=unet processor=AttnProcessor
+2026-02-23 20:36:31,262 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:31,281 | INFO | Thread-1 (text2image_worker) | pipeline load done kind=text-to-image source=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0 elapsed_ms=7022.8
+2026-02-23 20:36:31,281 | DEBUG | Thread-1 (text2image_worker) | step callback mode task_id=9f234bea-5684-4de1-a02d-5033c5e01379 mode=callback_on_step_end
+2026-02-23 20:36:31,281 | INFO | Thread-1 (text2image_worker) | text2image inference start task_id=9f234bea-5684-4de1-a02d-5033c5e01379 model=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0 steps=20 guidance=8.5 size=640x640 callback_keys=callback_on_step_end,callback_on_step_end_tensor_inputs
+2026-02-23 20:36:31,282 | DEBUG | Thread-1 (text2image_worker) | pipeline call kwargs pipe=StableDiffusionXLPipeline accept_var_kwargs=True provided=11 passed=10 dropped=['cross_attention_kwargs']
+2026-02-23 20:36:31,795 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:58990 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:32,270 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:32,808 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:58991 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:33,272 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:33,828 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:58992 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:34,276 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:34,847 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.1
+INFO:     127.0.0.1:58993 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:35,264 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:35,870 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.5
+INFO:     127.0.0.1:58994 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:36,271 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:36,892 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.0
+INFO:     127.0.0.1:58995 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:37,277 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:37,897 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.2
+INFO:     127.0.0.1:58996 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:38,264 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.2
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:38,901 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:58997 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:39,268 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:39,918 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.2
+INFO:     127.0.0.1:58998 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:40,271 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:40,935 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.1
+INFO:     127.0.0.1:58999 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:41,261 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:41,952 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:59000 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:42,273 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:42,971 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.1
+INFO:     127.0.0.1:59001 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:43,275 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:43,989 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:59002 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:44,276 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:45,006 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:59003 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:45,273 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:46,021 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:59004 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:46,261 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:47,048 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:59005 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:47,273 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:48,072 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:59006 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:48,264 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:49,089 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:54532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:49,265 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.1
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:50,108 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:54533 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:50,270 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:51,125 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:54534 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:51,270 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:52,154 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.0
+INFO:     127.0.0.1:54538 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:52,267 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:53,169 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.1
+INFO:     127.0.0.1:54539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:53,265 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:54,198 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.3
+INFO:     127.0.0.1:54540 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:54,262 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:55,226 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:54541 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:55,274 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:56,247 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:54542 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:56,265 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:57,266 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.5
+INFO:     127.0.0.1:54544 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:57,267 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:58,262 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.0
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:58,296 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:54545 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:59,268 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:36:59,314 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:54547 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:00,262 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:00,341 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:54548 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:01,269 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:01,363 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.4
+INFO:     127.0.0.1:54549 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:02,261 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:02,383 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:54550 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:03,262 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:53715 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:03,409 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:54551 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:03,410 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=9f234bea-5684-4de1-a02d-5033c5e01379 message=Generating image step=1 total=20 progress=0.2350
+2026-02-23 20:37:34,479 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=9f234bea-5684-4de1-a02d-5033c5e01379 message=Generating image step=2 total=20 progress=0.2700
+2026-02-23 20:37:34,486 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=7.8
+2026-02-23 20:37:34,486 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=7.6
+2026-02-23 20:37:34,486 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=7.2
+INFO:     127.0.0.1:50539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,487 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=6.8
+INFO:     127.0.0.1:51042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,487 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.5
+INFO:     127.0.0.1:51043 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,488 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.7
+INFO:     127.0.0.1:55174 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,489 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=6.0
+INFO:     127.0.0.1:65079 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,489 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.2
+INFO:     127.0.0.1:64925 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,490 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.2
+INFO:     127.0.0.1:64552 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,491 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.1
+INFO:     127.0.0.1:50539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,492 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.4
+INFO:     127.0.0.1:64925 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,492 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.3
+INFO:     127.0.0.1:51042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,493 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.6
+INFO:     127.0.0.1:55174 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,493 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.3
+INFO:     127.0.0.1:65079 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,494 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:50539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,495 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:50539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,497 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:50539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,498 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:50539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,499 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:50539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,501 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:50539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,502 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:50539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,503 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:50539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,504 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:50539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,505 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:50539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,506 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:50539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,508 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:50539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,509 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:50539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,510 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:50539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,511 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:50539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,513 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:50539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,514 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:50539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,515 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:50539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,517 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.5
+INFO:     127.0.0.1:50539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:37:34,519 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:50539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,608 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=9f234bea-5684-4de1-a02d-5033c5e01379 message=Generating image step=3 total=20 progress=0.3050
+2026-02-23 20:38:05,614 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.7
+2026-02-23 20:38:05,615 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.3
+2026-02-23 20:38:05,615 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.3
+INFO:     127.0.0.1:64555 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,616 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.2
+INFO:     127.0.0.1:55362 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,616 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.1
+INFO:     127.0.0.1:65366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,617 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.1
+INFO:     127.0.0.1:57783 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,617 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.0
+INFO:     127.0.0.1:49667 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,617 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.8
+INFO:     127.0.0.1:60981 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,618 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.6
+INFO:     127.0.0.1:53527 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,620 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.1
+INFO:     127.0.0.1:49667 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,620 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.6
+INFO:     127.0.0.1:57783 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,620 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.1
+INFO:     127.0.0.1:65366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,620 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.6
+INFO:     127.0.0.1:60981 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,620 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.5
+INFO:     127.0.0.1:55362 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,622 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:60981 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,623 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:60981 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,624 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:60981 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,625 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:60981 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,626 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:60981 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,628 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:60981 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,629 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:60981 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,630 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:60981 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,631 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:60981 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,632 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:60981 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,633 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:60981 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,634 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:60981 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,635 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:60981 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,636 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:60981 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,637 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:60981 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,638 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:60981 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,639 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:60981 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,640 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:60981 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,641 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:60981 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:05,642 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:60981 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,659 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=9f234bea-5684-4de1-a02d-5033c5e01379 message=Generating image step=4 total=20 progress=0.3400
+2026-02-23 20:38:36,667 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=7.0
+2026-02-23 20:38:36,668 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=6.8
+2026-02-23 20:38:36,668 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=6.3
+INFO:     127.0.0.1:62223 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,669 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.3
+INFO:     127.0.0.1:62521 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,669 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=6.9
+INFO:     127.0.0.1:60898 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,669 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.3
+INFO:     127.0.0.1:49670 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,670 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.5
+INFO:     127.0.0.1:57852 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,671 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.6
+INFO:     127.0.0.1:55830 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,671 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.5
+INFO:     127.0.0.1:56638 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,673 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.6
+INFO:     127.0.0.1:49670 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,673 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.8
+INFO:     127.0.0.1:62521 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,674 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.1
+INFO:     127.0.0.1:60898 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,674 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.1
+INFO:     127.0.0.1:57852 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,674 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.4
+INFO:     127.0.0.1:55830 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,676 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:60898 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,677 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:60898 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,678 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:60898 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,679 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:60898 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,681 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:60898 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,682 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:60898 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,683 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:60898 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,684 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:60898 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,685 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:60898 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,687 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:60898 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,688 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:60898 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,689 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:60898 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,690 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:60898 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,691 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:60898 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,692 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:60898 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,694 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:60898 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,695 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:60898 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,696 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:60898 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,697 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:60898 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:38:36,698 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:60898 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,683 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=9f234bea-5684-4de1-a02d-5033c5e01379 message=Generating image step=5 total=20 progress=0.3750
+2026-02-23 20:39:07,689 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.3
+2026-02-23 20:39:07,690 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.9
+2026-02-23 20:39:07,690 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.0
+INFO:     127.0.0.1:55838 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,690 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.0
+INFO:     127.0.0.1:55778 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,691 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.2
+INFO:     127.0.0.1:56933 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,691 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.3
+INFO:     127.0.0.1:57064 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,692 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.0
+INFO:     127.0.0.1:58711 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,692 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.8
+INFO:     127.0.0.1:65235 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,692 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.7
+INFO:     127.0.0.1:62100 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,694 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.0
+INFO:     127.0.0.1:65235 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,694 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.7
+INFO:     127.0.0.1:56933 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,694 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.6
+INFO:     127.0.0.1:57064 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,695 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.0
+INFO:     127.0.0.1:55778 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,695 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.3
+INFO:     127.0.0.1:58711 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,696 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:62100 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,697 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:62100 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,698 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:62100 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,699 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:62100 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,700 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:62100 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,702 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:62100 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,703 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:62100 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,704 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:62100 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,705 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:62100 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,706 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:62100 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,707 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:62100 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,708 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:62100 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,710 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:62100 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,711 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:62100 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,712 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:62100 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,713 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:62100 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,714 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:62100 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,715 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:62100 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,716 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:62100 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:07,717 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:62100 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,817 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=9f234bea-5684-4de1-a02d-5033c5e01379 message=Generating image step=6 total=20 progress=0.4100
+2026-02-23 20:39:38,823 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.2
+2026-02-23 20:39:38,824 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.4
+2026-02-23 20:39:38,824 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.2
+INFO:     127.0.0.1:62108 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,824 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.1
+INFO:     127.0.0.1:55962 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,825 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.9
+INFO:     127.0.0.1:60452 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,825 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.7
+INFO:     127.0.0.1:56730 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,825 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.1
+INFO:     127.0.0.1:65489 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,826 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.2
+INFO:     127.0.0.1:65532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,827 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.4
+INFO:     127.0.0.1:59195 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,828 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.3
+INFO:     127.0.0.1:55962 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,829 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.2
+INFO:     127.0.0.1:60452 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,829 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.2
+INFO:     127.0.0.1:56730 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,829 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.4
+INFO:     127.0.0.1:65489 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,830 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.2
+INFO:     127.0.0.1:65532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,831 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:65532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,832 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:65532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,834 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:65532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,835 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:65532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,836 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:65532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,837 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:65532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,838 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:65532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,839 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:65532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,840 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:65532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,841 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:65532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,842 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:65532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,843 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:65532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,845 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:65532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,845 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:65532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,846 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:65532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,847 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:65532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,848 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:65532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,850 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:65532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,851 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:65532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:39:38,852 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:65532 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,951 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=9f234bea-5684-4de1-a02d-5033c5e01379 message=Generating image step=7 total=20 progress=0.4450
+2026-02-23 20:40:09,957 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=7.0
+2026-02-23 20:40:09,957 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=7.1
+2026-02-23 20:40:09,959 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.6
+INFO:     127.0.0.1:54678 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,959 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=7.8
+INFO:     127.0.0.1:63908 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,959 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=6.1
+INFO:     127.0.0.1:63376 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,961 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=6.8
+INFO:     127.0.0.1:59158 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,961 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=6.9
+INFO:     127.0.0.1:51196 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,962 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=7.1
+INFO:     127.0.0.1:60379 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,962 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=6.1
+INFO:     127.0.0.1:59766 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,965 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.8
+INFO:     127.0.0.1:59158 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,965 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.7
+INFO:     127.0.0.1:60379 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,966 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.2
+INFO:     127.0.0.1:54678 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,966 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.8
+INFO:     127.0.0.1:51196 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,966 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.8
+INFO:     127.0.0.1:63376 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,968 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:59766 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,969 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:59766 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,971 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:59766 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,972 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:59766 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,973 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:59766 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,975 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:59766 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,976 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:59766 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,977 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:59766 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,979 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:59766 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,980 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:59766 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,981 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:59766 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,983 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.1
+INFO:     127.0.0.1:59766 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,985 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:59766 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,986 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:59766 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,988 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:59766 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,989 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:59766 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,991 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:59766 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,992 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:59766 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,993 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:59766 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:09,995 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:59766 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,028 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=9f234bea-5684-4de1-a02d-5033c5e01379 message=Generating image step=8 total=20 progress=0.4800
+2026-02-23 20:40:41,034 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=6.0
+2026-02-23 20:40:41,035 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=6.3
+2026-02-23 20:40:41,035 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=6.1
+INFO:     127.0.0.1:59780 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,036 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.7
+INFO:     127.0.0.1:61607 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,036 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.2
+INFO:     127.0.0.1:51640 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,037 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.7
+INFO:     127.0.0.1:54396 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,038 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=6.0
+INFO:     127.0.0.1:62699 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,038 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.4
+INFO:     127.0.0.1:59360 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,039 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=6.0
+INFO:     127.0.0.1:52776 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,042 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.2
+INFO:     127.0.0.1:61607 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,042 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.5
+INFO:     127.0.0.1:54396 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,043 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.6
+INFO:     127.0.0.1:59360 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,043 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.5
+INFO:     127.0.0.1:51640 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,043 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.4
+INFO:     127.0.0.1:62699 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,045 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:54396 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,047 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:54396 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,048 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:54396 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,050 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:54396 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,051 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:54396 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,052 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:54396 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,054 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:54396 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,056 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:54396 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,057 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:54396 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,058 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:54396 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,060 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:54396 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,062 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:54396 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,063 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:54396 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,065 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:54396 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,066 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:54396 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,067 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:54396 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,069 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:54396 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,070 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:54396 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,072 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:54396 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:40:41,074 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:54396 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,003 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=9f234bea-5684-4de1-a02d-5033c5e01379 message=Generating image step=9 total=20 progress=0.5150
+2026-02-23 20:41:12,008 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.7
+2026-02-23 20:41:12,008 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.7
+2026-02-23 20:41:12,008 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.4
+INFO:     127.0.0.1:52790 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,009 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.0
+INFO:     127.0.0.1:55359 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,009 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.2
+INFO:     127.0.0.1:53915 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,010 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.2
+INFO:     127.0.0.1:49222 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,010 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.5
+INFO:     127.0.0.1:52664 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,010 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.6
+INFO:     127.0.0.1:63652 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,011 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.3
+INFO:     127.0.0.1:64447 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,012 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.0
+INFO:     127.0.0.1:52664 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,013 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.5
+INFO:     127.0.0.1:49222 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,013 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.6
+INFO:     127.0.0.1:53915 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,013 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.1
+INFO:     127.0.0.1:55359 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,014 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.0
+INFO:     127.0.0.1:63652 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,015 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:63652 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,016 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:63652 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,018 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:63652 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,019 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:63652 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,020 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:63652 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,021 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:63652 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,022 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:63652 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,023 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:63652 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,024 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:63652 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,025 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:63652 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,026 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:63652 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,027 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:63652 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,028 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:63652 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,029 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:63652 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,030 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:63652 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,031 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:63652 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,032 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:63652 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,034 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:63652 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,035 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:63652 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:12,036 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:63652 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,142 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=9f234bea-5684-4de1-a02d-5033c5e01379 message=Generating image step=10 total=20 progress=0.5500
+2026-02-23 20:41:43,149 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.7
+2026-02-23 20:41:43,149 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.7
+2026-02-23 20:41:43,150 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.9
+INFO:     127.0.0.1:53904 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,150 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.3
+INFO:     127.0.0.1:49731 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,150 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.4
+INFO:     127.0.0.1:51997 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,152 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.0
+INFO:     127.0.0.1:61982 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,152 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.1
+INFO:     127.0.0.1:57977 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,153 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.4
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,153 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.3
+INFO:     127.0.0.1:58926 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,157 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.6
+INFO:     127.0.0.1:51997 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,157 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.9
+INFO:     127.0.0.1:49731 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,157 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.5
+INFO:     127.0.0.1:61982 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,158 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.6
+INFO:     127.0.0.1:57977 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,158 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.0
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,160 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,162 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,163 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,164 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,166 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,167 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,168 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,170 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,171 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,173 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,174 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,175 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,177 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,178 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,179 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,181 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,182 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,184 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,185 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,186 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:41:43,227 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:57094 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,308 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=9f234bea-5684-4de1-a02d-5033c5e01379 message=Generating image step=11 total=20 progress=0.5850
+2026-02-23 20:42:14,314 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.8
+2026-02-23 20:42:14,315 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.4
+2026-02-23 20:42:14,315 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.1
+INFO:     127.0.0.1:58931 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,316 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.9
+INFO:     127.0.0.1:58425 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,316 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.2
+INFO:     127.0.0.1:56346 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,316 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.2
+INFO:     127.0.0.1:64621 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,317 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.3
+INFO:     127.0.0.1:52864 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,317 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.0
+INFO:     127.0.0.1:54769 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,317 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.0
+INFO:     127.0.0.1:50967 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,319 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.2
+INFO:     127.0.0.1:56346 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,319 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.4
+INFO:     127.0.0.1:64621 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,319 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.8
+INFO:     127.0.0.1:58425 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,320 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.6
+INFO:     127.0.0.1:52864 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,320 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.9
+INFO:     127.0.0.1:54769 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,321 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:54769 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,322 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:54769 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,323 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:54769 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,325 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:54769 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,326 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:54769 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,327 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:54769 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,328 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:54769 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,329 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:54769 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,330 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:54769 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,331 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:54769 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,332 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:54769 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,333 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:54769 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,334 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:54769 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,335 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:54769 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,336 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:54769 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,337 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:54769 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,339 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:54769 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,340 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:54769 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,341 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:54769 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:14,342 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:54769 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,297 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=9f234bea-5684-4de1-a02d-5033c5e01379 message=Generating image step=12 total=20 progress=0.6200
+2026-02-23 20:42:45,303 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.1
+2026-02-23 20:42:45,304 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.3
+2026-02-23 20:42:45,304 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.2
+INFO:     127.0.0.1:57368 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,305 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.0
+INFO:     127.0.0.1:54902 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,305 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.1
+INFO:     127.0.0.1:57512 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,306 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.8
+INFO:     127.0.0.1:54249 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,306 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.4
+INFO:     127.0.0.1:58547 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,306 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.4
+INFO:     127.0.0.1:52443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,307 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.7
+INFO:     127.0.0.1:49775 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,308 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.4
+INFO:     127.0.0.1:57512 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,308 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.1
+INFO:     127.0.0.1:54902 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,309 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.5
+INFO:     127.0.0.1:58547 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,309 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.7
+INFO:     127.0.0.1:52443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,309 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.0
+INFO:     127.0.0.1:54249 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,311 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:52443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,312 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:52443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,313 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:52443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,314 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:52443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,315 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:52443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,316 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:52443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,317 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:52443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,318 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:52443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,320 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:52443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,321 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:52443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,321 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:52443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,322 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:52443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,323 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:52443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,324 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:52443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,325 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:52443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,327 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:52443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,328 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:52443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,328 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:52443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,330 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:52443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:42:45,331 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:52443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,457 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=9f234bea-5684-4de1-a02d-5033c5e01379 message=Generating image step=13 total=20 progress=0.6550
+2026-02-23 20:43:16,466 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=9.2
+2026-02-23 20:43:16,467 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=8.7
+2026-02-23 20:43:16,468 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=8.0
+INFO:     127.0.0.1:55443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,468 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=9.2
+INFO:     127.0.0.1:49799 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,468 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=7.3
+INFO:     127.0.0.1:51073 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,469 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=6.2
+INFO:     127.0.0.1:59825 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,470 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=6.1
+INFO:     127.0.0.1:60082 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,471 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=6.1
+INFO:     127.0.0.1:54417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,471 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=6.4
+INFO:     127.0.0.1:53235 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,474 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.5
+INFO:     127.0.0.1:51073 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,474 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.5
+INFO:     127.0.0.1:55443 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,475 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.3
+INFO:     127.0.0.1:60082 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,476 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.0
+INFO:     127.0.0.1:59825 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,476 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.7
+INFO:     127.0.0.1:54417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,479 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:54417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,480 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:54417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,482 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:54417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,483 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:54417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,486 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:54417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,488 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:54417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,490 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:54417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,491 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:54417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,493 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:54417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,495 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:54417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,496 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:54417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,498 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:54417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,499 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:54417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,500 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:54417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,502 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:54417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,503 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:54417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,505 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:54417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,506 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:54417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,508 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:54417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:16,509 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:54417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,536 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=9f234bea-5684-4de1-a02d-5033c5e01379 message=Generating image step=14 total=20 progress=0.6900
+2026-02-23 20:43:47,542 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=6.0
+2026-02-23 20:43:47,542 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.5
+2026-02-23 20:43:47,543 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.3
+INFO:     127.0.0.1:53241 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,544 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.3
+INFO:     127.0.0.1:58086 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,544 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.8
+INFO:     127.0.0.1:51366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,545 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.0
+INFO:     127.0.0.1:60955 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,545 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.8
+INFO:     127.0.0.1:49907 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,546 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.7
+INFO:     127.0.0.1:58272 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,546 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.8
+INFO:     127.0.0.1:51539 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,549 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.5
+INFO:     127.0.0.1:58086 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,549 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.5
+INFO:     127.0.0.1:51366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,550 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.4
+INFO:     127.0.0.1:58272 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,550 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.1
+INFO:     127.0.0.1:49907 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,551 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.1
+INFO:     127.0.0.1:60955 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,552 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:51366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,554 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:51366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,555 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:51366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,557 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:51366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,558 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:51366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,559 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:51366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,561 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:51366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,563 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:51366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,565 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:51366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,567 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:51366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,568 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:51366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,570 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:51366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,571 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:51366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,572 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:51366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,574 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:51366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,575 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:51366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,577 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:51366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,578 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:51366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,579 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:51366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:43:47,580 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:51366 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,612 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=9f234bea-5684-4de1-a02d-5033c5e01379 message=Generating image step=15 total=20 progress=0.7250
+2026-02-23 20:44:18,619 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=6.5
+2026-02-23 20:44:18,619 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=6.0
+2026-02-23 20:44:18,619 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.9
+INFO:     127.0.0.1:51550 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,620 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.0
+INFO:     127.0.0.1:61203 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,620 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.2
+INFO:     127.0.0.1:53714 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,621 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.0
+INFO:     127.0.0.1:50686 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,621 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.7
+INFO:     127.0.0.1:58417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,621 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.6
+INFO:     127.0.0.1:51406 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,622 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.0
+INFO:     127.0.0.1:49980 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,624 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.6
+INFO:     127.0.0.1:61203 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,624 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.5
+INFO:     127.0.0.1:50686 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,624 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.7
+INFO:     127.0.0.1:51406 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,625 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.1
+INFO:     127.0.0.1:53714 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,625 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.3
+INFO:     127.0.0.1:58417 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,626 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:51406 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,627 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:51406 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,628 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:51406 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,630 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:51406 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,631 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:51406 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,632 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:51406 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,633 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:51406 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,634 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:51406 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,636 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:51406 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,637 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:51406 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,638 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:51406 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,639 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:51406 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,640 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:51406 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,641 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:51406 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,642 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:51406 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,643 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:51406 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,644 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:51406 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,646 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:51406 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,647 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:51406 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:18,648 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:51406 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,801 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=9f234bea-5684-4de1-a02d-5033c5e01379 message=Generating image step=16 total=20 progress=0.7600
+2026-02-23 20:44:49,807 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.2
+2026-02-23 20:44:49,807 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.1
+2026-02-23 20:44:49,807 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.0
+INFO:     127.0.0.1:51415 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,808 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.0
+INFO:     127.0.0.1:61617 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,808 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.1
+INFO:     127.0.0.1:57962 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,809 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.1
+INFO:     127.0.0.1:52589 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,809 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.0
+INFO:     127.0.0.1:52735 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,809 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.6
+INFO:     127.0.0.1:57901 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,809 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.5
+INFO:     127.0.0.1:50171 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,811 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.0
+INFO:     127.0.0.1:52589 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,811 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.4
+INFO:     127.0.0.1:57962 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,812 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.7
+INFO:     127.0.0.1:61617 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,812 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.5
+INFO:     127.0.0.1:57901 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,812 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.0
+INFO:     127.0.0.1:52735 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,813 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:52735 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,814 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:52735 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,816 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:52735 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,817 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:52735 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,819 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:52735 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,820 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:52735 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,821 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:52735 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,822 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:52735 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,823 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:52735 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,824 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:52735 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,825 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:52735 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,826 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:52735 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,827 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:52735 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,828 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:52735 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,829 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:52735 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,830 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:52735 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,831 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:52735 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,832 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:52735 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,833 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.3
+INFO:     127.0.0.1:52735 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:44:49,835 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:52735 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,010 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=9f234bea-5684-4de1-a02d-5033c5e01379 message=Generating image step=17 total=20 progress=0.7950
+2026-02-23 20:45:21,019 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=7.5
+2026-02-23 20:45:21,019 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=7.4
+2026-02-23 20:45:21,020 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=7.5
+INFO:     127.0.0.1:57410 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,020 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.8
+INFO:     127.0.0.1:64533 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,021 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=6.2
+INFO:     127.0.0.1:62495 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,021 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.1
+INFO:     127.0.0.1:51115 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,022 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.2
+INFO:     127.0.0.1:64149 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,023 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.7
+INFO:     127.0.0.1:59946 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,024 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.7
+INFO:     127.0.0.1:50557 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,026 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.7
+INFO:     127.0.0.1:59946 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,027 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.7
+INFO:     127.0.0.1:64533 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,027 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.4
+INFO:     127.0.0.1:64149 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,027 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.4
+INFO:     127.0.0.1:62495 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,027 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.6
+INFO:     127.0.0.1:51115 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,030 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.3
+INFO:     127.0.0.1:50557 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,032 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:50557 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,034 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:50557 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,035 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:50557 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,037 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:50557 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,038 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:50557 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,039 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:50557 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,040 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:50557 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,042 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:50557 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,043 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:50557 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,045 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:50557 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,047 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:50557 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,048 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:50557 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,050 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:50557 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,051 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:50557 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,052 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:50557 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,053 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:50557 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,054 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:50557 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,056 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:50557 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:21,057 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.4
+INFO:     127.0.0.1:50557 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,217 | DEBUG | Thread-1 (text2image_worker) | task progress step task_id=9f234bea-5684-4de1-a02d-5033c5e01379 message=Generating image step=18 total=20 progress=0.8300
+2026-02-23 20:45:52,223 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.6
+2026-02-23 20:45:52,223 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.3
+2026-02-23 20:45:52,224 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.3
+INFO:     127.0.0.1:50574 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,224 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=5.1
+INFO:     127.0.0.1:65042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,225 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.6
+INFO:     127.0.0.1:51916 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,225 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.6
+INFO:     127.0.0.1:50559 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,226 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.7
+INFO:     127.0.0.1:58277 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,226 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.5
+INFO:     127.0.0.1:53930 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,227 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.7
+INFO:     127.0.0.1:59042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,230 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.0
+INFO:     127.0.0.1:65042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,231 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=2.7
+INFO:     127.0.0.1:58277 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,231 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.8
+INFO:     127.0.0.1:51916 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,231 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=3.6
+INFO:     127.0.0.1:50559 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,232 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.0
+INFO:     127.0.0.1:53930 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,233 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=4.4
+INFO:     127.0.0.1:59042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,235 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:59042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,236 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:59042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,238 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:59042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,239 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:59042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,240 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:59042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,242 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:59042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,243 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:59042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,245 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:59042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,246 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:59042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,247 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:59042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,249 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:59042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,250 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:59042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,252 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:59042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,253 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:59042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,254 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:59042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,256 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.5
+INFO:     127.0.0.1:59042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,257 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:59042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,258 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:59042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,260 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:59042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+2026-02-23 20:45:52,262 | DEBUG | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=200 elapsed_ms=1.4
+INFO:     127.0.0.1:59042 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 200 OK
+'TON_ENABLE_EXPERIMENTAL' is not recognized as an internal or external command,
+operable program or batch file.
+2026-02-23 20:46:12,970 | INFO | MainThread | logger initialized file=C:\AI\VideoGen\logs\20260223_204612_videogen_pid21668.log level=DEBUG
+INFO:     Started server process [21668]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:61227 (Press CTRL+C to quit)
+2026-02-23 20:46:13,096 | INFO | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=404 elapsed_ms=1.5
+INFO:     127.0.0.1:63109 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 404 Not Found
+2026-02-23 20:46:13,099 | INFO | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=404 elapsed_ms=0.6
+INFO:     127.0.0.1:63109 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 404 Not Found
+2026-02-23 20:46:13,101 | INFO | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=404 elapsed_ms=0.6
+INFO:     127.0.0.1:63109 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 404 Not Found
+2026-02-23 20:46:13,102 | INFO | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=404 elapsed_ms=0.2
+INFO:     127.0.0.1:63109 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 404 Not Found
+2026-02-23 20:46:13,103 | INFO | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=404 elapsed_ms=0.3
+INFO:     127.0.0.1:63109 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 404 Not Found
+2026-02-23 20:46:13,104 | INFO | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=404 elapsed_ms=0.4
+INFO:     127.0.0.1:63109 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 404 Not Found
+2026-02-23 20:46:13,105 | INFO | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=404 elapsed_ms=0.3
+INFO:     127.0.0.1:63109 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 404 Not Found
+2026-02-23 20:46:13,106 | INFO | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=404 elapsed_ms=0.2
+INFO:     127.0.0.1:63109 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 404 Not Found
+2026-02-23 20:46:13,107 | INFO | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=404 elapsed_ms=0.2
+INFO:     127.0.0.1:63109 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 404 Not Found
+2026-02-23 20:46:13,108 | INFO | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=404 elapsed_ms=0.2
+INFO:     127.0.0.1:63109 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 404 Not Found
+2026-02-23 20:46:13,109 | INFO | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=404 elapsed_ms=0.3
+INFO:     127.0.0.1:63109 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 404 Not Found
+2026-02-23 20:46:13,110 | INFO | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=404 elapsed_ms=0.2
+INFO:     127.0.0.1:63109 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 404 Not Found
+2026-02-23 20:46:13,110 | INFO | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=404 elapsed_ms=0.2
+INFO:     127.0.0.1:63109 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 404 Not Found
+2026-02-23 20:46:13,111 | INFO | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=404 elapsed_ms=0.2
+INFO:     127.0.0.1:63109 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 404 Not Found
+2026-02-23 20:46:13,112 | INFO | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=404 elapsed_ms=0.1
+INFO:     127.0.0.1:63109 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 404 Not Found
+2026-02-23 20:46:13,113 | INFO | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=404 elapsed_ms=0.1
+INFO:     127.0.0.1:63109 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 404 Not Found
+2026-02-23 20:46:13,113 | INFO | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=404 elapsed_ms=0.3
+INFO:     127.0.0.1:63109 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 404 Not Found
+2026-02-23 20:46:13,114 | INFO | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=404 elapsed_ms=0.2
+INFO:     127.0.0.1:63109 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 404 Not Found
+2026-02-23 20:46:13,115 | INFO | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=404 elapsed_ms=0.2
+INFO:     127.0.0.1:63109 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 404 Not Found
+2026-02-23 20:46:13,116 | INFO | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=404 elapsed_ms=0.2
+INFO:     127.0.0.1:63109 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 404 Not Found
+2026-02-23 20:46:13,342 | INFO | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=404 elapsed_ms=0.7
+INFO:     127.0.0.1:63111 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 404 Not Found
+2026-02-23 20:46:14,360 | INFO | MainThread | request method=GET path=/api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 query= status=404 elapsed_ms=0.9
+INFO:     127.0.0.1:63112 - "GET /api/tasks/9f234bea-5684-4de1-a02d-5033c5e01379 HTTP/1.1" 404 Not Found

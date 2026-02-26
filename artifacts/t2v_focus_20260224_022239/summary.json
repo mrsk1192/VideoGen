@@ -1,0 +1,19 @@
+﻿{
+    "timestamp":  "20260224_022239",
+    "base_url":  "http://127.0.0.1:8000",
+    "task_id":  "6613bd96-b149-4ebc-a0e7-8f240f8681f5",
+    "status":  "completed",
+    "error":  "",
+    "model":  "C:\\AI\\VideoGen\\models\\ali-vilab--text-to-video-ms-1.7b",
+    "runtime_device":  "cuda",
+    "cuda_available":  true,
+    "rocm_available":  true,
+    "video_file":  "text2video_6613bd96-b149-4ebc-a0e7-8f240f8681f5.mp4",
+    "video_path":  "outputs\\text2video_6613bd96-b149-4ebc-a0e7-8f240f8681f5.mp4",
+    "duration_sec":  5,
+    "nb_frames":  30,
+    "fps":  "6/1",
+    "server_stdout":  "artifacts\\t2v_focus_20260224_022239\\server_stdout.log",
+    "server_stderr":  "artifacts\\t2v_focus_20260224_022239\\server_stderr.log",
+    "poll_monitor":  "artifacts\\t2v_focus_20260224_022239\\poll_monitor.log"
+}

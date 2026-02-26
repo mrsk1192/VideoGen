@@ -1,0 +1,7 @@
+[WARN] transformers compatibility check failed. Current environment may be partially incompatible.
+[WARN] ROCm/GPU backend was not detected in this Python environment.
+[INFO] Starting server at http://localhost:8000
+[INFO] TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=1
+INFO:     127.0.0.1:50066 - "GET /api/system/info HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50066 - "GET /api/system/info HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50066 - "GET /api/system/info HTTP/1.1" 200 OK

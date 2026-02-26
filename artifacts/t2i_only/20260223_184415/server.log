@@ -1,0 +1,612 @@
+The system cannot find the file specified.
+[WARN] transformers compatibility check failed. Current environment may be partially incompatible.
+[WARN] ROCm/GPU backend was not detected in this Python environment.
+[INFO] Starting server at http://localhost:51153
+2026-02-23 18:44:17,497 | INFO | MainThread | logger initialized file=C:\AI\VideoGen\logs\videogen.log
+INFO:     Started server process [18468]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:51153 (Press CTRL+C to quit)
+INFO:     127.0.0.1:51161 - "GET /api/system/info HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51163 - "GET /api/system/info HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54893 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /static/app.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54893 - "GET /static/styles.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/system/info HTTP/1.1" 200 OK
+2026-02-23 18:44:22,867 | INFO | MainThread | request method=GET path=/api/settings query= status=200 elapsed_ms=1.8
+INFO:     127.0.0.1:52039 - "GET /api/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/system/info HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54893 - "GET /api/models/local HTTP/1.1" 200 OK
+2026-02-23 18:44:22,898 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 18:44:22,898 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 18:44:22,898 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 18:44:22,899 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 18:44:22,899 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 18:44:22,899 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 18:44:22,899 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 18:44:22,899 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 18:44:22,900 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 18:44:22,900 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 18:44:22,900 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 18:44:22,900 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 18:44:22,901 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 18:44:22,901 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 18:44:22,901 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 18:44:22,902 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 18:44:22,902 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 18:44:22,902 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 18:44:22,903 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 18:44:22,903 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 18:44:22,903 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 18:44:22,903 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+2026-02-23 18:44:22,904 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+INFO:     127.0.0.1:52039 - "GET /api/models/catalog?task=text-to-video&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/models/catalog?task=image-to-image&limit=40 HTTP/1.1" 200 OK
+2026-02-23 18:44:22,905 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+INFO:     127.0.0.1:49718 - "GET /api/models/catalog?task=image-to-video&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54893 - "GET /api/models/catalog?task=text-to-image&limit=40 HTTP/1.1" 200 OK
+2026-02-23 18:44:22,911 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b status=200 elapsed_ms=4.4
+INFO:     127.0.0.1:49718 - "GET /api/models/loras/catalog?task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b HTTP/1.1" 200 OK
+2026-02-23 18:44:22,915 | INFO | MainThread | request method=GET path=/favicon.ico query= status=404 elapsed_ms=0.2
+INFO:     127.0.0.1:63789 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+2026-02-23 18:44:22,922 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=8.0
+INFO:     127.0.0.1:52039 - "GET /api/models/loras/catalog?task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 18:44:22,923 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-video&limit=200&model_ref=example-org%2Fexample-model status=200 elapsed_ms=9.0
+INFO:     127.0.0.1:49667 - "GET /api/models/loras/catalog?task=image-to-video&limit=200&model_ref=example-org%2Fexample-model HTTP/1.1" 200 OK
+2026-02-23 18:44:22,924 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=9.6
+INFO:     127.0.0.1:54893 - "GET /api/models/loras/catalog?task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54893 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54893 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/outputs?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54893 - "GET /api/models/local?dir=C%3A%5CAI%5CVideoGen%5Cmodels HTTP/1.1" 200 OK
+2026-02-23 18:44:22,946 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 18:44:22,946 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 18:44:22,947 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--i2vgen-xl
+2026-02-23 18:44:22,947 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 18:44:22,947 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 18:44:22,947 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 18:44:22,947 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 18:44:22,948 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 18:44:22,948 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 18:44:22,948 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 18:44:22,948 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 18:44:22,949 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 18:44:22,949 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-image path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 18:44:22,949 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--text-to-video-ms-1.7b
+2026-02-23 18:44:22,949 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 18:44:22,949 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\ali-vilab--VACE-Wan2.1-1.3B-Preview
+2026-02-23 18:44:22,949 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 18:44:22,950 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\DFloat11--Wan2.1-T2V-14B-Diffusers-DF11
+2026-02-23 18:44:22,950 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 18:44:22,950 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\latent-consistency--lcm-lora-sdxl
+2026-02-23 18:44:22,950 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 18:44:22,950 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\madebyollin--sdxl-vae-fp16-fix
+2026-02-23 18:44:22,951 | INFO | AnyIO worker thread | catalog skip incompatible task=image-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+2026-02-23 18:44:22,951 | INFO | AnyIO worker thread | catalog skip incompatible task=text-to-video path=C:\AI\VideoGen\models\stabilityai--stable-diffusion-xl-base-1.0
+INFO:     127.0.0.1:63789 - "GET /api/models/catalog?task=image-to-video&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52039 - "GET /api/models/catalog?task=text-to-video&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/models/catalog?task=image-to-image&limit=40 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54893 - "GET /api/models/catalog?task=text-to-image&limit=40 HTTP/1.1" 200 OK
+2026-02-23 18:44:22,965 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-video&limit=200&model_ref=example-org%2Fexample-model status=200 elapsed_ms=10.2
+INFO:     127.0.0.1:63789 - "GET /api/models/loras/catalog?task=image-to-video&limit=200&model_ref=example-org%2Fexample-model HTTP/1.1" 200 OK
+2026-02-23 18:44:22,965 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b status=200 elapsed_ms=10.0
+INFO:     127.0.0.1:54893 - "GET /api/models/loras/catalog?task=text-to-video&limit=200&model_ref=ali-vilab%2Ftext-to-video-ms-1.7b HTTP/1.1" 200 OK
+2026-02-23 18:44:22,966 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=10.8
+INFO:     127.0.0.1:49667 - "GET /api/models/loras/catalog?task=image-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+2026-02-23 18:44:22,967 | INFO | MainThread | request method=GET path=/api/models/loras/catalog query=task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 status=200 elapsed_ms=10.8
+INFO:     127.0.0.1:52039 - "GET /api/models/loras/catalog?task=text-to-image&limit=200&model_ref=stabilityai%2Fstable-diffusion-xl-base-1.0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52039 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52039 - "GET /api/models/vaes/catalog?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63789 - "GET /api/models/search?task=text-to-image&source=huggingface&query=RealVisXL_V5.0&limit=30 HTTP/1.1" 200 OK
+2026-02-23 18:44:26,859 | INFO | AnyIO worker thread | task created id=86562490-8a37-4aa1-9fd5-489fea648925 type=download message=Download queued
+2026-02-23 18:44:26,859 | INFO | AnyIO worker thread | download requested task_id=86562490-8a37-4aa1-9fd5-489fea648925 repo=SG161222/RealVisXL_V5.0 revision=None target_dir=C:\AI\VideoGen\models
+2026-02-23 18:44:26,860 | INFO | MainThread | request method=POST path=/api/models/download query= status=200 elapsed_ms=2.0
+INFO:     127.0.0.1:63789 - "POST /api/models/download HTTP/1.1" 200 OK
+2026-02-23 18:44:26,861 | INFO | Thread-1 (download_model_worker) | download start task_id=86562490-8a37-4aa1-9fd5-489fea648925 repo=SG161222/RealVisXL_V5.0 revision=main target=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0
+2026-02-23 18:44:26,861 | INFO | Thread-1 (download_model_worker) | task status id=86562490-8a37-4aa1-9fd5-489fea648925 type=download queued->running progress=0.100 message=Downloading SG161222/RealVisXL_V5.0
+INFO:     127.0.0.1:63789 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+
+Fetching 28 files:   0%|          | 0/28 [00:00<?, ?it/s]C:\AI\VideoGen\venv\Lib\site-packages\huggingface_hub\file_download.py:986: UserWarning: `local_dir_use_symlinks` parameter is deprecated and will be ignored. The process to download files to a local folder has been updated and do not rely on symlinks anymore. You only need to pass a destination folder as`local_dir`.
+For more details, check out https://huggingface.co/docs/huggingface_hub/main/en/guides/download#download-files-to-local-folder.
+  warnings.warn(
+C:\AI\VideoGen\venv\Lib\site-packages\huggingface_hub\file_download.py:949: FutureWarning: `resume_download` is deprecated and will be removed in version 1.0.0. Downloads always resume when possible. If you want to force a new download, use `force_download=True`.
+  warnings.warn(
+INFO:     127.0.0.1:49680 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52039 - "GET /api/models/search?task=text-to-image&source=all&query=&limit=30 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52039 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+
+Fetching 28 files:   4%|▎         | 1/28 [00:00<00:15,  1.77it/s]INFO:     127.0.0.1:53211 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52039 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/models/search?task=text-to-image&source=huggingface&query=&limit=30 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53215 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53267 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53271 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53272 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53273 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53274 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53275 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53276 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53277 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53278 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53279 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53280 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53281 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53282 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53283 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53284 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53285 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53286 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53287 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60329 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60330 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60331 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59010 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64178 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58843 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59614 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61263 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50263 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58907 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49238 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57051 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57052 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57053 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53176 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53177 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53178 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53179 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53180 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53181 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53182 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53183 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53184 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53185 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53186 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53187 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53188 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53189 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53190 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53191 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53192 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60176 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57696 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57697 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57698 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57699 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57700 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57701 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57702 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57703 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57704 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57705 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57706 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57707 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57708 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57709 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57710 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57711 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57712 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57713 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57714 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57715 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57716 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57717 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57719 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57720 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57721 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57722 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57726 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57729 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57731 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57732 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57733 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57734 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57735 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57736 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57737 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57738 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57739 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57740 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57741 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57742 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57743 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57744 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57745 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57747 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57748 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57749 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57750 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57752 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57753 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57754 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57755 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57756 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57757 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57758 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57760 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57761 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57762 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57763 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57764 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57765 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57766 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57767 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57768 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57769 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57770 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57771 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57772 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57773 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61498 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60354 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55374 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62144 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59310 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59989 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50061 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50062 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49921 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53793 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62707 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56155 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56156 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56157 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56158 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56159 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56160 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56161 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56162 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56163 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56164 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56165 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56166 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56167 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56168 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61185 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63242 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63243 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63244 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63245 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63246 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63247 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63248 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63249 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63250 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63251 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63252 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63253 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63254 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63255 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63256 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63257 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63258 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63259 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63260 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63261 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63262 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63263 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63264 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63265 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63266 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63267 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63268 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63269 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63270 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63271 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63272 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63273 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63274 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63275 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63276 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63277 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63278 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63279 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63280 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63281 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63282 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63283 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63284 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63285 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63286 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63287 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63288 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63289 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63290 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63291 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63292 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63293 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63294 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63295 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63296 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63297 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63298 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63299 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63300 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63302 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+
+Fetching 28 files:  11%|█         | 3/28 [03:33<32:56, 79.05s/it]INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63303 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63304 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63305 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63306 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63307 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63308 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63309 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63310 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63311 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63312 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63313 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63314 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63315 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63316 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63317 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63318 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63319 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63320 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63321 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63322 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63323 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63324 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63325 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63326 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49667 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63327 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62785 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62786 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62785 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62787 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62785 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62788 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62785 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62789 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62785 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62790 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62785 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62791 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+
+Fetching 28 files:  14%|█▍        | 4/28 [04:05<25:02, 62.59s/it]INFO:     127.0.0.1:62785 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+
+Fetching 28 files:  86%|████████▌ | 24/28 [04:05<00:23,  5.76s/it]
+Fetching 28 files: 100%|██████████| 28/28 [04:05<00:00,  8.76s/it]
+2026-02-23 18:48:32,524 | INFO | Thread-1 (download_model_worker) | task status id=86562490-8a37-4aa1-9fd5-489fea648925 type=download running->completed progress=1.000 message=Download complete
+2026-02-23 18:48:32,524 | INFO | Thread-1 (download_model_worker) | download done task_id=86562490-8a37-4aa1-9fd5-489fea648925 repo=SG161222/RealVisXL_V5.0 local_path=C:\AI\VideoGen\models\SG161222--RealVisXL_V5.0
+INFO:     127.0.0.1:62792 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62785 - "GET /api/tasks/86562490-8a37-4aa1-9fd5-489fea648925 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62785 - "GET /api/models/local?dir=C%3A%5CAI%5CVideoGen%5Cmodels HTTP/1.1" 200 OK
