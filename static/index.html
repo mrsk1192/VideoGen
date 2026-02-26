@@ -15,11 +15,11 @@
     <header class="top">
       <div>
         <h1 data-i18n="appTitle">ROCm VideoGen Studio</h1>
-        <p data-i18n="appSubtitle">Text-to-Video / Image-to-Video with server-side model search & download</p>
+        <p data-i18n="appSubtitle">Text-to-Image / Image-to-Image / Text-to-Video / Image-to-Video</p>
       </div>
       <div class="top-right">
         <label class="lang-picker">
-          <span data-i18n="languageLabel">Language</span>
+          <span data-i18n="languageLabel" class="has-help" data-help-key="helpLanguage" tabindex="0">Language</span>
           <select id="languageSelect">
             <option value="en">English</option>
             <option value="ja">日本語</option>
@@ -37,36 +37,149 @@
     </header>
 
     <nav class="tabs">
-      <button class="tab active" data-tab="text" data-i18n="tabTextToVideo">Text to Video</button>
+      <button class="tab active" data-tab="text-image" data-i18n="tabTextToImage">Text to Image</button>
+      <button class="tab" data-tab="image-image" data-i18n="tabImageToImage">Image to Image</button>
+      <button class="tab" data-tab="text" data-i18n="tabTextToVideo">Text to Video</button>
       <button class="tab" data-tab="image" data-i18n="tabImageToVideo">Image to Video</button>
-      <button class="tab" data-tab="models" data-i18n="tabModels">Models</button>
+      <button class="tab" data-tab="models" data-i18n="tabModels">Model Search</button>
+      <button class="tab" data-tab="local-models" data-i18n="tabLocalModels">Local Models</button>
+      <button class="tab" data-tab="outputs" data-i18n="tabOutputs">Outputs</button>
       <button class="tab" data-tab="settings" data-i18n="tabSettings">Settings</button>
     </nav>
 
-    <section class="panel active" id="panel-text">
+    <section class="panel active" id="panel-text-image">
+      <form id="text2imageForm" class="form">
+        <label>
+          <span data-i18n="labelPrompt" class="has-help" data-help-key="helpPromptText2Image" tabindex="0">Prompt</span>
+          <textarea id="t2iPrompt" required data-i18n-placeholder="placeholderT2IPrompt" placeholder="A portrait photo of a fox wearing a suit, studio light"></textarea>
+        </label>
+        <label>
+          <span data-i18n="labelNegativePrompt" class="has-help" data-help-key="helpNegativePromptText2Image" tabindex="0">Negative Prompt</span>
+          <textarea id="t2iNegative" data-i18n-placeholder="placeholderNegativePrompt" placeholder="low quality, blurry"></textarea>
+        </label>
+        <label>
+          <span data-i18n="labelModelSelect" class="has-help" data-help-key="helpModelSelectText2Image" tabindex="0">Model Selection</span>
+          <div class="input-actions model-select-actions">
+            <select id="t2iModelSelect"></select>
+            <div id="t2iModelPreview" class="model-picked-preview model-preview-inline"></div>
+            <button id="refreshT2IModels" type="button" data-i18n="btnRefreshModels">Refresh</button>
+          </div>
+        </label>
+        <label>
+          <span data-i18n="labelLoraSelect" class="has-help" data-help-key="helpLoraSelectText2Image" tabindex="0">LoRA Selection</span>
+          <div class="input-actions">
+            <select id="t2iLoraSelect" multiple size="4"></select>
+            <button id="refreshT2ILoras" type="button" data-i18n="btnRefreshLoras">Refresh LoRAs</button>
+          </div>
+        </label>
+        <label>
+          <span data-i18n="labelVaeSelect" class="has-help" data-help-key="helpVaeSelectText2Image" tabindex="0">VAE Selection</span>
+          <div class="input-actions">
+            <select id="t2iVaeSelect"></select>
+            <button id="refreshT2IVaes" type="button" data-i18n="btnRefreshVaes">Refresh VAEs</button>
+          </div>
+        </label>
+        <div class="grid">
+          <label><span data-i18n="labelSteps" class="has-help" data-help-key="helpStepsText2Image" tabindex="0">Steps</span> <input id="t2iSteps" type="number" min="1" max="120" value="30" /></label>
+          <label><span data-i18n="labelGuidance" class="has-help" data-help-key="helpGuidanceText2Image" tabindex="0">Guidance</span> <input id="t2iGuidance" type="number" min="0" max="30" step="0.1" value="7.5" /></label>
+          <label><span data-i18n="labelLoraScale" class="has-help" data-help-key="helpLoraScale" tabindex="0">LoRA Scale</span> <input id="t2iLoraScale" type="number" min="0" max="2" step="0.05" value="1.0" /></label>
+          <label><span data-i18n="labelWidth" class="has-help" data-help-key="helpWidthText2Image" tabindex="0">Width</span> <input id="t2iWidth" type="number" min="128" max="2048" step="64" value="512" /></label>
+          <label><span data-i18n="labelHeight" class="has-help" data-help-key="helpHeightText2Image" tabindex="0">Height</span> <input id="t2iHeight" type="number" min="128" max="2048" step="64" value="512" /></label>
+          <label><span data-i18n="labelSeed" class="has-help" data-help-key="helpSeedText2Image" tabindex="0">Seed</span> <input id="t2iSeed" type="number" min="0" data-i18n-placeholder="placeholderSeed" placeholder="random if empty" /></label>
+        </div>
+        <button type="submit" class="primary" data-i18n="btnGenerateTextImage">Generate Text Image</button>
+      </form>
+    </section>
+
+    <section class="panel" id="panel-image-image">
+      <form id="image2imageForm" class="form">
+        <label>
+          <span data-i18n="labelInputImage" class="has-help" data-help-key="helpInputImage" tabindex="0">Input Image</span>
+          <input id="i2iImage" type="file" accept="image/*" required />
+        </label>
+        <label>
+          <span data-i18n="labelPrompt" class="has-help" data-help-key="helpPromptImage2Image" tabindex="0">Prompt</span>
+          <textarea id="i2iPrompt" required data-i18n-placeholder="placeholderI2IPrompt" placeholder="Refine this image into a cinematic poster style"></textarea>
+        </label>
+        <label>
+          <span data-i18n="labelNegativePrompt" class="has-help" data-help-key="helpNegativePromptImage2Image" tabindex="0">Negative Prompt</span>
+          <textarea id="i2iNegative" data-i18n-placeholder="placeholderI2INegativePrompt" placeholder="low quality, blurry"></textarea>
+        </label>
+        <label>
+          <span data-i18n="labelModelSelect" class="has-help" data-help-key="helpModelSelectImage2Image" tabindex="0">Model Selection</span>
+          <div class="input-actions model-select-actions">
+            <select id="i2iModelSelect"></select>
+            <div id="i2iModelPreview" class="model-picked-preview model-preview-inline"></div>
+            <button id="refreshI2IModels" type="button" data-i18n="btnRefreshModels">Refresh</button>
+          </div>
+        </label>
+        <label>
+          <span data-i18n="labelLoraSelect" class="has-help" data-help-key="helpLoraSelectImage2Image" tabindex="0">LoRA Selection</span>
+          <div class="input-actions">
+            <select id="i2iLoraSelect" multiple size="4"></select>
+            <button id="refreshI2ILoras" type="button" data-i18n="btnRefreshLoras">Refresh LoRAs</button>
+          </div>
+        </label>
+        <label>
+          <span data-i18n="labelVaeSelect" class="has-help" data-help-key="helpVaeSelectImage2Image" tabindex="0">VAE Selection</span>
+          <div class="input-actions">
+            <select id="i2iVaeSelect"></select>
+            <button id="refreshI2IVaes" type="button" data-i18n="btnRefreshVaes">Refresh VAEs</button>
+          </div>
+        </label>
+        <div class="grid">
+          <label><span data-i18n="labelSteps" class="has-help" data-help-key="helpStepsImage2Image" tabindex="0">Steps</span> <input id="i2iSteps" type="number" min="1" max="120" value="30" /></label>
+          <label><span data-i18n="labelGuidance" class="has-help" data-help-key="helpGuidanceImage2Image" tabindex="0">Guidance</span> <input id="i2iGuidance" type="number" min="0" max="30" step="0.1" value="7.5" /></label>
+          <label><span data-i18n="labelStrength" class="has-help" data-help-key="helpStrengthImage2Image" tabindex="0">Strength</span> <input id="i2iStrength" type="number" min="0" max="1" step="0.05" value="0.8" /></label>
+          <label><span data-i18n="labelLoraScale" class="has-help" data-help-key="helpLoraScale" tabindex="0">LoRA Scale</span> <input id="i2iLoraScale" type="number" min="0" max="2" step="0.05" value="1.0" /></label>
+          <label><span data-i18n="labelWidth" class="has-help" data-help-key="helpWidthImage2Image" tabindex="0">Width</span> <input id="i2iWidth" type="number" min="128" max="2048" step="64" value="512" /></label>
+          <label><span data-i18n="labelHeight" class="has-help" data-help-key="helpHeightImage2Image" tabindex="0">Height</span> <input id="i2iHeight" type="number" min="128" max="2048" step="64" value="512" /></label>
+          <label><span data-i18n="labelSeed" class="has-help" data-help-key="helpSeedImage2Image" tabindex="0">Seed</span> <input id="i2iSeed" type="number" min="0" data-i18n-placeholder="placeholderSeed" placeholder="random if empty" /></label>
+        </div>
+        <button type="submit" class="primary" data-i18n="btnGenerateImageImage">Generate Image Image</button>
+      </form>
+    </section>
+
+    <section class="panel" id="panel-text">
       <form id="text2videoForm" class="form">
         <label>
-          <span data-i18n="labelPrompt">Prompt</span>
+          <span data-i18n="labelPrompt" class="has-help" data-help-key="helpPromptText2Video" tabindex="0">Prompt</span>
           <textarea id="t2vPrompt" required data-i18n-placeholder="placeholderT2VPrompt" placeholder="A cinematic drone shot above neon city..."></textarea>
         </label>
         <label>
-          <span data-i18n="labelNegativePrompt">Negative Prompt</span>
+          <span data-i18n="labelNegativePrompt" class="has-help" data-help-key="helpNegativePromptText2Video" tabindex="0">Negative Prompt</span>
           <textarea id="t2vNegative" data-i18n-placeholder="placeholderNegativePrompt" placeholder="low quality, blurry"></textarea>
         </label>
         <label>
-          <span data-i18n="labelModelSelect">Model Selection</span>
-          <div class="input-actions">
+          <span data-i18n="labelModelSelect" class="has-help" data-help-key="helpModelSelectText2Video" tabindex="0">Model Selection</span>
+          <div class="input-actions model-select-actions">
             <select id="t2vModelSelect"></select>
+            <div id="t2vModelPreview" class="model-picked-preview model-preview-inline"></div>
             <button id="refreshT2VModels" type="button" data-i18n="btnRefreshModels">Refresh</button>
           </div>
         </label>
-        <div id="t2vModelPreview" class="model-picked-preview"></div>
+        <label>
+          <span data-i18n="labelLoraSelect" class="has-help" data-help-key="helpLoraSelectText2Video" tabindex="0">LoRA Selection</span>
+          <div class="input-actions">
+            <select id="t2vLoraSelect" multiple size="4"></select>
+            <button id="refreshT2VLoras" type="button" data-i18n="btnRefreshLoras">Refresh LoRAs</button>
+          </div>
+        </label>
         <div class="grid">
-          <label><span data-i18n="labelSteps">Steps</span> <input id="t2vSteps" type="number" min="1" max="120" value="30" /></label>
-          <label><span data-i18n="labelFrames">Frames</span> <input id="t2vFrames" type="number" min="8" max="128" value="16" /></label>
-          <label><span data-i18n="labelGuidance">Guidance</span> <input id="t2vGuidance" type="number" min="0" max="30" step="0.1" value="9.0" /></label>
-          <label><span data-i18n="labelFps">FPS</span> <input id="t2vFps" type="number" min="1" max="60" value="8" /></label>
-          <label><span data-i18n="labelSeed">Seed</span> <input id="t2vSeed" type="number" min="0" data-i18n-placeholder="placeholderSeed" placeholder="random if empty" /></label>
+          <label><span data-i18n="labelSteps" class="has-help" data-help-key="helpStepsText2Video" tabindex="0">Steps</span> <input id="t2vSteps" type="number" min="1" max="120" value="30" /></label>
+          <label><span data-i18n="labelFrames" class="has-help" data-help-key="helpFramesText2Video" tabindex="0">Frames</span> <input id="t2vFrames" type="number" min="8" max="128" value="16" /></label>
+          <label><span data-i18n="labelGuidance" class="has-help" data-help-key="helpGuidanceText2Video" tabindex="0">Guidance</span> <input id="t2vGuidance" type="number" min="0" max="30" step="0.1" value="9.0" /></label>
+          <label><span data-i18n="labelLoraScale" class="has-help" data-help-key="helpLoraScale" tabindex="0">LoRA Scale</span> <input id="t2vLoraScale" type="number" min="0" max="2" step="0.05" value="1.0" /></label>
+          <label><span data-i18n="labelFps" class="has-help" data-help-key="helpFpsText2Video" tabindex="0">FPS</span> <input id="t2vFps" type="number" min="1" max="60" value="8" /></label>
+          <label>
+            <span data-i18n="labelT2VBackend" class="has-help" data-help-key="helpT2VBackend" tabindex="0">T2V Backend</span>
+            <select id="t2vBackendSelect">
+              <option value="auto" data-i18n="backendAuto">Auto</option>
+              <option value="cuda" data-i18n="backendCuda">GPU (CUDA/ROCm)</option>
+              <option value="npu" data-i18n="backendNpu">NPU</option>
+            </select>
+          </label>
+          <label><span data-i18n="labelSeed" class="has-help" data-help-key="helpSeedText2Video" tabindex="0">Seed</span> <input id="t2vSeed" type="number" min="0" data-i18n-placeholder="placeholderSeed" placeholder="random if empty" /></label>
         </div>
         <button type="submit" class="primary" data-i18n="btnGenerateTextVideo">Generate Text Video</button>
       </form>
@@ -75,33 +188,41 @@
     <section class="panel" id="panel-image">
       <form id="image2videoForm" class="form">
         <label>
-          <span data-i18n="labelInputImage">Input Image</span>
+          <span data-i18n="labelInputImage" class="has-help" data-help-key="helpInputImage" tabindex="0">Input Image</span>
           <input id="i2vImage" type="file" accept="image/*" required />
         </label>
         <label>
-          <span data-i18n="labelPrompt">Prompt</span>
+          <span data-i18n="labelPrompt" class="has-help" data-help-key="helpPromptImage2Video" tabindex="0">Prompt</span>
           <textarea id="i2vPrompt" required data-i18n-placeholder="placeholderI2VPrompt" placeholder="Turn this image into a smooth cinematic motion..."></textarea>
         </label>
         <label>
-          <span data-i18n="labelNegativePrompt">Negative Prompt</span>
+          <span data-i18n="labelNegativePrompt" class="has-help" data-help-key="helpNegativePromptImage2Video" tabindex="0">Negative Prompt</span>
           <textarea id="i2vNegative" data-i18n-placeholder="placeholderI2VNegativePrompt" placeholder="artifact, flicker"></textarea>
         </label>
         <label>
-          <span data-i18n="labelModelSelect">Model Selection</span>
-          <div class="input-actions">
+          <span data-i18n="labelModelSelect" class="has-help" data-help-key="helpModelSelectImage2Video" tabindex="0">Model Selection</span>
+          <div class="input-actions model-select-actions">
             <select id="i2vModelSelect"></select>
+            <div id="i2vModelPreview" class="model-picked-preview model-preview-inline"></div>
             <button id="refreshI2VModels" type="button" data-i18n="btnRefreshModels">Refresh</button>
           </div>
         </label>
-        <div id="i2vModelPreview" class="model-picked-preview"></div>
+        <label>
+          <span data-i18n="labelLoraSelect" class="has-help" data-help-key="helpLoraSelectImage2Video" tabindex="0">LoRA Selection</span>
+          <div class="input-actions">
+            <select id="i2vLoraSelect" multiple size="4"></select>
+            <button id="refreshI2VLoras" type="button" data-i18n="btnRefreshLoras">Refresh LoRAs</button>
+          </div>
+        </label>
         <div class="grid">
-          <label><span data-i18n="labelSteps">Steps</span> <input id="i2vSteps" type="number" min="1" max="120" value="30" /></label>
-          <label><span data-i18n="labelFrames">Frames</span> <input id="i2vFrames" type="number" min="8" max="128" value="16" /></label>
-          <label><span data-i18n="labelGuidance">Guidance</span> <input id="i2vGuidance" type="number" min="0" max="30" step="0.1" value="9.0" /></label>
-          <label><span data-i18n="labelFps">FPS</span> <input id="i2vFps" type="number" min="1" max="60" value="8" /></label>
-          <label><span data-i18n="labelWidth">Width</span> <input id="i2vWidth" type="number" min="128" max="2048" step="64" value="512" /></label>
-          <label><span data-i18n="labelHeight">Height</span> <input id="i2vHeight" type="number" min="128" max="2048" step="64" value="512" /></label>
-          <label><span data-i18n="labelSeed">Seed</span> <input id="i2vSeed" type="number" min="0" data-i18n-placeholder="placeholderSeed" placeholder="random if empty" /></label>
+          <label><span data-i18n="labelSteps" class="has-help" data-help-key="helpStepsImage2Video" tabindex="0">Steps</span> <input id="i2vSteps" type="number" min="1" max="120" value="30" /></label>
+          <label><span data-i18n="labelFrames" class="has-help" data-help-key="helpFramesImage2Video" tabindex="0">Frames</span> <input id="i2vFrames" type="number" min="8" max="128" value="16" /></label>
+          <label><span data-i18n="labelGuidance" class="has-help" data-help-key="helpGuidanceImage2Video" tabindex="0">Guidance</span> <input id="i2vGuidance" type="number" min="0" max="30" step="0.1" value="9.0" /></label>
+          <label><span data-i18n="labelLoraScale" class="has-help" data-help-key="helpLoraScale" tabindex="0">LoRA Scale</span> <input id="i2vLoraScale" type="number" min="0" max="2" step="0.05" value="1.0" /></label>
+          <label><span data-i18n="labelFps" class="has-help" data-help-key="helpFpsImage2Video" tabindex="0">FPS</span> <input id="i2vFps" type="number" min="1" max="60" value="8" /></label>
+          <label><span data-i18n="labelWidth" class="has-help" data-help-key="helpWidthImage2Video" tabindex="0">Width</span> <input id="i2vWidth" type="number" min="128" max="2048" step="64" value="512" /></label>
+          <label><span data-i18n="labelHeight" class="has-help" data-help-key="helpHeightImage2Video" tabindex="0">Height</span> <input id="i2vHeight" type="number" min="128" max="2048" step="64" value="512" /></label>
+          <label><span data-i18n="labelSeed" class="has-help" data-help-key="helpSeedImage2Video" tabindex="0">Seed</span> <input id="i2vSeed" type="number" min="0" data-i18n-placeholder="placeholderSeed" placeholder="random if empty" /></label>
         </div>
         <button type="submit" class="primary" data-i18n="btnGenerateImageVideo">Generate Image Video</button>
       </form>
@@ -110,77 +231,126 @@
     <section class="panel" id="panel-models">
       <form id="searchForm" class="form compact">
         <label>
-          <span data-i18n="labelDownloadSavePathOptional">Download Save Path (optional)</span>
-          <div class="input-actions">
-            <input id="downloadTargetDir" data-i18n-placeholder="placeholderDownloadSavePath" placeholder="empty = use Models Directory from Settings" />
-            <button id="browseDownloadTargetDir" type="button" data-i18n="btnBrowsePath">Browse</button>
-          </div>
+          <span data-i18n="labelDownloadSavePathOptional" class="has-help" data-help-key="helpDownloadSavePath" tabindex="0">Download Save Path (optional)</span>
+          <input id="downloadTargetDir" data-i18n-placeholder="placeholderDownloadSavePath" placeholder="empty = use Models Directory from Settings" />
         </label>
         <div class="grid">
           <label>
-            <span data-i18n="labelTask">Task</span>
+            <span data-i18n="labelTask" class="has-help" data-help-key="helpTask" tabindex="0">Task</span>
             <select id="searchTask">
+              <option value="text-to-image">text-to-image</option>
+              <option value="image-to-image">image-to-image</option>
               <option value="text-to-video">text-to-video</option>
               <option value="image-to-video">image-to-video</option>
             </select>
           </label>
-          <label><span data-i18n="labelQuery">Query</span> <input id="searchQuery" data-i18n-placeholder="placeholderSearchQuery" placeholder="i2vgen, text-to-video..." /></label>
-          <label><span data-i18n="labelLimit">Limit</span> <input id="searchLimit" type="number" min="1" max="50" value="12" /></label>
+          <label>
+            <span data-i18n="labelSearchSource" class="has-help" data-help-key="helpSearchSource" tabindex="0">Source</span>
+            <select id="searchSource">
+              <option value="all" data-i18n="searchSourceAll">All</option>
+              <option value="huggingface" data-i18n="searchSourceHf">Hugging Face</option>
+              <option value="civitai" data-i18n="searchSourceCivitai">CivitAI</option>
+            </select>
+          </label>
+          <label>
+            <span data-i18n="labelSearchBaseModel" class="has-help" data-help-key="helpSearchBaseModel" tabindex="0">Base Model</span>
+            <select id="searchBaseModel"></select>
+          </label>
+          <label><span data-i18n="labelQuery" class="has-help" data-help-key="helpQuery" tabindex="0">Query</span> <input id="searchQuery" data-i18n-placeholder="placeholderSearchQuery" placeholder="i2vgen, text-to-video..." /></label>
+          <label><span data-i18n="labelLimit" class="has-help" data-help-key="helpLimit" tabindex="0">Limit</span> <input id="searchLimit" type="number" min="1" max="50" value="30" /></label>
         </div>
         <button type="submit" data-i18n="btnSearchModels">Search Models</button>
       </form>
       <div id="searchResults" class="list"></div>
+    </section>
+
+    <section class="panel" id="panel-local-models">
       <h3 data-i18n="headingLocalModels">Local Models</h3>
+      <label>
+        <span data-i18n="labelLocalModelsPath" class="has-help" data-help-key="helpLocalModelsPath" tabindex="0">Local Models Path</span>
+        <input id="localModelsDir" data-i18n-placeholder="placeholderLocalModelsPath" placeholder="empty = use Models Directory from Settings" />
+      </label>
+      <label>
+        <span data-i18n="labelLocalLineage" class="has-help" data-help-key="helpLocalLineage" tabindex="0">Lineage</span>
+        <select id="localLineageFilter"></select>
+      </label>
       <button id="refreshLocalModels" type="button" data-i18n="btnRefreshLocalList">Refresh Local List</button>
       <div id="localModels" class="list"></div>
     </section>
 
+    <section class="panel" id="panel-outputs">
+      <h3 data-i18n="headingOutputs">Outputs</h3>
+      <span id="outputsPath"></span>
+      <button id="refreshOutputs" type="button" data-i18n="btnRefreshOutputs">Refresh Outputs</button>
+      <div id="outputsList" class="list"></div>
+    </section>
+
     <section class="panel" id="panel-settings">
       <form id="settingsForm" class="form">
-        <div class="grid">
+        <div class="settings-stack">
           <label>
-            <span data-i18n="labelModelsDirectory">Models Directory</span>
-            <div class="input-actions">
-              <input id="cfgModelsDir" />
-              <button id="browseCfgModelsDir" type="button" data-i18n="btnBrowsePath">Browse</button>
-            </div>
+            <span data-i18n="labelModelsDirectory" class="has-help" data-help-key="helpModelsDirectory" tabindex="0">Models Directory</span>
+            <input id="cfgModelsDir" />
           </label>
-          <label><span data-i18n="labelOutputsDirectory">Outputs Directory</span> <input id="cfgOutputsDir" /></label>
-          <label><span data-i18n="labelTempDirectory">Temp Directory</span> <input id="cfgTmpDir" /></label>
-          <label><span data-i18n="labelHfToken">HF Token</span> <input id="cfgToken" type="password" data-i18n-placeholder="placeholderOptional" placeholder="optional" /></label>
-          <label><span data-i18n="labelDefaultTextModel">Default Text Model</span> <input id="cfgTextModel" /></label>
-          <label><span data-i18n="labelDefaultImageModel">Default Image Model</span> <input id="cfgImageModel" /></label>
-          <label><span data-i18n="labelDefaultSteps">Default Steps</span> <input id="cfgSteps" type="number" min="1" max="120" /></label>
-          <label><span data-i18n="labelDefaultFrames">Default Frames</span> <input id="cfgFrames" type="number" min="8" max="128" /></label>
-          <label><span data-i18n="labelDefaultGuidance">Default Guidance</span> <input id="cfgGuidance" type="number" min="0" max="30" step="0.1" /></label>
-          <label><span data-i18n="labelDefaultFps">Default FPS</span> <input id="cfgFps" type="number" min="1" max="60" /></label>
-          <label><span data-i18n="labelDefaultWidth">Default Width</span> <input id="cfgWidth" type="number" min="128" max="2048" step="64" /></label>
-          <label><span data-i18n="labelDefaultHeight">Default Height</span> <input id="cfgHeight" type="number" min="128" max="2048" step="64" /></label>
+          <label><span data-i18n="labelListenPort" class="has-help" data-help-key="helpListenPort" tabindex="0">Listen Port</span> <input id="cfgListenPort" type="number" min="1" max="65535" step="1" /></label>
+          <label>
+            <span data-i18n="labelRocmAotriton" class="has-help" data-help-key="helpRocmAotriton" tabindex="0">ROCm AOTriton Experimental</span>
+            <input id="cfgRocmAotriton" type="checkbox" />
+          </label>
+          <label><span data-i18n="labelOutputsDirectory" class="has-help" data-help-key="helpOutputsDirectory" tabindex="0">Outputs Directory</span> <input id="cfgOutputsDir" /></label>
+          <label><span data-i18n="labelTempDirectory" class="has-help" data-help-key="helpTempDirectory" tabindex="0">Temp Directory</span> <input id="cfgTmpDir" /></label>
+          <label>
+            <span data-i18n="labelLogLevel" class="has-help" data-help-key="helpLogLevel" tabindex="0">Log Level</span>
+            <select id="cfgLogLevel">
+              <option value="DEBUG" data-i18n="logLevelDebug">DEBUG</option>
+              <option value="INFO" data-i18n="logLevelInfo">INFO</option>
+              <option value="WARNING" data-i18n="logLevelWarning">WARNING</option>
+              <option value="ERROR" data-i18n="logLevelError">ERROR</option>
+            </select>
+          </label>
+          <label><span data-i18n="labelHfToken" class="has-help" data-help-key="helpHfToken" tabindex="0">HF Token</span> <input id="cfgToken" type="password" data-i18n-placeholder="placeholderOptional" placeholder="optional" /></label>
+          <label>
+            <span data-i18n="labelDefaultT2VBackend" class="has-help" data-help-key="helpDefaultT2VBackend" tabindex="0">Default T2V Backend</span>
+            <select id="cfgT2VBackend">
+              <option value="auto" data-i18n="backendAuto">Auto</option>
+              <option value="cuda" data-i18n="backendCuda">GPU (CUDA/ROCm)</option>
+              <option value="npu" data-i18n="backendNpu">NPU</option>
+            </select>
+          </label>
+          <label>
+            <span data-i18n="labelT2VNpuRunner" class="has-help" data-help-key="helpT2VNpuRunner" tabindex="0">T2V NPU Runner</span>
+            <input id="cfgT2VNpuRunner" data-i18n-placeholder="placeholderOptional" placeholder="optional" />
+          </label>
+          <label>
+            <span data-i18n="labelT2VNpuModelDir" class="has-help" data-help-key="helpT2VNpuModelDir" tabindex="0">T2V NPU Model Directory</span>
+            <input id="cfgT2VNpuModelDir" data-i18n-placeholder="placeholderOptional" placeholder="optional" />
+          </label>
+          <label><span data-i18n="labelDefaultTextModel" class="has-help" data-help-key="helpDefaultTextModel" tabindex="0">Default: Text to Video</span> <select id="cfgTextModel"></select></label>
+          <label><span data-i18n="labelDefaultImageModel" class="has-help" data-help-key="helpDefaultImageModel" tabindex="0">Default: Image to Video</span> <select id="cfgImageModel"></select></label>
+          <label><span data-i18n="labelDefaultTextImageModel" class="has-help" data-help-key="helpDefaultTextImageModel" tabindex="0">Default: Text to Image</span> <select id="cfgTextImageModel"></select></label>
+          <label><span data-i18n="labelDefaultImageImageModel" class="has-help" data-help-key="helpDefaultImageImageModel" tabindex="0">Default: Image to Image</span> <select id="cfgImageImageModel"></select></label>
+          <label><span data-i18n="labelDefaultSteps" class="has-help" data-help-key="helpDefaultSteps" tabindex="0">Default Steps</span> <input id="cfgSteps" type="number" min="1" max="120" /></label>
+          <label><span data-i18n="labelDefaultFrames" class="has-help" data-help-key="helpDefaultFrames" tabindex="0">Default Frames</span> <input id="cfgFrames" type="number" min="8" max="128" /></label>
+          <label><span data-i18n="labelDefaultGuidance" class="has-help" data-help-key="helpDefaultGuidance" tabindex="0">Default Guidance</span> <input id="cfgGuidance" type="number" min="0" max="30" step="0.1" /></label>
+          <label><span data-i18n="labelDefaultFps" class="has-help" data-help-key="helpDefaultFps" tabindex="0">Default FPS</span> <input id="cfgFps" type="number" min="1" max="60" /></label>
+          <label><span data-i18n="labelDefaultWidth" class="has-help" data-help-key="helpDefaultWidth" tabindex="0">Default Width</span> <input id="cfgWidth" type="number" min="128" max="2048" step="64" /></label>
+          <label><span data-i18n="labelDefaultHeight" class="has-help" data-help-key="helpDefaultHeight" tabindex="0">Default Height</span> <input id="cfgHeight" type="number" min="128" max="2048" step="64" /></label>
+          <label>
+            <span data-i18n="labelClearHfCache" class="has-help" data-help-key="helpClearHfCache" tabindex="0">Clear Hugging Face Cache</span>
+            <button id="clearHfCacheBtn" type="button" data-i18n="btnClearHfCache">Clear Cache</button>
+          </label>
         </div>
         <button type="submit" class="primary" data-i18n="btnSaveSettings">Save Settings</button>
       </form>
     </section>
 
-    <section id="pathBrowser" class="panel path-browser">
-      <div class="path-browser-head">
-        <h3 data-i18n="headingPathBrowser">Folder Browser</h3>
-        <button id="pathBrowserClose" type="button" data-i18n="btnClosePathBrowser">Close</button>
-      </div>
-      <div class="path-browser-current">
-        <strong data-i18n="labelCurrentPath">Current Path</strong>
-        <code id="pathBrowserCurrentPath">-</code>
-      </div>
-      <div class="path-browser-actions">
-        <button id="pathBrowserRoots" type="button" data-i18n="btnRoots">Roots</button>
-        <button id="pathBrowserUp" type="button" data-i18n="btnUpFolder">Up</button>
-        <button id="pathBrowserUse" type="button" class="primary" data-i18n="btnUseThisPath">Use This Path</button>
-      </div>
-      <div id="pathBrowserRootsList" class="path-browser-roots"></div>
-      <div id="pathBrowserList" class="list"></div>
-    </section>
-
     <section class="status">
       <div id="taskStatus" data-i18n="statusNoTask">No task running.</div>
+      <div id="taskProgressWrap" class="task-progress-wrap" aria-live="polite">
+        <div id="taskProgressBar" class="task-progress-bar"></div>
+        <div id="taskProgressLabel" class="task-progress-label">0% | ETA --:-- | ELAPSED 00:00</div>
+      </div>
+      <img id="imagePreview" alt="Generated image preview" />
       <video id="preview" controls></video>
     </section>
   </main>

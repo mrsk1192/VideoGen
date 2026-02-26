@@ -151,6 +151,33 @@ label {
   font-size: 0.95rem;
 }
 
+.has-help {
+  position: relative;
+  cursor: help;
+  text-decoration: underline dotted rgba(156, 183, 204, 0.9);
+  text-underline-offset: 2px;
+}
+
+.has-help:hover::after,
+.has-help:focus-visible::after {
+  content: attr(data-help);
+  position: absolute;
+  left: 0;
+  top: calc(100% + 8px);
+  width: min(480px, 78vw);
+  white-space: pre-wrap;
+  z-index: 40;
+  padding: 0.55rem 0.65rem;
+  border-radius: 10px;
+  border: 1px solid rgba(130, 174, 208, 0.55);
+  background: rgba(5, 10, 18, 0.96);
+  color: #e7f2ff;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+}
+
 .input-actions {
   display: flex;
   gap: 0.5rem;
@@ -159,6 +186,18 @@ label {
 .input-actions input,
 .input-actions select {
   flex: 1;
+}
+
+.input-actions select[multiple] {
+  min-height: 6.8rem;
+}
+
+.model-select-actions {
+  align-items: center;
+}
+
+.model-select-actions select {
+  min-width: 260px;
 }
 
 input,
@@ -189,6 +228,12 @@ textarea {
   gap: 0.7rem;
 }
 
+.settings-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
 button {
   border: 1px solid rgba(255, 154, 60, 0.8);
   border-radius: 10px;
@@ -200,6 +245,28 @@ button {
 
 button:hover {
   filter: brightness(1.08);
+}
+
+.downloaded-flag {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(20, 197, 175, 0.8);
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  color: #8ff3de;
+  background: rgba(20, 197, 175, 0.12);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.local-delete-btn {
+  border-color: rgba(255, 107, 107, 0.9);
+  background: rgba(255, 107, 107, 0.12);
+}
+
+.output-delete-btn {
+  border-color: rgba(255, 107, 107, 0.9);
+  background: rgba(255, 107, 107, 0.12);
 }
 
 .primary {
@@ -234,6 +301,13 @@ button:hover {
   align-items: flex-start;
 }
 
+.local-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .model-main {
   display: flex;
   gap: 0.7rem;
@@ -261,6 +335,15 @@ button:hover {
 .row span {
   color: var(--sub);
   font-size: 0.86rem;
+  font-family: "IBM Plex Mono", monospace;
+  word-break: break-all;
+}
+
+#outputsPath {
+  display: block;
+  color: var(--sub);
+  font-size: 0.84rem;
+  margin-bottom: 0.55rem;
   font-family: "IBM Plex Mono", monospace;
   word-break: break-all;
 }
@@ -347,6 +430,12 @@ button:hover {
   background: rgba(4, 8, 15, 0.45);
 }
 
+.model-preview-inline {
+  flex: 0 0 auto;
+  width: min(360px, 42vw);
+  padding: 0.4rem 0.5rem;
+}
+
 .model-picked-preview p {
   margin: 0;
   color: var(--sub);
@@ -357,6 +446,10 @@ button:hover {
   display: flex;
   gap: 0.65rem;
   align-items: center;
+}
+
+.model-preview-inline .model-picked-card {
+  gap: 0.5rem;
 }
 
 .model-picked-thumb {
@@ -382,6 +475,13 @@ button:hover {
   padding: 0.3rem;
 }
 
+.model-preview-inline .model-picked-thumb,
+.model-preview-inline .model-picked-empty {
+  width: 92px;
+  height: 52px;
+  min-height: 52px;
+}
+
 .model-picked-meta {
   display: flex;
   flex-direction: column;
@@ -404,11 +504,50 @@ button:hover {
   font-family: "IBM Plex Mono", monospace;
 }
 
+.model-preview-inline .model-picked-meta span {
+  display: none;
+}
+
 #taskStatus {
   font-family: "IBM Plex Mono", monospace;
   font-size: 0.85rem;
   color: #d2e4f2;
   margin-bottom: 0.7rem;
+}
+
+.task-progress-wrap {
+  position: relative;
+  width: 100%;
+  height: 26px;
+  border-radius: 10px;
+  border: 1px solid rgba(130, 174, 208, 0.45);
+  background: rgba(4, 8, 15, 0.85);
+  overflow: hidden;
+  margin-bottom: 0.7rem;
+}
+
+.task-progress-bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0%;
+  background: linear-gradient(90deg, rgba(20, 197, 175, 0.85), rgba(255, 154, 60, 0.8));
+  transition: width 200ms linear;
+}
+
+.task-progress-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.5rem;
+  color: #eef8ff;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.78rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #preview {
@@ -417,6 +556,16 @@ button:hover {
   border: 1px solid rgba(20, 197, 175, 0.45);
   background: #000;
   display: none;
+}
+
+#imagePreview {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid rgba(20, 197, 175, 0.45);
+  background: #000;
+  display: none;
+  margin-bottom: 0.7rem;
+  object-fit: contain;
 }
 
 @media (max-width: 760px) {
@@ -433,5 +582,15 @@ button:hover {
   }
   .lang-picker {
     justify-content: space-between;
+  }
+  .model-select-actions {
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+  .model-select-actions select {
+    min-width: 0;
+  }
+  .model-preview-inline {
+    width: 100%;
   }
 }
