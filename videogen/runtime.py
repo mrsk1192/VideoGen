@@ -54,9 +54,7 @@ def select_device_and_dtype(
     cuda_available = bool(torch_module.cuda.is_available())
     if not cuda_available:
         if require_gpu and not allow_cpu_fallback:
-            raise RuntimeError(
-                "GPU is unavailable (torch.cuda.is_available() is false) and CPU fallback is disabled in settings."
-            )
+            raise RuntimeError("GPU is unavailable (torch.cuda.is_available() is false) and CPU fallback is disabled in settings.")
         return "cpu", torch_module.float32, "float32"
 
     if preferred_dtype == "bf16":
@@ -98,9 +96,8 @@ def runtime_diagnostics(
         "require_gpu": parse_bool_setting(server_settings.get("require_gpu", True), default=True),
         "allow_cpu_fallback": parse_bool_setting(server_settings.get("allow_cpu_fallback", False), default=False),
         "preferred_dtype": str(server_settings.get("preferred_dtype", "float16")).strip().lower(),
-        "allow_software_video_fallback": parse_bool_setting(
-            server_settings.get("allow_software_video_fallback", False), default=False
-        ),
+        "allow_software_video_fallback": parse_bool_setting(server_settings.get("allow_software_video_fallback", False), default=False),
+        "gpu_max_concurrency": int(server_settings.get("gpu_max_concurrency", 1) or 1),
     }
     if import_error:
         output["import_error"] = import_error
@@ -122,11 +119,17 @@ def runtime_diagnostics(
         )
         output["device"] = selected_device
         output["dtype"] = selected_dtype
+        preferred_dtype = str(server_settings.get("preferred_dtype", "float16")).strip().lower()
+        if preferred_dtype == "bf16" and selected_dtype != "bf16":
+            output["dtype_warning"] = "bf16 was requested but not supported. Falling back to float16."
     except Exception as exc:
         output["device_policy_error"] = str(exc)
 
     try:
         if torch_module.cuda.is_available():
+            output["gpu_device_count"] = int(torch_module.cuda.device_count())
+            with_device = torch_module.cuda.current_device()
+            output["gpu_name"] = str(torch_module.cuda.get_device_name(with_device))
             free_bytes, total_bytes = torch_module.cuda.mem_get_info()
             output["gpu_free_bytes"] = int(free_bytes)
             output["gpu_total_bytes"] = int(total_bytes)
@@ -138,4 +141,3 @@ def runtime_diagnostics(
     except Exception:
         output["bf16_supported"] = False
     return output
-

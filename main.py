@@ -62,6 +62,7 @@ from videogen.runtime import (
 from videogen.runtime import (
     runtime_diagnostics as runtime_diagnostics_snapshot,
 )
+from videogen.storage import run_cleanup
 from videogen.tasks import (
     TaskCancelledError,
     TaskManager,
@@ -148,6 +149,7 @@ HIGH_VALUE_ENDPOINTS = {
     "/api/tasks",
     "/api/tasks/cancel",
     "/api/runtime",
+    "/api/cleanup",
     "/api/outputs/delete",
     "/api/settings",
     "/api/cache/hf/clear",
@@ -343,6 +345,7 @@ def host_memory_stats() -> Dict[str, int]:
     # Windows: use GlobalMemoryStatusEx for available physical memory.
     if os.name == "nt":
         with contextlib.suppress(Exception):
+
             class MEMORYSTATUSEX(ctypes.Structure):
                 _fields_ = [
                     ("dwLength", ctypes.c_ulong),
@@ -460,6 +463,12 @@ def is_gpu_oom_error(exc: BaseException) -> bool:
         if ("cuda" in text) or ("hip" in text) or ("vram" in text) or ("hbm" in text):
             return True
     return False
+
+
+def format_user_friendly_error(exc: BaseException) -> str:
+    if is_gpu_oom_error(exc):
+        return "GPU out of memory. Try reducing duration/frames/resolution/steps, " "or set lower gpu_max_concurrency in settings."
+    return str(exc)
 
 
 def detach_exception_state(exc: BaseException) -> None:
@@ -789,11 +798,7 @@ def detect_runtime() -> Dict[str, Any]:
 
             providers = [str(p) for p in ort.get_available_providers()]
             npu_provider = next(
-                (
-                    p
-                    for p in providers
-                    if ("NPU" in p.upper()) or ("VITISAI" in p.upper()) or ("RYZENAI" in p.upper())
-                ),
+                (p for p in providers if ("NPU" in p.upper()) or ("VITISAI" in p.upper()) or ("RYZENAI" in p.upper())),
                 "",
             )
             if npu_provider:
@@ -822,6 +827,7 @@ def detect_runtime() -> Dict[str, Any]:
         t2v_npu_runner_configured=npu_runner_configured,
     )
     runtime_info["pre_torch_env"] = PRE_TORCH_ENV
+    runtime_info["gpu_max_concurrency_effective"] = GPU_SEMAPHORE_LIMIT
     expected_aotriton = "1" if parse_bool_setting(settings.get("server", {}).get("rocm_aotriton_experimental", True), True) else "0"
     current_aotriton = str(os.environ.get("TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL", "")).strip()
     if current_aotriton != expected_aotriton:
@@ -971,10 +977,7 @@ def iter_framepack_segments(total_frames: int, segment_frames: int, overlap_fram
 def run_text2video_npu_runner(task_id: str, payload: "Text2VideoRequest", settings: Dict[str, Any], model_ref: str) -> Dict[str, Any]:
     runner_raw = str(settings.get("server", {}).get("t2v_npu_runner", "")).strip()
     if not runner_raw:
-        raise RuntimeError(
-            "NPU backend requires server.t2v_npu_runner. "
-            "Configure a runner executable/script path in Settings."
-        )
+        raise RuntimeError("NPU backend requires server.t2v_npu_runner. " "Configure a runner executable/script path in Settings.")
     runner_path = Path(runner_raw).expanduser()
     if not runner_path.is_absolute():
         runner_path = (BASE_DIR / runner_path).resolve()
@@ -1063,10 +1066,7 @@ def run_text2video_npu_runner(task_id: str, payload: "Text2VideoRequest", settin
     if completed.stderr:
         LOGGER.debug("text2video npu runner stderr task_id=%s tail=%s", task_id, stderr_tail)
     if completed.returncode != 0:
-        raise RuntimeError(
-            f"NPU runner failed (exit={completed.returncode}). "
-            f"stderr_tail={stderr_tail or '(none)'}"
-        )
+        raise RuntimeError(f"NPU runner failed (exit={completed.returncode}). " f"stderr_tail={stderr_tail or '(none)'}")
     if not output_path.exists():
         raise RuntimeError(f"NPU runner completed but output video not found: {output_path}")
     return {"video_file": output_name, "encoder": "npu_runner", "runner": str(runner_path)}
@@ -1080,6 +1080,36 @@ def get_device_and_dtype() -> tuple[str, Any]:
         import_error=TORCH_IMPORT_ERROR,
     )
     return device, dtype
+
+
+@contextlib.contextmanager
+def inference_execution_context(device: str, dtype: Any) -> Any:
+    """
+    推論実行コンテキスト。
+
+    なぜ必要か:
+    - ROCm/NVIDIA ともに `inference_mode` で不要な勾配追跡を止めてメモリ負荷を下げる。
+    - GPU時は `autocast` を併用し、設定された mixed precision を確実に適用する。
+    - CPU時は autocast を使わず、推論モードのみを適用する。
+    """
+    resolved_dtype = dtype
+    if isinstance(dtype, str):
+        mapped_dtype = {
+            "float16": torch.float16,
+            "fp16": torch.float16,
+            "bf16": torch.bfloat16,
+            "bfloat16": torch.bfloat16,
+            "float32": torch.float32,
+            "fp32": torch.float32,
+        }.get(dtype.strip().lower())
+        if mapped_dtype is not None:
+            resolved_dtype = mapped_dtype
+    with torch.inference_mode():
+        if device == "cuda":
+            with torch.autocast(device_type="cuda", dtype=resolved_dtype):
+                yield
+            return
+        yield
 
 
 def assert_generation_runtime_ready() -> None:
@@ -1795,7 +1825,7 @@ def get_pipeline(
         if device == "cuda" and not bool(getattr(torch.version, "hip", None)) and hasattr(pipe, "unet"):
             try:
                 pipe.unet.to(memory_format=torch.channels_last)
-                #pipe.unet.to(memory_format=torch.contiguous_format)
+                # pipe.unet.to(memory_format=torch.contiguous_format)
             except Exception:
                 LOGGER.debug("channels_last optimization skipped", exc_info=True)
         with PIPELINES_LOCK:
@@ -1955,9 +1985,7 @@ def open_video_writer_with_policy(output_path: Path, fps: int) -> tuple[Any, str
         return open_hardware_video_writer(output_path, fps)
     except Exception:
         settings = settings_store.get()
-        allow_software = parse_bool_setting(
-            settings.get("server", {}).get("allow_software_video_fallback", False), default=False
-        )
+        allow_software = parse_bool_setting(settings.get("server", {}).get("allow_software_video_fallback", False), default=False)
         if not allow_software:
             raise
         try:
@@ -2028,9 +2056,7 @@ def export_video_with_fallback(frames: Any, output_path: Path, fps: int) -> str:
         if output_path.exists():
             output_path.unlink(missing_ok=True)
         settings = settings_store.get()
-        allow_software = parse_bool_setting(
-            settings.get("server", {}).get("allow_software_video_fallback", False), default=False
-        )
+        allow_software = parse_bool_setting(settings.get("server", {}).get("allow_software_video_fallback", False), default=False)
         if not allow_software:
             raise RuntimeError(
                 "Hardware video encoder is unavailable. "
@@ -2065,9 +2091,7 @@ def export_video_with_fallback(frames: Any, output_path: Path, fps: int) -> str:
         except Exception as software_exc:
             if output_path.exists():
                 output_path.unlink(missing_ok=True)
-            raise RuntimeError(
-                "Hardware video encoder failed and software fallback also failed."
-            ) from software_exc
+            raise RuntimeError("Hardware video encoder failed and software fallback also failed.") from software_exc
     finally:
         if writer is not None:
             with contextlib.suppress(Exception):
@@ -2121,9 +2145,7 @@ def call_with_supported_kwargs(pipe: Any, kwargs: Dict[str, Any]) -> Any:
                 raise
             if try_patch_wan_ftfy_dependency(pipe):
                 return pipe(**filtered)
-            raise RuntimeError(
-                "Wan pipeline runtime dependency is missing: install `ftfy` in this environment."
-            ) from exc
+            raise RuntimeError("Wan pipeline runtime dependency is missing: install `ftfy` in this environment.") from exc
     max_retry = 4
     current_kwargs = dict(filtered)
     for _ in range(max_retry):
@@ -2134,9 +2156,7 @@ def call_with_supported_kwargs(pipe: Any, kwargs: Dict[str, Any]) -> Any:
                 raise
             if try_patch_wan_ftfy_dependency(pipe):
                 return pipe(**current_kwargs)
-            raise RuntimeError(
-                "Wan pipeline runtime dependency is missing: install `ftfy` in this environment."
-            ) from exc
+            raise RuntimeError("Wan pipeline runtime dependency is missing: install `ftfy` in this environment.") from exc
         except TypeError as exc:
             # Some wrappers expose **kwargs but still reject unknown keys internally.
             if "unexpected keyword argument" not in str(exc):
@@ -2912,11 +2932,7 @@ def build_local_tree_item(
         "task_dir": task_dir,
         "task_api": task_api,
         "apply_supported": bool(
-            task_api
-            and (
-                category in ("BaseModel", "Lora")
-                or (category == "VAE" and task_api in ("text-to-image", "image-to-image"))
-            )
+            task_api and (category in ("BaseModel", "Lora") or (category == "VAE" and task_api in ("text-to-image", "image-to-image")))
         ),
         "model_id": model_id,
         "preview_url": model_item_preview_url(item_path, model_root),
@@ -2947,7 +2963,9 @@ def build_local_model_tree(model_root: Path) -> Dict[str, Any]:
         if not canonical:
             continue
         normalized_task_dirs.append((canonical, task_dir))
-    normalized_task_dirs.sort(key=lambda pair: (LOCAL_TREE_TASK_ORDER.index(pair[0]) if pair[0] in LOCAL_TREE_TASK_ORDER else 999, pair[1].name.lower()))
+    normalized_task_dirs.sort(
+        key=lambda pair: (LOCAL_TREE_TASK_ORDER.index(pair[0]) if pair[0] in LOCAL_TREE_TASK_ORDER else 999, pair[1].name.lower())
+    )
     for canonical_task, task_path in normalized_task_dirs:
         bases_out: list[Dict[str, Any]] = []
         task_item_count = 0
@@ -3069,7 +3087,13 @@ def build_local_model_tree(model_root: Path) -> Dict[str, Any]:
             "items": [],
         }
         categories.append(created)
-        categories.sort(key=lambda item: LOCAL_TREE_CATEGORY_ORDER.index(str(item.get("category") or "")) if str(item.get("category") or "") in LOCAL_TREE_CATEGORY_ORDER else 999)
+        categories.sort(
+            key=lambda item: (
+                LOCAL_TREE_CATEGORY_ORDER.index(str(item.get("category") or ""))
+                if str(item.get("category") or "") in LOCAL_TREE_CATEGORY_ORDER
+                else 999
+            )
+        )
         return created
 
     for child in sorted(model_root.iterdir(), key=lambda path: (path.is_file(), path.name.lower())):
@@ -3471,7 +3495,9 @@ def search_hf_models(
     return list(result.get("items") or [])
 
 
-def search_civitai_models(task: Literal["text-to-image", "image-to-image", "text-to-video", "image-to-video"], query: str, limit: int) -> list[Dict[str, Any]]:
+def search_civitai_models(
+    task: Literal["text-to-image", "image-to-image", "text-to-video", "image-to-video"], query: str, limit: int
+) -> list[Dict[str, Any]]:
     result = search_civitai_models_v2(task=task, query=query, limit=limit, page=1, sort="downloads", nsfw="exclude", model_kind="")
     return list(result.get("items") or [])
 
@@ -3640,7 +3666,9 @@ def get_civitai_model_detail(model_id: int) -> Dict[str, Any]:
                         "downloadUrl": str(file_entry.get("downloadUrl") or ""),
                         "metadata": {
                             "type": file_entry.get("type"),
-                            "format": file_entry.get("metadata", {}).get("format") if isinstance(file_entry.get("metadata"), dict) else None,
+                            "format": (
+                                file_entry.get("metadata", {}).get("format") if isinstance(file_entry.get("metadata"), dict) else None
+                            ),
                             "fp": file_entry.get("metadata", {}).get("fp") if isinstance(file_entry.get("metadata"), dict) else None,
                         },
                     }
@@ -3709,9 +3737,7 @@ def stream_http_download(
                 out_file.write(chunk)
                 downloaded += len(chunk)
                 now = time.time()
-                should_report = (downloaded - last_reported >= (2 * DOWNLOAD_STREAM_CHUNK_BYTES)) or (
-                    (now - last_reported_ts) >= 1.0
-                )
+                should_report = (downloaded - last_reported >= (2 * DOWNLOAD_STREAM_CHUNK_BYTES)) or ((now - last_reported_ts) >= 1.0)
                 if should_report:
                     last_reported = downloaded
                     last_reported_ts = now
@@ -3896,6 +3922,10 @@ class ClearHfCacheRequest(BaseModel):
     dry_run: bool = False
 
 
+class CleanupRequest(BaseModel):
+    include_cache: bool = True
+
+
 class RescanLocalModelsRequest(BaseModel):
     dir: Optional[str] = None
 
@@ -3967,21 +3997,22 @@ def text2image_worker(task_id: str, payload: Text2ImageRequest) -> None:
                 ",".join(sorted(step_progress_kwargs.keys())) if step_progress_kwargs else "(none)",
             )
             gen_started = time.perf_counter()
-            out = call_with_supported_kwargs(
-                pipe,
-                {
-                    "prompt": payload.prompt,
-                    "negative_prompt": payload.negative_prompt or None,
-                    "num_inference_steps": payload.num_inference_steps,
-                    "guidance_scale": payload.guidance_scale,
-                    "width": payload.width,
-                    "height": payload.height,
-                    "generator": generator,
-                    "output_type": "pil",
-                    "cross_attention_kwargs": {"scale": payload.lora_scale} if len(lora_refs) == 1 else None,
-                    **step_progress_kwargs,
-                },
-            )
+            with inference_execution_context(device, dtype):
+                out = call_with_supported_kwargs(
+                    pipe,
+                    {
+                        "prompt": payload.prompt,
+                        "negative_prompt": payload.negative_prompt or None,
+                        "num_inference_steps": payload.num_inference_steps,
+                        "guidance_scale": payload.guidance_scale,
+                        "width": payload.width,
+                        "height": payload.height,
+                        "generator": generator,
+                        "output_type": "pil",
+                        "cross_attention_kwargs": {"scale": payload.lora_scale} if len(lora_refs) == 1 else None,
+                        **step_progress_kwargs,
+                    },
+                )
             LOGGER.info("text2image inference done task_id=%s elapsed_ms=%.1f", task_id, (time.perf_counter() - gen_started) * 1000)
         images: list[Any]
         raw_images = out.images
@@ -4040,7 +4071,7 @@ def text2image_worker(task_id: str, payload: Text2ImageRequest) -> None:
     except Exception as exc:
         trace = format_exception_trace()
         LOGGER.exception("text2image failed task_id=%s model=%s diagnostics=%s", task_id, model_ref, runtime_diagnostics())
-        update_task(task_id, status="error", message="Generation failed", error=str(exc), error_trace=trace)
+        update_task(task_id, status="error", message="Generation failed", error=format_user_friendly_error(exc), error_trace=trace)
     finally:
         release_pipeline_usage(pipeline_cache_key)
 
@@ -4127,9 +4158,7 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
             pipe = get_pipeline_for_inference("text-to-video", model_ref, settings)
         except Exception as load_error:
             if effective_backend == "cuda" and is_gpu_oom_error(load_error):
-                raise RuntimeError(
-                    f"Failed to load selected text-to-video model on GPU due to out-of-memory: {model_ref}"
-                ) from load_error
+                raise RuntimeError(f"Failed to load selected text-to-video model on GPU due to out-of-memory: {model_ref}") from load_error
             raise
         pipeline_cache_key = str(getattr(pipe, "_videogen_cache_key", "") or "")
         update_task(task_id, progress=0.15, message="Applying LoRA")
@@ -4149,7 +4178,7 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
             else:
                 raise
         update_task(task_id, progress=0.26, message=f"Preparing video stream (0/{total_frames} frames)")
-        device, _ = get_device_and_dtype()
+        device, dtype = get_device_and_dtype()
         output_name = f"text2video_{task_id}.mp4"
         output_path = resolve_path(settings["paths"]["outputs_dir"]) / output_name
         writer: Any = None
@@ -4209,10 +4238,11 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
                     ",".join(sorted(step_progress_kwargs.keys())) if step_progress_kwargs else "(none)",
                 )
                 gen_started = time.perf_counter()
-                out = call_with_supported_kwargs(
-                    pipe,
-                    request_payload,
-                )
+                with inference_execution_context(device, dtype):
+                    out = call_with_supported_kwargs(
+                        pipe,
+                        request_payload,
+                    )
                 chunk_frames = out.frames[0]
                 appended, chunk_shape, chunk_dtype = append_frames_to_video_writer(
                     writer,
@@ -4310,7 +4340,7 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
             effective_backend,
             runtime_diagnostics(),
         )
-        update_task(task_id, status="error", message="Generation failed", error=str(exc), error_trace=trace)
+        update_task(task_id, status="error", message="Generation failed", error=format_user_friendly_error(exc), error_trace=trace)
     finally:
         if semaphore_acquired:
             GPU_GENERATION_SEMAPHORE.release()
@@ -4388,7 +4418,7 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
         height = int(payload["height"])
         if width > 0 and height > 0:
             image = image.resize((width, height))
-        device, _ = get_device_and_dtype()
+        device, dtype = get_device_and_dtype()
         gen_device = "cuda" if device == "cuda" else "cpu"
         step_count = int(payload["num_inference_steps"])
         update_task(task_id, progress=0.3, message=f"Preparing video stream (0/{total_frames} frames)")
@@ -4436,23 +4466,24 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
                     ",".join(sorted(step_progress_kwargs.keys())) if step_progress_kwargs else "(none)",
                 )
                 gen_started = time.perf_counter()
-                out = call_with_supported_kwargs(
-                    pipe,
-                    {
-                        "prompt": payload["prompt"],
-                        "negative_prompt": payload["negative_prompt"] or None,
-                        "image": current_image,
-                        "height": height,
-                        "width": width,
-                        "target_fps": int(payload["fps"]),
-                        "num_inference_steps": step_count,
-                        "num_frames": request_frames,
-                        "guidance_scale": float(payload["guidance_scale"]),
-                        "generator": chunk_generator,
-                        "cross_attention_kwargs": {"scale": lora_scale} if len(lora_refs) == 1 else None,
-                        **step_progress_kwargs,
-                    },
-                )
+                with inference_execution_context(device, dtype):
+                    out = call_with_supported_kwargs(
+                        pipe,
+                        {
+                            "prompt": payload["prompt"],
+                            "negative_prompt": payload["negative_prompt"] or None,
+                            "image": current_image,
+                            "height": height,
+                            "width": width,
+                            "target_fps": int(payload["fps"]),
+                            "num_inference_steps": step_count,
+                            "num_frames": request_frames,
+                            "guidance_scale": float(payload["guidance_scale"]),
+                            "generator": chunk_generator,
+                            "cross_attention_kwargs": {"scale": lora_scale} if len(lora_refs) == 1 else None,
+                            **step_progress_kwargs,
+                        },
+                    )
                 chunk_frames = out.frames[0]
                 appended, chunk_shape, chunk_dtype = append_frames_to_video_writer(
                     writer,
@@ -4541,7 +4572,7 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
                 output_path.unlink(missing_ok=True)
         trace = format_exception_trace()
         LOGGER.exception("image2video failed task_id=%s model=%s diagnostics=%s", task_id, model_ref, runtime_diagnostics())
-        update_task(task_id, status="error", message="Generation failed", error=str(exc), error_trace=trace)
+        update_task(task_id, status="error", message="Generation failed", error=format_user_friendly_error(exc), error_trace=trace)
     finally:
         if semaphore_acquired:
             GPU_GENERATION_SEMAPHORE.release()
@@ -4618,21 +4649,22 @@ def image2image_worker(task_id: str, payload: Dict[str, Any]) -> None:
             ",".join(sorted(step_progress_kwargs.keys())) if step_progress_kwargs else "(none)",
         )
         gen_started = time.perf_counter()
-        out = call_with_supported_kwargs(
-            pipe,
-            {
-                "prompt": payload["prompt"],
-                "negative_prompt": payload["negative_prompt"] or None,
-                "image": image,
-                "num_inference_steps": int(payload["num_inference_steps"]),
-                "guidance_scale": float(payload["guidance_scale"]),
-                "strength": float(payload["strength"]),
-                "generator": generator,
-                "output_type": "pil",
-                "cross_attention_kwargs": {"scale": lora_scale} if len(lora_refs) == 1 else None,
-                **step_progress_kwargs,
-            },
-        )
+        with inference_execution_context(device, dtype):
+            out = call_with_supported_kwargs(
+                pipe,
+                {
+                    "prompt": payload["prompt"],
+                    "negative_prompt": payload["negative_prompt"] or None,
+                    "image": image,
+                    "num_inference_steps": int(payload["num_inference_steps"]),
+                    "guidance_scale": float(payload["guidance_scale"]),
+                    "strength": float(payload["strength"]),
+                    "generator": generator,
+                    "output_type": "pil",
+                    "cross_attention_kwargs": {"scale": lora_scale} if len(lora_refs) == 1 else None,
+                    **step_progress_kwargs,
+                },
+            )
         LOGGER.info("image2image inference done task_id=%s elapsed_ms=%.1f", task_id, (time.perf_counter() - gen_started) * 1000)
         images: list[Any]
         raw_images = out.images
@@ -4691,7 +4723,7 @@ def image2image_worker(task_id: str, payload: Dict[str, Any]) -> None:
     except Exception as exc:
         trace = format_exception_trace()
         LOGGER.exception("image2image failed task_id=%s model=%s diagnostics=%s", task_id, model_ref, runtime_diagnostics())
-        update_task(task_id, status="error", message="Generation failed", error=str(exc), error_trace=trace)
+        update_task(task_id, status="error", message="Generation failed", error=format_user_friendly_error(exc), error_trace=trace)
     finally:
         if semaphore_acquired:
             GPU_GENERATION_SEMAPHORE.release()
@@ -5042,7 +5074,7 @@ def download_model_worker(task_id: str, req: DownloadRequest) -> None:
     except Exception as exc:
         trace = format_exception_trace()
         LOGGER.exception("download failed task_id=%s repo=%s target=%s", task_id, repo_id, str(model_dir))
-        update_task(task_id, status="error", message="Download failed", error=str(exc), error_trace=trace)
+        update_task(task_id, status="error", message="Download failed", error=format_user_friendly_error(exc), error_trace=trace)
 
 
 app = FastAPI(title="ROCm VideoGen")
@@ -5058,10 +5090,7 @@ def startup_preload_default_t2i() -> None:
         os.environ.get("VIDEOGEN_ALLOW_ROCM_STARTUP_PRELOAD", "0"),
         default=False,
     ):
-        LOGGER.warning(
-            "startup preload skipped on ROCm for stability. "
-            "Set VIDEOGEN_ALLOW_ROCM_STARTUP_PRELOAD=1 to force."
-        )
+        LOGGER.warning("startup preload skipped on ROCm for stability. " "Set VIDEOGEN_ALLOW_ROCM_STARTUP_PRELOAD=1 to force.")
         return
     if start_preload_default_t2i("startup"):
         LOGGER.info("startup preload scheduled: text-to-image")
@@ -5211,6 +5240,23 @@ def clear_hf_cache(req: ClearHfCacheRequest) -> Dict[str, Any]:
     }
 
 
+@app.post("/api/cleanup")
+def cleanup_runtime_storage(req: CleanupRequest) -> Dict[str, Any]:
+    settings = settings_store.get()
+    storage_settings = settings.get("storage", {})
+    if not parse_bool_setting(storage_settings.get("cleanup_enabled", True), default=True):
+        raise HTTPException(status_code=400, detail="cleanup is disabled by settings.storage.cleanup_enabled=false")
+    cache_candidates = sorted(gather_hf_cache_candidates(), key=lambda path: str(path).lower()) if req.include_cache else []
+    result = run_cleanup(settings=settings, base_dir=BASE_DIR, hf_cache_candidates=cache_candidates)
+    LOGGER.info(
+        "runtime cleanup done removed_outputs=%s removed_tmp=%s removed_cache_paths=%s",
+        len(result.get("removed_outputs") or []),
+        len(result.get("removed_tmp") or []),
+        len(result.get("removed_cache_paths") or []),
+    )
+    return result
+
+
 @app.put("/api/settings")
 def update_settings(payload: Dict[str, Any]) -> Dict[str, Any]:
     updated = settings_store.update(payload)
@@ -5261,8 +5307,7 @@ def list_local_models(dir: str = "") -> Dict[str, Any]:
                 preview_url = None
                 if preview_rel:
                     preview_url = (
-                        f"/api/models/preview?rel={quote(preview_rel, safe='/')}"
-                        f"&base_dir={quote(str(models_dir), safe='/:\\\\')}"
+                        f"/api/models/preview?rel={quote(preview_rel, safe='/')}" f"&base_dir={quote(str(models_dir), safe='/:\\\\')}"
                     )
                 items.append(
                     {
@@ -5901,10 +5946,7 @@ def generate_text2video(req: Text2VideoRequest) -> Dict[str, str]:
         if not runner_raw:
             raise HTTPException(
                 status_code=400,
-                detail=(
-                    "NPU backend requires server.t2v_npu_runner. "
-                    "Set it in Settings (T2V NPU Runner)."
-                ),
+                detail=("NPU backend requires server.t2v_npu_runner. " "Set it in Settings (T2V NPU Runner)."),
             )
         runner_path = Path(runner_raw).expanduser()
         if not runner_path.is_absolute():

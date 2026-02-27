@@ -272,14 +272,30 @@ def test_models_search_merges_hf_and_civitai(client: TestClient, monkeypatch: py
         main,
         "search_hf_models",
         lambda task, query, limit, token: [
-            {"id": "hf/a", "pipeline_tag": task, "downloads": 100, "likes": 10, "size_bytes": 1, "source": "huggingface", "download_supported": True}
+            {
+                "id": "hf/a",
+                "pipeline_tag": task,
+                "downloads": 100,
+                "likes": 10,
+                "size_bytes": 1,
+                "source": "huggingface",
+                "download_supported": True,
+            }
         ],
     )
     monkeypatch.setattr(
         main,
         "search_civitai_models",
         lambda task, query, limit: [
-            {"id": "civitai/1", "pipeline_tag": task, "downloads": 90, "likes": 9, "size_bytes": 2, "source": "civitai", "download_supported": True}
+            {
+                "id": "civitai/1",
+                "pipeline_tag": task,
+                "downloads": 90,
+                "likes": 9,
+                "size_bytes": 2,
+                "source": "civitai",
+                "download_supported": True,
+            }
         ],
     )
     resp = client.get("/api/models/search", params={"task": "text-to-image", "query": "test", "limit": 6})
@@ -336,8 +352,20 @@ def test_models_search2_filters_by_size_mb(client: TestClient, monkeypatch: pyte
         "search_hf_models_v2",
         lambda **_kwargs: {
             "items": [
-                {"id": "hf/small", "title": "hf/small", "pipeline_tag": "text-to-image", "size_bytes": 400 * 1024 * 1024, "source": "huggingface"},
-                {"id": "hf/mid", "title": "hf/mid", "pipeline_tag": "text-to-image", "size_bytes": 1500 * 1024 * 1024, "source": "huggingface"},
+                {
+                    "id": "hf/small",
+                    "title": "hf/small",
+                    "pipeline_tag": "text-to-image",
+                    "size_bytes": 400 * 1024 * 1024,
+                    "source": "huggingface",
+                },
+                {
+                    "id": "hf/mid",
+                    "title": "hf/mid",
+                    "pipeline_tag": "text-to-image",
+                    "size_bytes": 1500 * 1024 * 1024,
+                    "source": "huggingface",
+                },
                 {"id": "hf/unknown", "title": "hf/unknown", "pipeline_tag": "text-to-image", "size_bytes": None, "source": "huggingface"},
             ],
             "has_next": False,
@@ -348,8 +376,20 @@ def test_models_search2_filters_by_size_mb(client: TestClient, monkeypatch: pyte
         "search_civitai_models_v2",
         lambda **_kwargs: {
             "items": [
-                {"id": "civitai/large", "title": "civitai/large", "pipeline_tag": "text-to-image", "size_bytes": 2500 * 1024 * 1024, "source": "civitai"},
-                {"id": "civitai/huge", "title": "civitai/huge", "pipeline_tag": "text-to-image", "size_bytes": 5000 * 1024 * 1024, "source": "civitai"},
+                {
+                    "id": "civitai/large",
+                    "title": "civitai/large",
+                    "pipeline_tag": "text-to-image",
+                    "size_bytes": 2500 * 1024 * 1024,
+                    "source": "civitai",
+                },
+                {
+                    "id": "civitai/huge",
+                    "title": "civitai/huge",
+                    "pipeline_tag": "text-to-image",
+                    "size_bytes": 5000 * 1024 * 1024,
+                    "source": "civitai",
+                },
             ],
             "has_next": False,
         },
@@ -410,13 +450,29 @@ def test_models_search_source_filter(client: TestClient, monkeypatch: pytest.Mon
     def fake_hf(task, query, limit, token):
         called["hf"] += 1
         return [
-            {"id": "hf/only", "pipeline_tag": task, "downloads": 10, "likes": 1, "size_bytes": 1, "source": "huggingface", "download_supported": True}
+            {
+                "id": "hf/only",
+                "pipeline_tag": task,
+                "downloads": 10,
+                "likes": 1,
+                "size_bytes": 1,
+                "source": "huggingface",
+                "download_supported": True,
+            }
         ]
 
     def fake_civitai(task, query, limit):
         called["civitai"] += 1
         return [
-            {"id": "civitai/only", "pipeline_tag": task, "downloads": 9, "likes": 1, "size_bytes": 1, "source": "civitai", "download_supported": True}
+            {
+                "id": "civitai/only",
+                "pipeline_tag": task,
+                "downloads": 9,
+                "likes": 1,
+                "size_bytes": 1,
+                "source": "civitai",
+                "download_supported": True,
+            }
         ]
 
     monkeypatch.setattr(main, "search_hf_models", fake_hf)
@@ -456,14 +512,14 @@ def test_models_search_civitai_live_parser_path(client: TestClient, monkeypatch:
                 "name": "Example CivitAI",
                 "type": "Checkpoint",
                 "stats": {"downloadCount": 1200, "favoriteCount": 12},
-                    "modelVersions": [
-                        {
-                            "images": [{"url": "https://example.invalid/preview.jpg"}],
-                            "files": [{"sizeKB": 2048, "downloadUrl": "https://example.invalid/model.safetensors"}],
-                        }
-                    ],
-                }
-            ]
+                "modelVersions": [
+                    {
+                        "images": [{"url": "https://example.invalid/preview.jpg"}],
+                        "files": [{"sizeKB": 2048, "downloadUrl": "https://example.invalid/model.safetensors"}],
+                    }
+                ],
+            }
+        ]
     }
 
     def fake_urlopen(request_obj, timeout: int = 20):
@@ -513,16 +569,12 @@ def test_download_task_lifecycle_civitai_with_selected_file(client: TestClient, 
                 "id": 456,
                 "name": "v1",
                 "images": [{"url": "https://example.invalid/preview.jpg"}],
-                "files": [
-                    {"id": 789, "name": "file_a.safetensors", "type": "Model", "downloadUrl": "https://example.invalid/file_a"}
-                ],
+                "files": [{"id": 789, "name": "file_a.safetensors", "type": "Model", "downloadUrl": "https://example.invalid/file_a"}],
             },
             {
                 "id": 999,
                 "name": "v2",
-                "files": [
-                    {"id": 555, "name": "file_b.safetensors", "type": "Model", "downloadUrl": "https://example.invalid/file_b"}
-                ],
+                "files": [{"id": 555, "name": "file_b.safetensors", "type": "Model", "downloadUrl": "https://example.invalid/file_b"}],
             },
         ],
     }
@@ -1098,3 +1150,33 @@ def test_cancel_task_endpoint(client: TestClient) -> None:
     task = client.get(f"/api/tasks/{task_id}")
     assert task.status_code == 200
     assert task.json()["cancel_requested"] is True
+
+
+def test_cleanup_endpoint_removes_expired_files(client: TestClient, tmp_path: Path) -> None:
+    outputs_dir = tmp_path / "cleanup_outputs"
+    tmp_dir = tmp_path / "cleanup_tmp"
+    outputs_dir.mkdir(parents=True, exist_ok=True)
+    tmp_dir.mkdir(parents=True, exist_ok=True)
+    stale_output = outputs_dir / "stale.png"
+    stale_tmp = tmp_dir / "stale.tmp"
+    stale_output.write_bytes(b"123")
+    stale_tmp.write_bytes(b"456")
+    old_ts = time.time() - (10 * 24 * 60 * 60)
+    os.utime(stale_output, (old_ts, old_ts))
+    os.utime(stale_tmp, (old_ts, old_ts))
+
+    settings = client.get("/api/settings").json()
+    settings["paths"]["outputs_dir"] = str(outputs_dir.resolve())
+    settings["paths"]["tmp_dir"] = str(tmp_dir.resolve())
+    settings["storage"]["cleanup_max_age_days"] = 7
+    settings["storage"]["cleanup_max_outputs_count"] = 100
+    settings["storage"]["cleanup_max_tmp_count"] = 100
+    put_resp = client.put("/api/settings", json=settings)
+    assert put_resp.status_code == 200
+
+    resp = client.post("/api/cleanup", json={"include_cache": False})
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["status"] == "ok"
+    assert not stale_output.exists()
+    assert not stale_tmp.exists()

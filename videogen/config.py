@@ -35,6 +35,13 @@ DEFAULT_SETTINGS: Dict[str, Any] = {
         "tmp_dir": "tmp",
         "logs_dir": "logs",
     },
+    "storage": {
+        "cleanup_enabled": True,
+        "cleanup_max_age_days": 7,
+        "cleanup_max_outputs_count": 200,
+        "cleanup_max_tmp_count": 300,
+        "cleanup_max_cache_size_gb": 30,
+    },
     "huggingface": {
         "token": "",
     },
@@ -87,6 +94,7 @@ def sanitize_settings(payload: Dict[str, Any]) -> Dict[str, Any]:
     server = cleaned.setdefault("server", {})
     defaults = cleaned.setdefault("defaults", {})
     logging_config = cleaned.setdefault("logging", {})
+    storage_config = cleaned.setdefault("storage", {})
 
     raw_port = server.get("listen_port", 8000)
     try:
@@ -95,17 +103,11 @@ def sanitize_settings(payload: Dict[str, Any]) -> Dict[str, Any]:
         listen_port = 8000
     server["listen_port"] = listen_port if 1 <= listen_port <= 65535 else 8000
     server["listen_host"] = str(server.get("listen_host", "0.0.0.0")).strip() or "0.0.0.0"
-    server["rocm_aotriton_experimental"] = parse_bool_setting(
-        server.get("rocm_aotriton_experimental", True), default=True
-    )
+    server["rocm_aotriton_experimental"] = parse_bool_setting(server.get("rocm_aotriton_experimental", True), default=True)
     server["require_gpu"] = parse_bool_setting(server.get("require_gpu", True), default=True)
     server["allow_cpu_fallback"] = parse_bool_setting(server.get("allow_cpu_fallback", False), default=False)
-    server["preload_default_t2i_on_startup"] = parse_bool_setting(
-        server.get("preload_default_t2i_on_startup", True), default=True
-    )
-    server["allow_software_video_fallback"] = parse_bool_setting(
-        server.get("allow_software_video_fallback", False), default=False
-    )
+    server["preload_default_t2i_on_startup"] = parse_bool_setting(server.get("preload_default_t2i_on_startup", True), default=True)
+    server["allow_software_video_fallback"] = parse_bool_setting(server.get("allow_software_video_fallback", False), default=False)
     raw_t2v_backend = str(server.get("t2v_backend", "auto")).strip().lower()
     server["t2v_backend"] = raw_t2v_backend if raw_t2v_backend in SUPPORTED_T2V_BACKENDS else "auto"
     server["t2v_npu_runner"] = str(server.get("t2v_npu_runner", "")).strip()
@@ -140,6 +142,28 @@ def sanitize_settings(payload: Dict[str, Any]) -> Dict[str, Any]:
 
     raw_level = str(logging_config.get("level", "INFO")).strip().upper()
     logging_config["level"] = raw_level if raw_level in VALID_LOG_LEVELS else "INFO"
+
+    storage_config["cleanup_enabled"] = parse_bool_setting(storage_config.get("cleanup_enabled", True), default=True)
+    try:
+        max_age_days = int(storage_config.get("cleanup_max_age_days", 7))
+    except Exception:
+        max_age_days = 7
+    storage_config["cleanup_max_age_days"] = max(1, min(max_age_days, 90))
+    try:
+        max_outputs_count = int(storage_config.get("cleanup_max_outputs_count", 200))
+    except Exception:
+        max_outputs_count = 200
+    storage_config["cleanup_max_outputs_count"] = max(10, min(max_outputs_count, 5000))
+    try:
+        max_tmp_count = int(storage_config.get("cleanup_max_tmp_count", 300))
+    except Exception:
+        max_tmp_count = 300
+    storage_config["cleanup_max_tmp_count"] = max(10, min(max_tmp_count, 10000))
+    try:
+        max_cache_size_gb = float(storage_config.get("cleanup_max_cache_size_gb", 30))
+    except Exception:
+        max_cache_size_gb = 30.0
+    storage_config["cleanup_max_cache_size_gb"] = max(1.0, min(max_cache_size_gb, 500.0))
 
     try:
         fps = int(defaults.get("fps", 8))
@@ -227,4 +251,3 @@ def load_raw_settings_file(settings_path: Path) -> Optional[Dict[str, Any]]:
         return payload if isinstance(payload, dict) else None
     except Exception:
         return None
-
