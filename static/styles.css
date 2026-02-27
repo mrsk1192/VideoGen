@@ -178,6 +178,11 @@ body {
   color: #ffb2b2;
 }
 
+.downloads-item-status.cancelled {
+  border-color: rgba(255, 188, 92, 0.85);
+  color: #ffd89a;
+}
+
 .downloads-item-meta {
   color: var(--sub);
   font-size: 0.76rem;
@@ -1259,6 +1264,52 @@ button:hover {
 
 .model-preview-inline .model-picked-meta span {
   display: none;
+}
+
+.ghost-btn {
+  border: 1px solid rgba(130, 174, 208, 0.45);
+  background: rgba(10, 16, 28, 0.75);
+  color: #d9ebfb;
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+  font-family: "IBM Plex Mono", monospace;
+  margin-bottom: 0.7rem;
+}
+
+.ghost-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+button.is-busy {
+  opacity: 0.65;
+}
+
+.loading-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: "IBM Plex Mono", monospace;
+  color: #b8d7ea;
+}
+
+.loading-inline::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #2dd4bf;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 #taskStatus {

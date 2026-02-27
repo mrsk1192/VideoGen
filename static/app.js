@@ -301,6 +301,7 @@ const I18N = {
     msgPortChangeSaved: "Listen port saved. Restart `start.bat` to apply new port.",
     msgServerSettingRestartRequired: "Server setting saved. Restart `start.bat` to apply changes.",
     msgNoModelsFound: "No models found.",
+    msgModelSearchLoading: "Searching models...",
     msgModelDetailEmpty: "Select a model to view detail.",
     msgModelDetailLoading: "Loading model detail...",
     msgModelDetailLoadFailed: "Model detail failed: {error}",
@@ -394,6 +395,9 @@ const I18N = {
     statusRunning: "running",
     statusCompleted: "completed",
     statusError: "error",
+    statusCancelled: "cancelled",
+    btnCancelTask: "Cancel Task",
+    msgTaskCancelRequested: "Cancellation requested for task={id}",
     taskLine: "task={id} | type={type} | status={status} | {progress}% | {message}",
     taskError: "error={error}",
     runtimeDevice: "device",
@@ -721,6 +725,7 @@ const I18N = {
     msgPortChangeSaved: "リッスンポートを保存しました。反映には `start.bat` の再起動が必要です。",
     msgServerSettingRestartRequired: "サーバー設定を保存しました。反映には `start.bat` の再起動が必要です。",
     msgNoModelsFound: "モデルが見つかりません。",
+    msgModelSearchLoading: "モデルを検索中...",
     msgModelDetailEmpty: "モデルを選択すると詳細を表示します。",
     msgModelDetailLoading: "モデル詳細を読み込み中...",
     msgModelDetailLoadFailed: "モデル詳細の取得に失敗: {error}",
@@ -814,6 +819,9 @@ const I18N = {
     statusRunning: "実行中",
     statusCompleted: "完了",
     statusError: "エラー",
+    statusCancelled: "キャンセル",
+    btnCancelTask: "タスクをキャンセル",
+    msgTaskCancelRequested: "タスクのキャンセルを要求しました: {id}",
     taskLine: "task={id} | type={type} | status={status} | {progress}% | {message}",
     taskError: "error={error}",
     runtimeDevice: "device",
@@ -956,6 +964,7 @@ const I18N = {
 const state = {
   currentTaskId: null,
   pollTimer: null,
+  taskPollDelayMs: TASK_POLL_INTERVAL_MS,
   settings: null,
   localModels: [],
   localModelsBaseDir: "",
@@ -1000,12 +1009,14 @@ const state = {
   searchDetail: null,
   downloadTasks: [],
   downloadPollTimer: null,
+  downloadPollDelayMs: DOWNLOAD_TASK_POLL_INTERVAL_MS,
   downloadDigest: {},
   processedDownloadCompletions: {},
   downloadsPopoverOpen: false,
   activeTab: "text-image",
   currentTaskSnapshot: null,
   lastErrorPopupTaskId: null,
+  generationBusy: false,
 };
 
 const SEARCH_BASE_MODEL_OPTIONS_BY_TASK = {
@@ -1155,6 +1166,7 @@ function renderDownloadsList() {
       const errorText = task.error ? `<div class="downloads-item-meta">error=${escapeHtml(task.error)}</div>` : "";
       const messageText = translateServerMessage(task.message || "");
       const repoHint = task.result?.repo_id || task.result?.model || task.id;
+      const cancellable = task.status === "queued" || task.status === "running";
       return `
         <article class="downloads-item" data-task-id="${escapeHtml(task.id)}">
           <div class="downloads-item-head">
@@ -1164,6 +1176,7 @@ function renderDownloadsList() {
           <div class="downloads-item-meta">${escapeHtml(messageText || "-")}</div>
           <div class="downloads-progress"><div class="downloads-progress-fill" style="width:${progress}%"></div></div>
           <div class="downloads-item-meta">${escapeHtml(progress)}% | ${escapeHtml(bytesText)} | ${escapeHtml(formatDateTime(task.updated_at))}</div>
+          ${cancellable ? `<button type="button" class="ghost-btn download-cancel-btn" data-task-id="${escapeHtml(task.id)}">${escapeHtml(t("btnCancelTask"))}</button>` : ""}
           ${errorText}
         </article>
       `;
@@ -1178,6 +1191,24 @@ function renderDownloadsList() {
       const localPath = task.result?.local_path || "-";
       const errorText = task.error || "-";
       showTaskMessage(`download=${task.id} | status=${task.status} | path=${localPath} | error=${errorText}`);
+    });
+  });
+  container.querySelectorAll(".download-cancel-btn").forEach((node) => {
+    node.addEventListener("click", async (event) => {
+      event.stopPropagation();
+      const taskId = node.getAttribute("data-task-id") || "";
+      if (!taskId) return;
+      try {
+        await api("/api/tasks/cancel", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ task_id: taskId }),
+        });
+        showTaskMessage(t("msgTaskCancelRequested", { id: taskId }));
+        await refreshDownloadTasks();
+      } catch (error) {
+        showTaskMessage(t("msgTaskPollFailed", { error: error.message }));
+      }
     });
   });
   updateDownloadsBadge();
@@ -1229,20 +1260,27 @@ async function refreshDownloadTasks() {
 
 function startDownloadPolling() {
   if (state.downloadPollTimer) {
-    clearInterval(state.downloadPollTimer);
+    clearTimeout(state.downloadPollTimer);
     state.downloadPollTimer = null;
   }
   const poll = async () => {
     try {
       await refreshDownloadTasks();
+      state.downloadPollDelayMs = DOWNLOAD_TASK_POLL_INTERVAL_MS;
     } catch (error) {
+      state.downloadPollDelayMs = Math.min(15000, Math.round((state.downloadPollDelayMs || DOWNLOAD_TASK_POLL_INTERVAL_MS) * 1.8));
       if (state.downloadsPopoverOpen) {
         showTaskMessage(t("msgDownloadsRefreshFailed", { error: error.message }));
       }
+    } finally {
+      if (state.downloadPollTimer) {
+        clearTimeout(state.downloadPollTimer);
+      }
+      state.downloadPollTimer = setTimeout(poll, state.downloadPollDelayMs || DOWNLOAD_TASK_POLL_INTERVAL_MS);
     }
   };
+  state.downloadPollDelayMs = DOWNLOAD_TASK_POLL_INTERVAL_MS;
   poll();
-  state.downloadPollTimer = setInterval(poll, DOWNLOAD_TASK_POLL_INTERVAL_MS);
 }
 
 function getModelOptionLabel(item) {
@@ -1344,6 +1382,9 @@ function applyI18n() {
     if (modalContent) modalContent.innerHTML = "";
   }
   renderDownloadsList();
+  if (el("cancelCurrentTaskBtn")) {
+    el("cancelCurrentTaskBtn").textContent = t("btnCancelTask");
+  }
   if (el("searchPrevBtn")) el("searchPrevBtn").textContent = t("btnPrev");
   if (el("searchNextBtn")) el("searchNextBtn").textContent = t("btnNext");
   if ((state.lastSearchResults || []).length) {
@@ -1372,6 +1413,26 @@ async function api(path, options = {}) {
 
 function showTaskMessage(text) {
   el("taskStatus").textContent = text;
+}
+
+function setGenerationBusy(isBusy) {
+  state.generationBusy = Boolean(isBusy);
+  const submitSelectors = [
+    "#text2videoForm button[type='submit']",
+    "#image2videoForm button[type='submit']",
+    "#text2imageForm button[type='submit']",
+    "#image2imageForm button[type='submit']",
+  ];
+  submitSelectors.forEach((selector) => {
+    const node = document.querySelector(selector);
+    if (!node) return;
+    node.disabled = state.generationBusy;
+    node.classList.toggle("is-busy", state.generationBusy);
+  });
+  const cancelBtn = el("cancelCurrentTaskBtn");
+  if (cancelBtn) {
+    cancelBtn.disabled = !state.generationBusy || !state.currentTaskId;
+  }
 }
 
 function showTaskErrorPopup(task) {
@@ -1568,6 +1629,7 @@ function translateTaskStatus(status) {
   if (status === "running") return t("statusRunning");
   if (status === "completed") return t("statusCompleted");
   if (status === "error") return t("statusError");
+  if (status === "cancelled") return t("statusCancelled");
   return status || t("taskTypeUnknown");
 }
 
@@ -1599,13 +1661,15 @@ function translateServerMessage(message) {
     "Generation failed": t("serverGenerationFailed"),
     "Download complete": t("serverDownloadComplete"),
     "Download failed": t("serverDownloadFailed"),
+    Cancelled: t("statusCancelled"),
+    "Cancellation requested": t("statusCancelled"),
   };
   return map[raw] || raw;
 }
 
 async function loadRuntimeInfo() {
   try {
-    const info = await api("/api/system/info");
+    const info = await api("/api/runtime");
     state.runtimeInfo = info;
     const flags = [
       `${t("runtimeDevice")}=${info.device}`,
@@ -1615,7 +1679,10 @@ async function loadRuntimeInfo() {
       `${t("runtimeDiffusers")}=${info.diffusers_ready}`,
     ];
     if (info.torch_version) flags.push(`${t("runtimeTorch")}=${info.torch_version}`);
+    if (info.dtype) flags.push(`dtype=${info.dtype}`);
+    if (info.bf16_supported !== undefined) flags.push(`bf16_supported=${info.bf16_supported}`);
     if (info.npu_reason) flags.push(`${t("runtimeNpuReason")}=${info.npu_reason}`);
+    if (info.aotriton_mismatch?.warning) flags.push(`AOTriton=${info.aotriton_mismatch.warning}`);
     if (info.import_error) flags.push(`${t("runtimeError")}=${info.import_error}`);
     el("runtimeInfo").textContent = flags.join(" | ");
     applyNpuAvailability(info);
@@ -1662,6 +1729,16 @@ function applySettings(settings) {
   el("cfgListenPort").value = serverSettings?.listen_port ?? 8000;
   if (el("cfgRocmAotriton")) {
     el("cfgRocmAotriton").checked = serverSettings?.rocm_aotriton_experimental !== false;
+  }
+  if (el("cfgPreferredDtype")) {
+    const preferred = String(serverSettings?.preferred_dtype || "float16").toLowerCase();
+    el("cfgPreferredDtype").value = preferred === "bf16" ? "bf16" : "float16";
+  }
+  if (el("cfgGpuMaxConcurrency")) {
+    el("cfgGpuMaxConcurrency").value = Number(serverSettings?.gpu_max_concurrency || 1);
+  }
+  if (el("cfgSoftwareVideoFallback")) {
+    el("cfgSoftwareVideoFallback").checked = Boolean(serverSettings?.allow_software_video_fallback);
   }
   if (el("cfgT2VBackend")) {
     el("cfgT2VBackend").value = defaultT2vBackend;
@@ -1972,6 +2049,9 @@ async function saveSettings(event) {
     server: {
       listen_port: Number(el("cfgListenPort").value),
       rocm_aotriton_experimental: Boolean(el("cfgRocmAotriton")?.checked),
+      preferred_dtype: (el("cfgPreferredDtype")?.value || "float16").trim(),
+      gpu_max_concurrency: Number(el("cfgGpuMaxConcurrency")?.value || 1),
+      allow_software_video_fallback: Boolean(el("cfgSoftwareVideoFallback")?.checked),
       t2v_backend: (el("cfgT2VBackend")?.value || "auto").trim(),
       t2v_npu_runner: (el("cfgT2VNpuRunner")?.value || "").trim(),
       t2v_npu_model_dir: (el("cfgT2VNpuModelDir")?.value || "").trim(),
@@ -2600,6 +2680,12 @@ async function loadLocalModels(options = {}) {
   const dir = el("localModelsDir")?.value?.trim() || "";
   const params = new URLSearchParams();
   if (dir) params.set("dir", dir);
+  if (el("localModelsTree")) {
+    el("localModelsTree").innerHTML = `<div class="loading-inline">${escapeHtml(t("runtimeLoading"))}</div>`;
+  }
+  if (el("localModels")) {
+    el("localModels").innerHTML = `<div class="loading-inline">${escapeHtml(t("runtimeLoading"))}</div>`;
+  }
   try {
     if (forceRescan) {
       const tree = await api("/api/models/local/rescan", {
@@ -2882,7 +2968,7 @@ async function openModelDetail(item) {
   const titleNode = el("modelDetailModalTitle");
   const content = el("modelDetailModalContent");
   if (titleNode) titleNode.textContent = t("msgModelDetailLoading");
-  if (content) content.innerHTML = `<div class="downloads-empty">${escapeHtml(t("msgModelDetailLoading"))}</div>`;
+  if (content) content.innerHTML = `<div class="loading-inline">${escapeHtml(t("msgModelDetailLoading"))}</div>`;
   openModelDetailModal();
   const source = item?.source === "civitai" ? "civitai" : "huggingface";
   try {
@@ -3106,6 +3192,9 @@ async function searchModels(event, options = {}) {
   if (sizeMinGb !== null && sizeMaxGb !== null && sizeMaxGb < sizeMinGb) {
     throw new Error(t("msgSearchSizeRangeInvalid"));
   }
+  if (el("searchCards")) {
+    el("searchCards").innerHTML = `<div class="loading-inline">${escapeHtml(t("msgModelSearchLoading"))}</div>`;
+  }
   const sizeMinMb = sizeMinGb !== null && sizeMinGb > 0 ? sizeMinGb * 1024 : null;
   const sizeMaxMb = sizeMaxGb !== null && sizeMaxGb > 0 ? sizeMaxGb * 1024 : null;
   const params = new URLSearchParams({
@@ -3189,6 +3278,7 @@ async function startModelDownload(repoOrItem, extra = {}) {
 
 async function generateText2Video(event) {
   event.preventDefault();
+  setGenerationBusy(true);
   const selectedModel = el("t2vModelSelect").value.trim();
   const loraIds = getSelectedValues("t2vLoraSelect");
   const payload = {
@@ -3205,19 +3295,25 @@ async function generateText2Video(event) {
     fps: Number(el("t2vFps").value),
     seed: readNum("t2vSeed"),
   };
-  const data = await api("/api/generate/text2video", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  showTaskMessage(t("msgTextGenerationStarted", { id: data.task_id }));
-  trackTask(data.task_id);
+  try {
+    const data = await api("/api/generate/text2video", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    showTaskMessage(t("msgTextGenerationStarted", { id: data.task_id }));
+    trackTask(data.task_id);
+  } catch (error) {
+    setGenerationBusy(false);
+    throw error;
+  }
 }
 
 async function generateImage2Video(event) {
   event.preventDefault();
   const imageFile = el("i2vImage").files[0];
   if (!imageFile) throw new Error(t("msgInputImageRequired"));
+  setGenerationBusy(true);
   const formData = new FormData();
   const loraIds = getSelectedValues("i2vLoraSelect");
   formData.append("image", imageFile);
@@ -3235,16 +3331,22 @@ async function generateImage2Video(event) {
   formData.append("height", String(Number(el("i2vHeight").value)));
   if (el("i2vSeed").value.trim()) formData.append("seed", el("i2vSeed").value.trim());
 
-  const data = await api("/api/generate/image2video", {
-    method: "POST",
-    body: formData,
-  });
-  showTaskMessage(t("msgImageGenerationStarted", { id: data.task_id }));
-  trackTask(data.task_id);
+  try {
+    const data = await api("/api/generate/image2video", {
+      method: "POST",
+      body: formData,
+    });
+    showTaskMessage(t("msgImageGenerationStarted", { id: data.task_id }));
+    trackTask(data.task_id);
+  } catch (error) {
+    setGenerationBusy(false);
+    throw error;
+  }
 }
 
 async function generateText2Image(event) {
   event.preventDefault();
+  setGenerationBusy(true);
   const selectedModel = el("t2iModelSelect").value.trim();
   const loraIds = getSelectedValues("t2iLoraSelect");
   const payload = {
@@ -3261,19 +3363,25 @@ async function generateText2Image(event) {
     height: Number(el("t2iHeight").value),
     seed: readNum("t2iSeed"),
   };
-  const data = await api("/api/generate/text2image", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  showTaskMessage(t("msgTextImageGenerationStarted", { id: data.task_id }));
-  trackTask(data.task_id);
+  try {
+    const data = await api("/api/generate/text2image", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    showTaskMessage(t("msgTextImageGenerationStarted", { id: data.task_id }));
+    trackTask(data.task_id);
+  } catch (error) {
+    setGenerationBusy(false);
+    throw error;
+  }
 }
 
 async function generateImage2Image(event) {
   event.preventDefault();
   const imageFile = el("i2iImage").files[0];
   if (!imageFile) throw new Error(t("msgInputImageRequired"));
+  setGenerationBusy(true);
   const formData = new FormData();
   const loraIds = getSelectedValues("i2iLoraSelect");
   formData.append("image", imageFile);
@@ -3290,15 +3398,25 @@ async function generateImage2Image(event) {
   formData.append("width", String(Number(el("i2iWidth").value)));
   formData.append("height", String(Number(el("i2iHeight").value)));
   if (el("i2iSeed").value.trim()) formData.append("seed", el("i2iSeed").value.trim());
-  const data = await api("/api/generate/image2image", {
-    method: "POST",
-    body: formData,
-  });
-  showTaskMessage(t("msgImageImageGenerationStarted", { id: data.task_id }));
-  trackTask(data.task_id);
+  try {
+    const data = await api("/api/generate/image2image", {
+      method: "POST",
+      body: formData,
+    });
+    showTaskMessage(t("msgImageImageGenerationStarted", { id: data.task_id }));
+    trackTask(data.task_id);
+  } catch (error) {
+    setGenerationBusy(false);
+    throw error;
+  }
 }
 
 function renderTask(task) {
+  if (!task) {
+    state.currentTaskSnapshot = null;
+    setGenerationBusy(false);
+    return;
+  }
   state.currentTaskSnapshot = task || null;
   renderTaskProgress(task);
   showTaskErrorPopup(task);
@@ -3325,6 +3443,10 @@ function renderTask(task) {
   } else {
     showTaskMessage(base);
   }
+  const cancelBtn = el("cancelCurrentTaskBtn");
+  if (cancelBtn) {
+    cancelBtn.disabled = !(state.currentTaskId && (task.status === "queued" || task.status === "running"));
+  }
   const video = el("preview");
   const image = el("imagePreview");
   if (task.status === "completed" && task.result?.video_file) {
@@ -3342,7 +3464,7 @@ function renderTask(task) {
 
 function stopPolling() {
   if (state.pollTimer) {
-    clearInterval(state.pollTimer);
+    clearTimeout(state.pollTimer);
     state.pollTimer = null;
   }
 }
@@ -3351,9 +3473,11 @@ async function pollTask() {
   if (!state.currentTaskId) return;
   try {
     const task = await api(`/api/tasks/${state.currentTaskId}`);
+    state.taskPollDelayMs = TASK_POLL_INTERVAL_MS;
     renderTask(task);
-    if (task.status === "completed" || task.status === "error") {
+    if (task.status === "completed" || task.status === "error" || task.status === "cancelled") {
       stopPolling();
+      setGenerationBusy(false);
       if (task.task_type === "download" && task.status === "completed") {
         await loadLocalModels();
       }
@@ -3364,25 +3488,44 @@ async function pollTask() {
           showTaskMessage(t("msgOutputsRefreshFailed", { error: error.message }));
         }
       }
+      return;
     }
+    stopPolling();
+    state.pollTimer = setTimeout(pollTask, state.taskPollDelayMs);
   } catch (error) {
     stopPolling();
+    state.taskPollDelayMs = Math.min(15000, Math.round((state.taskPollDelayMs || TASK_POLL_INTERVAL_MS) * 1.8));
     if (String(error.message).includes("404")) {
       saveLastTaskId(null);
       state.currentTaskId = null;
       state.currentTaskSnapshot = null;
       renderTaskProgress(null);
+      setGenerationBusy(false);
+      return;
     }
     showTaskMessage(t("msgTaskPollFailed", { error: error.message }));
+    state.pollTimer = setTimeout(pollTask, state.taskPollDelayMs);
   }
 }
 
 function trackTask(taskId) {
   state.currentTaskId = taskId;
   saveLastTaskId(taskId);
+  setGenerationBusy(true);
   stopPolling();
+  state.taskPollDelayMs = TASK_POLL_INTERVAL_MS;
   pollTask();
-  state.pollTimer = setInterval(pollTask, TASK_POLL_INTERVAL_MS);
+}
+
+async function cancelCurrentTask() {
+  if (!state.currentTaskId) return;
+  const payload = { task_id: state.currentTaskId };
+  await api("/api/tasks/cancel", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  showTaskMessage(t("msgTaskCancelRequested", { id: state.currentTaskId }));
 }
 
 async function restoreLastTask() {
@@ -3393,8 +3536,10 @@ async function restoreLastTask() {
     state.currentTaskId = lastTaskId;
     renderTask(task);
     if (task.status === "queued" || task.status === "running") {
+      setGenerationBusy(true);
       stopPolling();
-      state.pollTimer = setInterval(pollTask, TASK_POLL_INTERVAL_MS);
+      state.taskPollDelayMs = TASK_POLL_INTERVAL_MS;
+      pollTask();
     }
   } catch (error) {
     saveLastTaskId(null);
@@ -3724,6 +3869,13 @@ async function bootstrap() {
       await refreshDownloadTasks();
     } catch (error) {
       showTaskMessage(t("msgDownloadsRefreshFailed", { error: error.message }));
+    }
+  });
+  bindClick("cancelCurrentTaskBtn", async () => {
+    try {
+      await cancelCurrentTask();
+    } catch (error) {
+      showTaskMessage(t("msgTaskPollFailed", { error: error.message }));
     }
   });
   bindClick("modelDetailModalClose", () => {
