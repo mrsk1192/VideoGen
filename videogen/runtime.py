@@ -32,6 +32,7 @@ def apply_pre_torch_env(base_dir: Path) -> Dict[str, Any]:
         "aotriton_env_before": has_env,
         "aotriton_env_effective": os.environ.get("TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL", ""),
         "pytorch_alloc_conf": os.environ.get("PYTORCH_ALLOC_CONF", ""),
+        "pytorch_hip_alloc_conf": os.environ.get("PYTORCH_HIP_ALLOC_CONF", ""),
     }
 
 
@@ -97,10 +98,13 @@ def runtime_diagnostics(
         "allow_cpu_fallback": parse_bool_setting(server_settings.get("allow_cpu_fallback", False), default=False),
         "preferred_dtype": str(server_settings.get("preferred_dtype", "bf16")).strip().lower(),
         "vram_gpu_direct_load_threshold_gb": float(server_settings.get("vram_gpu_direct_load_threshold_gb", 48.0) or 48.0),
+        "vram_full_load_threshold_gb": float(server_settings.get("vram_full_load_threshold_gb", 80.0) or 80.0),
         "enable_device_map_auto": parse_bool_setting(server_settings.get("enable_device_map_auto", True), default=True),
         "enable_model_cpu_offload": parse_bool_setting(server_settings.get("enable_model_cpu_offload", True), default=True),
+        "try_device_map_dict_full_load": parse_bool_setting(server_settings.get("try_device_map_dict_full_load", False), default=False),
         "allow_software_video_fallback": parse_bool_setting(server_settings.get("allow_software_video_fallback", False), default=False),
         "gpu_max_concurrency": int(server_settings.get("gpu_max_concurrency", 1) or 1),
+        "pytorch_hip_alloc_conf": os.environ.get("PYTORCH_HIP_ALLOC_CONF", ""),
     }
     if import_error:
         output["import_error"] = import_error

@@ -80,6 +80,10 @@ from videogen.tasks import (
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
 DATA_DIR = BASE_DIR / "data"
+FORCED_HIP_ALLOC_CONF = "expandable_segments:True,max_split_size_mb:512"
+# ROCm allocator policy must be fixed before importing torch. This is the final
+# fallback for direct uvicorn launches that do not pass through start scripts.
+os.environ["PYTORCH_HIP_ALLOC_CONF"] = FORCED_HIP_ALLOC_CONF
 PRE_TORCH_ENV = apply_pre_torch_env(BASE_DIR)
 
 TORCH_IMPORT_ERROR: Optional[str] = None
@@ -510,6 +514,37 @@ def clear_cuda_allocator_cache(reason: str) -> None:
     LOGGER.info("cuda allocator cache cleared reason=%s", reason)
 
 
+def pre_inference_gc_and_empty_cache_if_needed(pipe: Any) -> None:
+    """
+    96GB級プロファイルでは推論開始直前に一度だけGC/empty_cacheを実行する。
+
+    Why:
+    - ロード直後や前タスク断片の解放待ちで連続領域が分断されると、十分な総VRAMがあっても
+      推論開始時に大きな確保が失敗しやすくなる。
+    - 毎ステップ実行すると逆効果なので、タスク開始前の1回のみを許可する。
+    """
+    if TORCH_IMPORT_ERROR or pipe is None:
+        return
+    if not bool(getattr(pipe, "_videogen_pre_inference_cleanup_pending", False)):
+        return
+    if not torch.cuda.is_available():
+        with contextlib.suppress(Exception):
+            setattr(pipe, "_videogen_pre_inference_cleanup_pending", False)
+        return
+    profile = str(getattr(pipe, "_videogen_vram_profile", "")).strip().lower()
+    if profile != "96gb_class":
+        with contextlib.suppress(Exception):
+            setattr(pipe, "_videogen_pre_inference_cleanup_pending", False)
+        return
+    LOGGER.info("Pre-inference GC + empty_cache")
+    with contextlib.suppress(Exception):
+        gc.collect()
+    with contextlib.suppress(Exception):
+        torch.cuda.empty_cache()
+    with contextlib.suppress(Exception):
+        setattr(pipe, "_videogen_pre_inference_cleanup_pending", False)
+
+
 def _increment_pipeline_usage_locked(cache_key: str) -> None:
     PIPELINE_USAGE_COUNTS[cache_key] = int(PIPELINE_USAGE_COUNTS.get(cache_key, 0)) + 1
 
@@ -789,6 +824,11 @@ def refresh_gpu_generation_semaphore(settings: Dict[str, Any]) -> None:
 ensure_runtime_dirs(settings_store.get())
 setup_logger(settings_store.get())
 refresh_gpu_generation_semaphore(settings_store.get())
+hip_alloc_conf_effective = str(os.environ.get("PYTORCH_HIP_ALLOC_CONF", "")).strip()
+if "expandable_segments:True" in hip_alloc_conf_effective:
+    LOGGER.info("HIP allocator: expandable_segments enabled conf=%s", hip_alloc_conf_effective)
+else:
+    LOGGER.warning("HIP allocator config does not include expandable_segments:True conf=%s", hip_alloc_conf_effective or "(unset)")
 
 
 def server_flag(name: str, default: bool) -> bool:
@@ -843,16 +883,33 @@ def detect_runtime() -> Dict[str, Any]:
         t2v_npu_runner_configured=npu_runner_configured,
     )
     hardware_profile = detect_hardware_profile(torch_module=torch, import_error=TORCH_IMPORT_ERROR)
-    runtime_info["hardware_profile"] = hardware_profile.to_dict()
+    hardware_dict = hardware_profile.to_dict()
+    runtime_info["hardware_profile"] = hardware_dict
+    runtime_info["total_vram_gb"] = hardware_dict.get("gpu_total_gb", 0.0)
+    runtime_info["free_vram_gb"] = hardware_dict.get("gpu_free_gb", 0.0)
+    runtime_info["selected_dtype"] = str(runtime_info.get("dtype", runtime_info.get("device_dtype", "")))
+    runtime_info["vram_full_load_threshold_gb"] = get_vram_full_load_threshold_gb(settings)
+    runtime_info["vram_profile"] = (
+        "96gb_class" if is_96gb_vram_profile(hardware_profile, settings, prefer_gpu_device_map=True) else "low_vram_or_default"
+    )
     runtime_info["load_policy_preview"] = build_load_policy_preview(
         settings=settings,
         hardware=hardware_profile,
         offload_dir=resolve_offload_dir(BASE_DIR),
     )
+    runtime_info.setdefault("device_map_used", None)
+    runtime_info.setdefault("cpu_offload_used", False)
+    runtime_info.setdefault("tiling_enabled", None)
     last_policy = latest_load_policy()
     if last_policy:
         runtime_info["last_load_policy"] = last_policy
+        policy_payload = last_policy.get("policy", {}) if isinstance(last_policy, dict) else {}
+        if isinstance(policy_payload, dict):
+            runtime_info["device_map_used"] = policy_payload.get("device_map_used", policy_payload.get("device_map"))
+            runtime_info["cpu_offload_used"] = bool(policy_payload.get("cpu_offload_used", policy_payload.get("enable_model_cpu_offload")))
+            runtime_info["tiling_enabled"] = policy_payload.get("vae_tiling_enabled")
     runtime_info["pre_torch_env"] = PRE_TORCH_ENV
+    runtime_info["pytorch_hip_alloc_conf"] = str(os.environ.get("PYTORCH_HIP_ALLOC_CONF", "")).strip()
     runtime_info["gpu_max_concurrency_effective"] = GPU_SEMAPHORE_LIMIT
     expected_aotriton = "1" if parse_bool_setting(settings.get("server", {}).get("rocm_aotriton_experimental", True), True) else "0"
     current_aotriton = str(os.environ.get("TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL", "")).strip()
@@ -1219,6 +1276,14 @@ def infer_task_step_from_message(message: str) -> str:
         return "queued"
     if "vramにロード中" in text or "device_map='cuda'" in text or "device_map={'': 'cuda'}" in text:
         return "model_load_gpu"
+    if "loading pipeline (low_cpu_mem_usage=true)" in text:
+        return "model_load"
+    if "moving pipeline to vram" in text:
+        return "model_load_gpu"
+    if "disabling vae tiling" in text:
+        return "model_load_gpu"
+    if "pre-inference gc + empty_cache" in text:
+        return "inference"
     if "自動device_map" in text or "device_map='auto'" in text:
         return "model_load_auto_map"
     if "cpuオフロード" in text:
@@ -1665,6 +1730,25 @@ def should_apply_rocm_attention_override() -> bool:
     return parse_bool_setting(os.environ.get("VIDEOGEN_ROCM_ATTN_OVERRIDE", "0"), default=False)
 
 
+def get_vram_full_load_threshold_gb(settings: Dict[str, Any]) -> float:
+    server = settings.get("server", {}) if isinstance(settings, dict) else {}
+    try:
+        threshold_gb = float(server.get("vram_full_load_threshold_gb", 80.0))
+    except Exception:
+        threshold_gb = 80.0
+    return max(1.0, min(threshold_gb, 256.0))
+
+
+def is_96gb_vram_profile(hardware_profile: Any, settings: Dict[str, Any], prefer_gpu_device_map: bool) -> bool:
+    if not prefer_gpu_device_map:
+        return False
+    if not bool(getattr(hardware_profile, "cuda_available", False)):
+        return False
+    threshold_gb = get_vram_full_load_threshold_gb(settings)
+    threshold_bytes = int(threshold_gb * (1024**3))
+    return int(getattr(hardware_profile, "gpu_total_bytes", 0) or 0) >= threshold_bytes
+
+
 def load_pipeline_from_pretrained_with_strategy(
     *,
     loader: Callable[..., Any],
@@ -1678,6 +1762,102 @@ def load_pipeline_from_pretrained_with_strategy(
 ) -> Any:
     offload_dir = resolve_offload_dir(BASE_DIR)
     hardware_profile = detect_hardware_profile(torch_module=torch, import_error=TORCH_IMPORT_ERROR)
+    cache_key_value = cache_key or f"{kind}:{source}"
+    vram_profile = "96gb_class" if is_96gb_vram_profile(hardware_profile, settings, prefer_gpu_device_map) else "low_vram_or_default"
+    if vram_profile == "96gb_class":
+        base_kwargs: Dict[str, Any] = {
+            "torch_dtype": dtype,
+            "low_cpu_mem_usage": True,
+            "offload_state_dict": True,
+            "offload_folder": str(offload_dir),
+        }
+        if status_callback is not None:
+            with contextlib.suppress(Exception):
+                status_callback("model_load_gpu", "Loading pipeline (low_cpu_mem_usage=True)")
+        LOGGER.info("Loading pipeline (low_cpu_mem_usage=True) kind=%s source=%s profile=%s", kind, source, vram_profile)
+        log_memory_snapshot("before", kind=kind, source=source, strategy="full_vram_no_device_map")
+        pipe: Any = None
+        strategy_name = "full_vram_no_device_map"
+        strategy_message = "VRAMにロード中 (device_map omitted)"
+        server = settings.get("server", {}) if isinstance(settings, dict) else {}
+        try_device_map_dict = parse_bool_setting(server.get("try_device_map_dict_full_load", False), default=False)
+        if try_device_map_dict:
+            dict_map_kwargs = dict(base_kwargs)
+            dict_map_kwargs["device_map"] = {"": "cuda"}
+            try:
+                pipe = loader(source, **dict_map_kwargs)
+                strategy_name = "full_vram_dict_map"
+                strategy_message = "VRAMにロード中 (device_map={'': 'cuda'})"
+            except (TypeError, ValueError) as exc:
+                LOGGER.warning(
+                    "dict device_map load is unsupported; fallback to no device_map strategy kind=%s source=%s error=%s",
+                    kind,
+                    source,
+                    str(exc),
+                )
+                detach_exception_state(exc)
+                pipe = None
+        if pipe is None:
+            pipe = loader(source, **base_kwargs)
+
+        if status_callback is not None:
+            with contextlib.suppress(Exception):
+                status_callback("model_load_gpu", "Moving pipeline to VRAM (pipe.to('cuda'))")
+        LOGGER.info("Moving pipeline to VRAM (pipe.to('cuda')) kind=%s source=%s", kind, source)
+        if hasattr(pipe, "to"):
+            pipe = pipe.to(torch.device("cuda"))
+        with contextlib.suppress(Exception):
+            setattr(pipe, "_videogen_device_placement_done", True)
+        with contextlib.suppress(Exception):
+            setattr(pipe, "_videogen_enable_cpu_offload", False)
+            setattr(pipe, "_videogen_vram_profile", vram_profile)
+            setattr(pipe, "_videogen_pre_inference_cleanup_pending", True)
+            setattr(pipe, "_videogen_device_map_used", None)
+
+        vae_tiling_enabled = False
+        if hasattr(pipe, "vae") and getattr(pipe, "vae", None) is not None:
+            if status_callback is not None:
+                with contextlib.suppress(Exception):
+                    status_callback("model_load_gpu", "Disabling VAE tiling (96GB profile)")
+            LOGGER.info("Disabling VAE tiling (96GB profile)")
+            vae = getattr(pipe, "vae", None)
+            if vae is not None and hasattr(vae, "disable_tiling"):
+                with contextlib.suppress(Exception):
+                    vae.disable_tiling()
+            with contextlib.suppress(Exception):
+                setattr(pipe, "_videogen_vae_tiling_enabled", False)
+
+        policy_payload = {
+            "name": strategy_name,
+            "task_step": "model_load_gpu",
+            "task_message": strategy_message,
+            "device_map": None,
+            "use_safetensors": None,
+            "low_cpu_mem_usage": True,
+            "offload_state_dict": True,
+            "offload_folder": str(offload_dir),
+            "enable_model_cpu_offload": False,
+            "vram_profile": vram_profile,
+            "device_map_used": None,
+            "cpu_offload_used": False,
+            "vae_tiling_enabled": vae_tiling_enabled,
+        }
+        with contextlib.suppress(Exception):
+            setattr(pipe, "_videogen_load_policy", policy_payload)
+        record_last_load_policy(
+            cache_key_value,
+            {
+                "cache_key": cache_key_value,
+                "kind": kind,
+                "source": source,
+                "policy": policy_payload,
+                "hardware_profile": hardware_profile.to_dict(),
+            },
+        )
+        LOGGER.info("pipeline pretrained load success kind=%s strategy=%s source=%s", kind, strategy_name, source)
+        log_memory_snapshot("after-success", kind=kind, source=source, strategy=strategy_name)
+        return pipe
+
     policies = build_load_policies(
         settings=settings,
         hardware=hardware_profile,
@@ -1691,6 +1871,7 @@ def load_pipeline_from_pretrained_with_strategy(
         if status_callback is not None:
             with contextlib.suppress(Exception):
                 status_callback(policy.task_step, policy.task_message)
+        LOGGER.info("Loading pipeline (low_cpu_mem_usage=True) kind=%s source=%s strategy=%s", kind, source, strategy_name)
         with contextlib.suppress(Exception):
             gc.collect()
         clear_cuda_allocator_cache(reason=f"pretrained-load-before:{kind}:{strategy_name}")
@@ -1716,14 +1897,25 @@ def load_pipeline_from_pretrained_with_strategy(
                 with contextlib.suppress(Exception):
                     setattr(pipe, "_videogen_enable_cpu_offload", False)
             with contextlib.suppress(Exception):
+                setattr(pipe, "_videogen_vram_profile", vram_profile)
+                setattr(pipe, "_videogen_pre_inference_cleanup_pending", False)
+                setattr(pipe, "_videogen_device_map_used", kwargs.get("device_map"))
+                setattr(pipe, "_videogen_vae_tiling_enabled", None)
+            with contextlib.suppress(Exception):
                 setattr(pipe, "_videogen_load_policy", policy.to_dict())
             record_last_load_policy(
-                cache_key or f"{kind}:{source}",
+                cache_key_value,
                 {
-                    "cache_key": cache_key or f"{kind}:{source}",
+                    "cache_key": cache_key_value,
                     "kind": kind,
                     "source": source,
-                    "policy": policy.to_dict(),
+                    "policy": {
+                        **policy.to_dict(),
+                        "vram_profile": vram_profile,
+                        "device_map_used": kwargs.get("device_map"),
+                        "cpu_offload_used": bool(policy.enable_model_cpu_offload),
+                        "vae_tiling_enabled": None,
+                    },
                     "hardware_profile": hardware_profile.to_dict(),
                 },
             )
@@ -1927,16 +2119,18 @@ def get_pipeline(
                 raise
         hf_device_map = getattr(pipe, "hf_device_map", None)
         use_cpu_offload = bool(getattr(pipe, "_videogen_enable_cpu_offload", False))
-        if (not hf_device_map) and (not use_cpu_offload):
+        already_placed = bool(getattr(pipe, "_videogen_device_placement_done", False))
+        if (not hf_device_map) and (not use_cpu_offload) and (not already_placed):
             pipe = pipe.to(device)
         else:
             with contextlib.suppress(Exception):
                 LOGGER.info(
-                    "pipeline placement is managed kind=%s source=%s hf_device_map_entries=%s cpu_offload=%s",
+                    "pipeline placement is managed kind=%s source=%s hf_device_map_entries=%s cpu_offload=%s already_placed=%s",
                     kind,
                     source,
                     len(hf_device_map) if isinstance(hf_device_map, dict) else 1,
                     use_cpu_offload,
+                    already_placed,
                 )
         if hasattr(pipe, "set_progress_bar_config"):
             with contextlib.suppress(Exception):
@@ -1972,22 +2166,34 @@ def get_pipeline_for_inference(
     settings: Dict[str, Any],
     status_callback: Optional[Callable[[str, str], None]] = None,
 ) -> Any:
+    def _mark_pre_inference_cleanup(pipe_obj: Any) -> Any:
+        if pipe_obj is None:
+            return pipe_obj
+        profile = str(getattr(pipe_obj, "_videogen_vram_profile", "")).strip().lower()
+        if profile == "96gb_class":
+            with contextlib.suppress(Exception):
+                setattr(pipe_obj, "_videogen_pre_inference_cleanup_pending", True)
+        return pipe_obj
+
     try:
-        return get_pipeline(
+        pipe = get_pipeline(
             kind,
             model_ref,
             settings,
             acquire_usage=True,
             status_callback=status_callback,
         )
+        return _mark_pre_inference_cleanup(pipe)
     except TypeError as exc:
         text = str(exc)
         if "unexpected keyword argument" not in text:
             raise
         LOGGER.debug("get_pipeline compatibility fallback used kind=%s model_ref=%s error=%s", kind, model_ref, text)
         with contextlib.suppress(TypeError):
-            return get_pipeline(kind, model_ref, settings, acquire_usage=True)
-        return get_pipeline(kind, model_ref, settings)
+            pipe = get_pipeline(kind, model_ref, settings, acquire_usage=True)
+            return _mark_pre_inference_cleanup(pipe)
+        pipe = get_pipeline(kind, model_ref, settings)
+        return _mark_pre_inference_cleanup(pipe)
 
 
 def get_preload_state() -> Dict[str, Any]:
@@ -2256,6 +2462,7 @@ def try_patch_wan_ftfy_dependency(pipe: Any) -> bool:
 
 
 def call_with_supported_kwargs(pipe: Any, kwargs: Dict[str, Any]) -> Any:
+    pre_inference_gc_and_empty_cache_if_needed(pipe)
     signature = inspect.signature(pipe.__call__)
     parameters = signature.parameters
     accepts_var_kwargs = any(param.kind == inspect.Parameter.VAR_KEYWORD for param in parameters.values())
@@ -5436,7 +5643,7 @@ def update_settings(payload: Dict[str, Any]) -> Dict[str, Any]:
             desired_aotriton,
         )
     LOGGER.info(
-        "settings updated models_dir=%s outputs_dir=%s tmp_dir=%s logs_dir=%s log_level=%s listen_port=%s rocm_aotriton_experimental=%s require_gpu=%s allow_cpu_fallback=%s preload_default_t2i_on_startup=%s t2v_backend=%s t2v_npu_runner=%s t2v_npu_model_dir=%s preferred_dtype=%s gpu_max_concurrency=%s allow_software_video_fallback=%s vram_gpu_direct_load_threshold_gb=%s enable_device_map_auto=%s enable_model_cpu_offload=%s",
+        "settings updated models_dir=%s outputs_dir=%s tmp_dir=%s logs_dir=%s log_level=%s listen_port=%s rocm_aotriton_experimental=%s require_gpu=%s allow_cpu_fallback=%s preload_default_t2i_on_startup=%s t2v_backend=%s t2v_npu_runner=%s t2v_npu_model_dir=%s preferred_dtype=%s gpu_max_concurrency=%s allow_software_video_fallback=%s vram_gpu_direct_load_threshold_gb=%s vram_full_load_threshold_gb=%s enable_device_map_auto=%s enable_model_cpu_offload=%s try_device_map_dict_full_load=%s",
         updated["paths"].get("models_dir"),
         updated["paths"].get("outputs_dir"),
         updated["paths"].get("tmp_dir"),
@@ -5454,8 +5661,10 @@ def update_settings(payload: Dict[str, Any]) -> Dict[str, Any]:
         updated.get("server", {}).get("gpu_max_concurrency"),
         updated.get("server", {}).get("allow_software_video_fallback"),
         updated.get("server", {}).get("vram_gpu_direct_load_threshold_gb"),
+        updated.get("server", {}).get("vram_full_load_threshold_gb"),
         updated.get("server", {}).get("enable_device_map_auto"),
         updated.get("server", {}).get("enable_model_cpu_offload"),
+        updated.get("server", {}).get("try_device_map_dict_full_load"),
     )
     return updated
 

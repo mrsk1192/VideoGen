@@ -255,6 +255,35 @@ def build_load_policy_preview(
     offload_dir: Path,
 ) -> Dict[str, Any]:
     server = settings.get("server", {})
+    try:
+        full_threshold_gb = float(server.get("vram_full_load_threshold_gb", 80.0) or 80.0)
+    except Exception:
+        full_threshold_gb = 80.0
+    full_threshold_gb = max(1.0, min(full_threshold_gb, 256.0))
+    full_threshold_bytes = int(full_threshold_gb * (1024**3))
+    is_full_vram = bool(hardware.cuda_available and hardware.gpu_total_bytes >= full_threshold_bytes)
+    if is_full_vram:
+        full_candidate = {
+            "name": "full_vram_no_device_map",
+            "task_step": "model_load_gpu",
+            "task_message": "VRAMにロード中 (device_map omitted)",
+            "device_map": None,
+            "use_safetensors": None,
+            "low_cpu_mem_usage": True,
+            "offload_state_dict": True,
+            "offload_folder": str(offload_dir),
+            "enable_model_cpu_offload": False,
+            "vram_profile": "96gb_class",
+        }
+        return {
+            "vram_gpu_direct_load_threshold_gb": float(server.get("vram_gpu_direct_load_threshold_gb", 48.0) or 48.0),
+            "vram_full_load_threshold_gb": full_threshold_gb,
+            "enable_device_map_auto": parse_bool_setting(server.get("enable_device_map_auto", True), default=True),
+            "enable_model_cpu_offload": parse_bool_setting(server.get("enable_model_cpu_offload", True), default=True),
+            "try_device_map_dict_full_load": parse_bool_setting(server.get("try_device_map_dict_full_load", False), default=False),
+            "candidates": [full_candidate],
+            "selected_policy_name": full_candidate["name"],
+        }
     policies = build_load_policies(
         settings=settings,
         hardware=hardware,
@@ -263,8 +292,10 @@ def build_load_policy_preview(
     )
     return {
         "vram_gpu_direct_load_threshold_gb": float(server.get("vram_gpu_direct_load_threshold_gb", 48.0) or 48.0),
+        "vram_full_load_threshold_gb": full_threshold_gb,
         "enable_device_map_auto": parse_bool_setting(server.get("enable_device_map_auto", True), default=True),
         "enable_model_cpu_offload": parse_bool_setting(server.get("enable_model_cpu_offload", True), default=True),
+        "try_device_map_dict_full_load": parse_bool_setting(server.get("try_device_map_dict_full_load", False), default=False),
         "candidates": [policy.to_dict() for policy in policies],
         "selected_policy_name": policies[0].name if policies else "",
     }
