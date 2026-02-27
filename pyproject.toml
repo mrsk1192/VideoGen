@@ -1,0 +1,14 @@
+[tool.black]
+line-length = 140
+target-version = ["py312"]
+include = "\\.pyi?$"
+
+[tool.ruff]
+line-length = 140
+target-version = "py312"
+exclude = ["venv", ".venv", "artifacts", "outputs", "models", "tmp", "logs"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]
+

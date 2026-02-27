@@ -1,13 +1,13 @@
-import copy
 import contextlib
+import copy
 import ctypes
 import dataclasses
 import gc
 import hashlib
 import importlib.util
-import logging
 import inspect
 import json
+import logging
 import math
 import os
 import re
@@ -24,27 +24,60 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Literal, Optional
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode
-from urllib.request import Request as UrlRequest, urlopen
+from urllib.request import Request as UrlRequest
+from urllib.request import urlopen
 
+import httpx
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from huggingface_hub import HfApi, hf_hub_download, snapshot_download
 from pydantic import BaseModel, Field
 
-# Keep allocator settings consistent even when users launch uvicorn directly
-# (without start.bat), which otherwise can worsen HIP/CUDA fragmentation.
-_default_alloc_conf = "max_split_size_mb:128,garbage_collection_threshold:0.8,expandable_segments:True"
-if not os.environ.get("PYTORCH_ALLOC_CONF") and not os.environ.get("PYTORCH_CUDA_ALLOC_CONF"):
-    os.environ["PYTORCH_ALLOC_CONF"] = _default_alloc_conf
-    os.environ["PYTORCH_CUDA_ALLOC_CONF"] = _default_alloc_conf
-elif os.environ.get("PYTORCH_ALLOC_CONF") and not os.environ.get("PYTORCH_CUDA_ALLOC_CONF"):
-    os.environ["PYTORCH_CUDA_ALLOC_CONF"] = os.environ["PYTORCH_ALLOC_CONF"]
-elif os.environ.get("PYTORCH_CUDA_ALLOC_CONF") and not os.environ.get("PYTORCH_ALLOC_CONF"):
-    os.environ["PYTORCH_ALLOC_CONF"] = os.environ["PYTORCH_CUDA_ALLOC_CONF"]
+from videogen.config import (
+    DEFAULT_SETTINGS as VIDEOGEN_DEFAULT_SETTINGS,
+)
+from videogen.config import (
+    SettingsStore as VideoGenSettingsStore,
+)
+from videogen.config import (
+    deep_merge as config_deep_merge,
+)
+from videogen.config import (
+    ensure_runtime_dirs as config_ensure_runtime_dirs,
+)
+from videogen.config import (
+    parse_bool_setting as config_parse_bool_setting,
+)
+from videogen.config import (
+    resolve_path as config_resolve_path,
+)
+from videogen.config import (
+    sanitize_settings as config_sanitize_settings,
+)
+from videogen.runtime import (
+    apply_pre_torch_env,
+    select_device_and_dtype,
+)
+from videogen.runtime import (
+    runtime_diagnostics as runtime_diagnostics_snapshot,
+)
+from videogen.tasks import (
+    TaskCancelledError,
+    TaskManager,
+)
+from videogen.tasks import (
+    task_progress_heartbeat as task_progress_heartbeat_ctx,
+)
+
+BASE_DIR = Path(__file__).resolve().parent
+STATIC_DIR = BASE_DIR / "static"
+DATA_DIR = BASE_DIR / "data"
+PRE_TORCH_ENV = apply_pre_torch_env(BASE_DIR)
 
 TORCH_IMPORT_ERROR: Optional[str] = None
 DIFFUSERS_IMPORT_ERROR: Optional[str] = None
+torch: Any = None
 try:
     import torch
 except Exception as exc:  # pragma: no cover
@@ -56,56 +89,18 @@ except Exception as exc:  # pragma: no cover
         TORCH_IMPORT_ERROR = str(exc)
 DIFFUSERS_COMPONENTS: Dict[str, Any] = {}
 
-
-BASE_DIR = Path(__file__).resolve().parent
-STATIC_DIR = BASE_DIR / "static"
-DATA_DIR = BASE_DIR / "data"
-
-DEFAULT_SETTINGS: Dict[str, Any] = {
-    "server": {
-        "listen_host": "0.0.0.0",
-        "listen_port": 8000,
-        "rocm_aotriton_experimental": True,
-        "require_gpu": True,
-        "allow_cpu_fallback": False,
-        "preload_default_t2i_on_startup": True,
-        "t2v_backend": "auto",
-        "t2v_npu_runner": "",
-        "t2v_npu_model_dir": "",
-    },
-    "paths": {
-        "models_dir": "models",
-        "outputs_dir": "outputs",
-        "tmp_dir": "tmp",
-        "logs_dir": "logs",
-    },
-    "huggingface": {
-        "token": "",
-    },
-    "logging": {
-        "level": "INFO",
-    },
-    "defaults": {
-        "text2image_model": "runwayml/stable-diffusion-v1-5",
-        "image2image_model": "runwayml/stable-diffusion-v1-5",
-        "text2video_model": "damo-vilab/text-to-video-ms-1.7b",
-        "image2video_model": "ali-vilab/i2vgen-xl",
-        "num_inference_steps": 30,
-        "num_frames": 16,
-        "duration_seconds": 2.0,
-        "guidance_scale": 9.0,
-        "fps": 8,
-        "width": 512,
-        "height": 512,
-    },
-}
+DEFAULT_SETTINGS: Dict[str, Any] = copy.deepcopy(VIDEOGEN_DEFAULT_SETTINGS)
 
 TASKS: Dict[str, Dict[str, Any]] = {}
 TASKS_LOCK = threading.Lock()
+TASK_MANAGER = TaskManager()
 PIPELINES: Dict[str, Any] = {}
 PIPELINES_LOCK = threading.Lock()
 PIPELINE_LOAD_LOCK = threading.Lock()
 PIPELINE_USAGE_COUNTS: Dict[str, int] = {}
+GPU_SEMAPHORE_LOCK = threading.Lock()
+GPU_GENERATION_SEMAPHORE = threading.Semaphore(1)
+GPU_SEMAPHORE_LIMIT = 1
 VAES: Dict[str, Any] = {}
 VAES_LOCK = threading.Lock()
 MODEL_SIZE_CACHE: Dict[str, Dict[str, Any]] = {}
@@ -151,6 +146,8 @@ HIGH_VALUE_ENDPOINTS = {
     "/api/models/local/rescan",
     "/api/models/local/reveal",
     "/api/tasks",
+    "/api/tasks/cancel",
+    "/api/runtime",
     "/api/outputs/delete",
     "/api/settings",
     "/api/cache/hf/clear",
@@ -253,84 +250,19 @@ def utc_now() -> str:
 
 
 def deep_merge(base: Dict[str, Any], updates: Dict[str, Any]) -> Dict[str, Any]:
-    merged = copy.deepcopy(base)
-    for key, value in updates.items():
-        if isinstance(value, dict) and isinstance(merged.get(key), dict):
-            merged[key] = deep_merge(merged[key], value)
-        else:
-            merged[key] = value
-    return merged
+    return config_deep_merge(base, updates)
 
 
 def parse_bool_setting(raw_value: Any, default: bool = False) -> bool:
-    if raw_value is None:
-        return default
-    if isinstance(raw_value, bool):
-        return raw_value
-    if isinstance(raw_value, str):
-        normalized = raw_value.strip().lower()
-        if normalized in TRUE_BOOL_STRINGS:
-            return True
-        if normalized in FALSE_BOOL_STRINGS:
-            return False
-        return default
-    return bool(raw_value)
+    return config_parse_bool_setting(raw_value, default=default)
 
 
 def sanitize_settings(payload: Dict[str, Any]) -> Dict[str, Any]:
-    cleaned = copy.deepcopy(payload)
-    server = cleaned.setdefault("server", {})
-    raw_port = server.get("listen_port", 8000)
-    try:
-        listen_port = int(raw_port)
-    except Exception:
-        listen_port = 8000
-    if listen_port < 1 or listen_port > 65535:
-        listen_port = 8000
-    server["listen_port"] = listen_port
-    listen_host = str(server.get("listen_host", "0.0.0.0")).strip() or "0.0.0.0"
-    server["listen_host"] = listen_host
-    server["rocm_aotriton_experimental"] = parse_bool_setting(server.get("rocm_aotriton_experimental", True), default=True)
-    server["require_gpu"] = parse_bool_setting(server.get("require_gpu", True), default=True)
-    server["allow_cpu_fallback"] = parse_bool_setting(server.get("allow_cpu_fallback", False), default=False)
-    server["preload_default_t2i_on_startup"] = parse_bool_setting(server.get("preload_default_t2i_on_startup", True), default=True)
-    raw_t2v_backend = str(server.get("t2v_backend", "auto")).strip().lower()
-    server["t2v_backend"] = raw_t2v_backend if raw_t2v_backend in SUPPORTED_T2V_BACKENDS else "auto"
-    server["t2v_npu_runner"] = str(server.get("t2v_npu_runner", "")).strip()
-    server["t2v_npu_model_dir"] = str(server.get("t2v_npu_model_dir", "")).strip()
-    logging_config = cleaned.setdefault("logging", {})
-    raw_level = str(logging_config.get("level", "INFO")).strip().upper()
-    logging_config["level"] = raw_level if raw_level in VALID_LOG_LEVELS else "INFO"
-    defaults = cleaned.setdefault("defaults", {})
-    try:
-        fps = int(defaults.get("fps", 8))
-    except Exception:
-        fps = 8
-    fps = max(1, min(60, fps))
-    defaults["fps"] = fps
-    duration_raw = defaults.get("duration_seconds")
-    if duration_raw is None:
-        try:
-            legacy_frames = int(defaults.get("num_frames", 16))
-        except Exception:
-            legacy_frames = 16
-        duration_seconds = max(0.1, float(legacy_frames) / float(max(1, fps)))
-    else:
-        try:
-            duration_seconds = float(duration_raw)
-        except Exception:
-            duration_seconds = VIDEO_DURATION_SECONDS_DEFAULT
-    duration_seconds = max(0.1, min(VIDEO_DURATION_SECONDS_MAX, duration_seconds))
-    defaults["duration_seconds"] = duration_seconds
-    defaults["num_frames"] = max(1, int(duration_seconds * fps + 0.5))
-    return cleaned
+    return config_sanitize_settings(payload)
 
 
 def resolve_path(path_like: str) -> Path:
-    candidate = Path(path_like).expanduser()
-    if not candidate.is_absolute():
-        candidate = BASE_DIR / candidate
-    return candidate.resolve()
+    return config_resolve_path(path_like, BASE_DIR)
 
 
 def get_logs_dir(settings: Dict[str, Any]) -> Path:
@@ -403,24 +335,7 @@ def format_exception_trace(limit_chars: int = TASK_TRACEBACK_MAX_CHARS) -> str:
 
 
 def runtime_diagnostics() -> Dict[str, Any]:
-    info = detect_runtime()
-    details: Dict[str, Any] = {
-        "device": info.get("device"),
-        "cuda_available": info.get("cuda_available"),
-        "rocm_available": info.get("rocm_available"),
-        "torch_version": info.get("torch_version"),
-    }
-    if info.get("import_error"):
-        details["import_error"] = info.get("import_error")
-        return details
-    try:
-        if torch.cuda.is_available():
-            free_bytes, total_bytes = torch.cuda.mem_get_info()
-            details["gpu_free_bytes"] = int(free_bytes)
-            details["gpu_total_bytes"] = int(total_bytes)
-    except Exception:
-        pass
-    return details
+    return detect_runtime()
 
 
 def host_memory_stats() -> Dict[str, int]:
@@ -823,16 +738,32 @@ class SettingsStore:
             return copy.deepcopy(self._settings)
 
 
-settings_store = SettingsStore(DATA_DIR / "settings.json", DEFAULT_SETTINGS)
+settings_store = VideoGenSettingsStore(DATA_DIR / "settings.json", DEFAULT_SETTINGS)
 
 
 def ensure_runtime_dirs(settings: Dict[str, Any]) -> None:
-    for key in ("models_dir", "outputs_dir", "tmp_dir", "logs_dir"):
-        resolve_path(settings["paths"][key]).mkdir(parents=True, exist_ok=True)
+    config_ensure_runtime_dirs(settings, BASE_DIR)
+
+
+def refresh_gpu_generation_semaphore(settings: Dict[str, Any]) -> None:
+    global GPU_GENERATION_SEMAPHORE, GPU_SEMAPHORE_LIMIT
+    server_settings = settings.get("server", {}) if isinstance(settings, dict) else {}
+    try:
+        requested = int(server_settings.get("gpu_max_concurrency", 1))
+    except Exception:
+        requested = 1
+    requested = max(1, min(requested, 8))
+    with GPU_SEMAPHORE_LOCK:
+        if requested == GPU_SEMAPHORE_LIMIT:
+            return
+        GPU_GENERATION_SEMAPHORE = threading.Semaphore(requested)
+        GPU_SEMAPHORE_LIMIT = requested
+    LOGGER.info("gpu generation concurrency updated max_parallel=%s", requested)
 
 
 ensure_runtime_dirs(settings_store.get())
 setup_logger(settings_store.get())
+refresh_gpu_generation_semaphore(settings_store.get())
 
 
 def server_flag(name: str, default: bool) -> bool:
@@ -873,44 +804,33 @@ def detect_runtime() -> Dict[str, Any]:
                 npu_reason = f"onnxruntime providers={providers}"
         except Exception as exc:  # pragma: no cover
             npu_reason = f"onnxruntime probe failed: {exc}"
-
-    if TORCH_IMPORT_ERROR:
-        return {
-            "diffusers_ready": False,
-            "cuda_available": False,
-            "rocm_available": False,
-            "npu_available": npu_available,
-            "npu_backend": npu_backend,
-            "npu_reason": npu_reason,
-            "t2v_backend_default": configured_t2v_backend,
-            "t2v_npu_runner_configured": npu_runner_configured,
-            "device": "cpu",
-            "import_error": TORCH_IMPORT_ERROR,
-        }
-    cuda_available = bool(torch.cuda.is_available())
-    rocm_available = bool(getattr(torch.version, "hip", None))
     diffusers_error = DIFFUSERS_IMPORT_ERROR
-    if diffusers_error is None:
+    if TORCH_IMPORT_ERROR is None and diffusers_error is None:
         try:
             load_diffusers_components()
         except Exception as exc:  # pragma: no cover
             diffusers_error = str(exc)
-    return {
-        "diffusers_ready": diffusers_error is None,
-        "cuda_available": cuda_available,
-        "rocm_available": rocm_available,
-        "npu_available": npu_available,
-        "npu_backend": npu_backend,
-        "npu_reason": npu_reason,
-        "t2v_backend_default": configured_t2v_backend,
-        "t2v_npu_runner_configured": npu_runner_configured,
-        "device": "cuda" if cuda_available else "cpu",
-        "torch_version": torch.__version__,
-        "rocm_aotriton_env": os.environ.get("TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL", ""),
-        "require_gpu": server_flag("require_gpu", True),
-        "allow_cpu_fallback": server_flag("allow_cpu_fallback", False),
-        "import_error": diffusers_error,
-    }
+    runtime_info = runtime_diagnostics_snapshot(
+        settings=settings,
+        torch_module=torch,
+        import_error=TORCH_IMPORT_ERROR,
+        diffusers_error=diffusers_error,
+        npu_available=npu_available,
+        npu_backend=npu_backend,
+        npu_reason=npu_reason,
+        t2v_backend_default=configured_t2v_backend,
+        t2v_npu_runner_configured=npu_runner_configured,
+    )
+    runtime_info["pre_torch_env"] = PRE_TORCH_ENV
+    expected_aotriton = "1" if parse_bool_setting(settings.get("server", {}).get("rocm_aotriton_experimental", True), True) else "0"
+    current_aotriton = str(os.environ.get("TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL", "")).strip()
+    if current_aotriton != expected_aotriton:
+        runtime_info["aotriton_mismatch"] = {
+            "expected": expected_aotriton,
+            "actual": current_aotriton or "(unset)",
+            "warning": "AOTriton env differs from settings. Restart with start.bat or set env before torch import.",
+        }
+    return runtime_info
 
 
 def resolve_text2video_backend(requested_backend: str, settings: Dict[str, Any]) -> Literal["cuda", "npu"]:
@@ -1153,15 +1073,13 @@ def run_text2video_npu_runner(task_id: str, payload: "Text2VideoRequest", settin
 
 
 def get_device_and_dtype() -> tuple[str, Any]:
-    if TORCH_IMPORT_ERROR:
-        raise RuntimeError(f"Diffusers runtime is not available: {TORCH_IMPORT_ERROR}")
-    cuda_available = bool(torch.cuda.is_available())
-    if not cuda_available:
-        raise RuntimeError(
-            "GPU is unavailable (torch.cuda.is_available() is false). "
-            "CPU fallback is disabled for root-cause diagnostics."
-        )
-    return "cuda", torch.float16
+    settings = settings_store.get()
+    device, dtype, _ = select_device_and_dtype(
+        settings=settings,
+        torch_module=torch,
+        import_error=TORCH_IMPORT_ERROR,
+    )
+    return device, dtype
 
 
 def assert_generation_runtime_ready() -> None:
@@ -1180,11 +1098,11 @@ def load_diffusers_components() -> Dict[str, Any]:
         raise RuntimeError(f"Runtime is not available: {TORCH_IMPORT_ERROR}")
     try:
         from diffusers import (
+            AutoencoderKL,
             AutoPipelineForImage2Image,
             AutoPipelineForText2Image,
-            AutoencoderKL,
-            DPMSolverMultistepScheduler,
             DiffusionPipeline,
+            DPMSolverMultistepScheduler,
             I2VGenXLPipeline,
             StableDiffusionImg2ImgPipeline,
             StableDiffusionPipeline,
@@ -1220,41 +1138,17 @@ def load_diffusers_components() -> Dict[str, Any]:
 
 
 def create_task(task_type: str, message: str = "Queued") -> str:
-    task_id = str(uuid.uuid4())
-    now = utc_now()
-    with TASKS_LOCK:
-        TASKS[task_id] = {
-            "id": task_id,
-            "task_type": task_type,
-            "status": "queued",
-            "progress": 0.0,
-            "message": message,
-            "created_at": now,
-            "updated_at": now,
-            "started_at": None,
-            "finished_at": None,
-            "result": None,
-            "error": None,
-            "downloaded_bytes": None,
-            "total_bytes": None,
-        }
+    task_id = TASK_MANAGER.create(task_type, message)
     LOGGER.info("task created id=%s type=%s message=%s", task_id, task_type, message)
     return task_id
 
 
 def update_task(task_id: str, **updates: Any) -> None:
-    with TASKS_LOCK:
-        if task_id not in TASKS:
-            return
-        previous = copy.deepcopy(TASKS[task_id])
-        TASKS[task_id].update(updates)
-        status = str(TASKS[task_id].get("status") or "")
-        if status == "running" and not TASKS[task_id].get("started_at"):
-            TASKS[task_id]["started_at"] = utc_now()
-        if status in ("completed", "error"):
-            TASKS[task_id]["finished_at"] = TASKS[task_id].get("finished_at") or utc_now()
-        TASKS[task_id]["updated_at"] = utc_now()
-        current = copy.deepcopy(TASKS[task_id])
+    previous = TASK_MANAGER.get(task_id)
+    TASK_MANAGER.update(task_id, **updates)
+    current = TASK_MANAGER.get(task_id)
+    if not previous or not current:
+        return
     if previous.get("status") != current.get("status"):
         LOGGER.info(
             "task status id=%s type=%s %s->%s progress=%.3f message=%s",
@@ -1283,55 +1177,28 @@ def task_progress_heartbeat(
     Keep task progress moving during long, non-step phases (e.g. decode/encode)
     so the UI does not look frozen around 90%.
     """
-    start = max(0.0, min(1.0, float(start_progress)))
-    end = max(start, min(1.0, float(end_progress)))
-    span = max(0.0, end - start)
-    if span <= 0.0:
+    with task_progress_heartbeat_ctx(
+        manager=TASK_MANAGER,
+        task_id=task_id,
+        start_progress=start_progress,
+        end_progress=end_progress,
+        message=message,
+        interval_sec=interval_sec,
+        estimated_duration_sec=estimated_duration_sec,
+    ):
         yield
-        return
-
-    stop_event = threading.Event()
-    state = {"last_progress": start}
-
-    def worker() -> None:
-        started_at = time.perf_counter()
-        expected = max(0.5, float(estimated_duration_sec))
-        tick = 0
-        while not stop_event.wait(max(0.2, float(interval_sec))):
-            elapsed = time.perf_counter() - started_at
-            ratio = min(elapsed / expected, 0.985)
-            progress = start + span * ratio
-            if progress <= state["last_progress"] + 1e-6:
-                continue
-            state["last_progress"] = progress
-            update_task(task_id, progress=progress, message=message)
-            tick += 1
-            if tick % 10 == 0:
-                LOGGER.debug(
-                    "task heartbeat task_id=%s message=%s progress=%.4f elapsed_sec=%.1f",
-                    task_id,
-                    message,
-                    progress,
-                    elapsed,
-                )
-
-    heartbeat = threading.Thread(
-        target=worker,
-        name=f"task-hb-{task_id[:8]}",
-        daemon=True,
-    )
-    heartbeat.start()
-    try:
-        yield
-    finally:
-        stop_event.set()
-        heartbeat.join(timeout=2.0)
 
 
 def get_task(task_id: str) -> Optional[Dict[str, Any]]:
-    with TASKS_LOCK:
-        task = TASKS.get(task_id)
-        return copy.deepcopy(task) if task else None
+    return TASK_MANAGER.get(task_id)
+
+
+def is_task_cancelled(task_id: str) -> bool:
+    return TASK_MANAGER.is_cancel_requested(task_id)
+
+
+def ensure_task_not_cancelled(task_id: str) -> None:
+    TASK_MANAGER.check_cancelled(task_id)
 
 
 def resolve_model_source(model_ref: str, settings: Dict[str, Any]) -> str:
@@ -1928,7 +1795,7 @@ def get_pipeline(
         if device == "cuda" and not bool(getattr(torch.version, "hip", None)) and hasattr(pipe, "unet"):
             try:
                 pipe.unet.to(memory_format=torch.channels_last)
-                #pipe.unet.to(memory_format=torch.contiguous_format)   
+                #pipe.unet.to(memory_format=torch.contiguous_format)
             except Exception:
                 LOGGER.debug("channels_last optimization skipped", exc_info=True)
         with PIPELINES_LOCK:
@@ -2083,6 +1950,36 @@ def open_hardware_video_writer(output_path: Path, fps: int) -> tuple[Any, str, C
     raise RuntimeError("No AMD hardware video codec was available (tried: h264_amf, hevc_amf).")
 
 
+def open_video_writer_with_policy(output_path: Path, fps: int) -> tuple[Any, str, Callable[[Any], Any]]:
+    try:
+        return open_hardware_video_writer(output_path, fps)
+    except Exception:
+        settings = settings_store.get()
+        allow_software = parse_bool_setting(
+            settings.get("server", {}).get("allow_software_video_fallback", False), default=False
+        )
+        if not allow_software:
+            raise
+        try:
+            import imageio.v2 as imageio  # type: ignore
+
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            writer = imageio.get_writer(
+                str(output_path),
+                format="FFMPEG",
+                mode="I",
+                fps=int(fps),
+                codec="libx264",
+                macro_block_size=1,
+                ffmpeg_log_level="error",
+                ffmpeg_params=["-pix_fmt", "yuv420p"],
+            )
+            LOGGER.warning("hardware encoder unavailable. using software fallback codec=libx264 path=%s", str(output_path))
+            return writer, "libx264", normalize_frame_to_uint8_rgb
+        except Exception as software_exc:
+            raise RuntimeError("Failed to open both hardware and software video encoders.") from software_exc
+
+
 def append_frames_to_video_writer(
     writer: Any,
     normalize_frame: Callable[[Any], Any],
@@ -2107,8 +2004,8 @@ def append_frames_to_video_writer(
 
 def export_video_with_fallback(frames: Any, output_path: Path, fps: int) -> str:
     """
-    Prefer AMD AMF hardware encoding on Windows to reduce CPU load.
-    Software encoding is intentionally disabled to avoid hidden CPU fallback during diagnostics.
+    Prefer AMD AMF hardware encoding on Windows.
+    Software fallback is opt-in via settings.server.allow_software_video_fallback.
     """
     writer: Any = None
     encoder_name = ""
@@ -2127,12 +2024,50 @@ def export_video_with_fallback(frames: Any, output_path: Path, fps: int) -> str:
             sample_dtype,
         )
         return encoder_name
-    except Exception:
+    except Exception as hardware_exc:
         if output_path.exists():
             output_path.unlink(missing_ok=True)
-        raise RuntimeError(
-            "Hardware video encoder is unavailable. CPU fallback is disabled for root-cause diagnostics."
+        settings = settings_store.get()
+        allow_software = parse_bool_setting(
+            settings.get("server", {}).get("allow_software_video_fallback", False), default=False
         )
+        if not allow_software:
+            raise RuntimeError(
+                "Hardware video encoder is unavailable. "
+                "Set settings.server.allow_software_video_fallback=true to opt in to software encoding."
+            ) from hardware_exc
+        try:
+            import imageio.v2 as imageio  # type: ignore
+
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            writer = imageio.get_writer(
+                str(output_path),
+                format="FFMPEG",
+                mode="I",
+                fps=int(fps),
+                codec="libx264",
+                macro_block_size=1,
+                ffmpeg_log_level="error",
+                ffmpeg_params=["-pix_fmt", "yuv420p"],
+            )
+            frame_count, sample_shape, sample_dtype = append_frames_to_video_writer(writer, normalize_frame_to_uint8_rgb, frames)
+            if frame_count <= 0:
+                raise RuntimeError("no frames were generated to encode")
+            LOGGER.warning(
+                "video encoded with software fallback codec=libx264 path=%s frames=%s fps=%s sample_shape=%s sample_dtype=%s",
+                str(output_path),
+                frame_count,
+                fps,
+                sample_shape,
+                sample_dtype,
+            )
+            return "libx264"
+        except Exception as software_exc:
+            if output_path.exists():
+                output_path.unlink(missing_ok=True)
+            raise RuntimeError(
+                "Hardware video encoder failed and software fallback also failed."
+            ) from software_exc
     finally:
         if writer is not None:
             with contextlib.suppress(Exception):
@@ -2228,6 +2163,7 @@ def build_step_progress_kwargs(
     state = {"last_step": 0}
 
     def publish(step_index: int) -> None:
+        ensure_task_not_cancelled(task_id)
         step = max(1, min(int(step_index) + 1, total))
         if step <= int(state["last_step"]):
             return
@@ -3214,10 +3150,36 @@ def civitai_request_json(path: str, params: Optional[Dict[str, Any]] = None) -> 
     url = f"{CIVITAI_API_BASE}/{path.lstrip('/')}"
     if query:
         url = f"{url}?{query}"
-    req = UrlRequest(url, headers={"User-Agent": "ROCm-VideoGen/1.0"})
-    with contextlib.closing(urlopen(req, timeout=20)) as resp:
-        payload = json.loads(resp.read().decode("utf-8"))
-    return payload if isinstance(payload, dict) else {}
+    # Compatibility path for tests that monkeypatch urllib.urlopen.
+    if getattr(urlopen, "__module__", "") != "urllib.request":
+        req = UrlRequest(url, headers={"User-Agent": "ROCm-VideoGen/1.0"})
+        with contextlib.closing(urlopen(req, timeout=20)) as resp:
+            payload = json.loads(resp.read().decode("utf-8"))
+        return payload if isinstance(payload, dict) else {}
+    settings = settings_store.get()
+    server_settings = settings.get("server", {})
+    timeout_sec = float(server_settings.get("request_timeout_sec", 20.0))
+    retry_count = int(server_settings.get("request_retry_count", 2))
+    retry_backoff_sec = float(server_settings.get("request_retry_backoff_sec", 1.0))
+    timeout = httpx.Timeout(timeout_sec, connect=min(timeout_sec, 10.0))
+    last_error: Optional[Exception] = None
+    for attempt in range(max(0, retry_count) + 1):
+        try:
+            response = httpx.get(
+                url,
+                headers={"User-Agent": "ROCm-VideoGen/1.0"},
+                timeout=timeout,
+                follow_redirects=True,
+            )
+            response.raise_for_status()
+            payload = response.json()
+            return payload if isinstance(payload, dict) else {}
+        except Exception as exc:
+            last_error = exc
+            if attempt >= retry_count:
+                break
+            time.sleep(max(0.1, retry_backoff_sec) * (2**attempt))
+    raise RuntimeError(f"CivitAI request failed: {last_error}")
 
 
 def parse_civitai_model_id(repo_id: str) -> Optional[int]:
@@ -3729,30 +3691,111 @@ def stream_http_download(
     progress_message: str,
     total_bytes_hint: Optional[int] = None,
 ) -> int:
-    req = UrlRequest(url, headers={"User-Agent": "ROCm-VideoGen/1.0"})
-    downloaded = 0
-    last_reported = 0
-    last_reported_ts = 0.0
-    with contextlib.closing(urlopen(req, timeout=60)) as resp, destination.open("wb") as out_file:
-        total = safe_int(resp.headers.get("Content-Length")) or safe_int(total_bytes_hint)
-        if total and total > 0:
-            update_task(task_id, progress=0.0, message=progress_message, downloaded_bytes=0, total_bytes=total)
-        while True:
-            chunk = resp.read(DOWNLOAD_STREAM_CHUNK_BYTES)
-            if not chunk:
-                break
-            out_file.write(chunk)
-            downloaded += len(chunk)
-            now = time.time()
-            should_report = (downloaded - last_reported >= (2 * DOWNLOAD_STREAM_CHUNK_BYTES)) or ((now - last_reported_ts) >= 1.0)
-            if should_report:
-                last_reported = downloaded
-                last_reported_ts = now
+    # Compatibility path for tests and custom monkeypatches that replace urllib.urlopen.
+    if getattr(urlopen, "__module__", "") != "urllib.request":
+        req = UrlRequest(url, headers={"User-Agent": "ROCm-VideoGen/1.0"})
+        downloaded = 0
+        last_reported = 0
+        last_reported_ts = 0.0
+        with contextlib.closing(urlopen(req, timeout=60)) as resp, destination.open("wb") as out_file:
+            total = safe_int(getattr(resp, "headers", {}).get("Content-Length")) or safe_int(total_bytes_hint)
+            if total and total > 0:
+                update_task(task_id, progress=0.0, message=progress_message, downloaded_bytes=0, total_bytes=total)
+            while True:
+                ensure_task_not_cancelled(task_id)
+                chunk = resp.read(DOWNLOAD_STREAM_CHUNK_BYTES)
+                if not chunk:
+                    break
+                out_file.write(chunk)
+                downloaded += len(chunk)
+                now = time.time()
+                should_report = (downloaded - last_reported >= (2 * DOWNLOAD_STREAM_CHUNK_BYTES)) or (
+                    (now - last_reported_ts) >= 1.0
+                )
+                if should_report:
+                    last_reported = downloaded
+                    last_reported_ts = now
+                    if total and total > 0:
+                        ratio = min(downloaded / total, 1.0)
+                        update_task(
+                            task_id,
+                            progress=min(ratio, 0.99),
+                            message=progress_message,
+                            downloaded_bytes=downloaded,
+                            total_bytes=total,
+                        )
+                    else:
+                        update_task(
+                            task_id,
+                            progress=min(0.95, (downloaded / (200 * 1024 * 1024))),
+                            message=progress_message,
+                            downloaded_bytes=downloaded,
+                            total_bytes=None,
+                        )
+        return downloaded
+
+    settings = settings_store.get()
+    server_settings = settings.get("server", {})
+    timeout_sec = float(server_settings.get("request_timeout_sec", 60.0))
+    retry_count = int(server_settings.get("request_retry_count", 2))
+    retry_backoff_sec = float(server_settings.get("request_retry_backoff_sec", 1.0))
+    timeout = httpx.Timeout(timeout_sec, connect=min(timeout_sec, 10.0))
+    last_error: Optional[Exception] = None
+
+    for attempt in range(max(0, retry_count) + 1):
+        downloaded = 0
+        last_reported = 0
+        last_reported_ts = 0.0
+        if destination.exists():
+            destination.unlink(missing_ok=True)
+        try:
+            ensure_task_not_cancelled(task_id)
+            with httpx.stream(
+                "GET",
+                url,
+                headers={"User-Agent": "ROCm-VideoGen/1.0"},
+                timeout=timeout,
+                follow_redirects=True,
+            ) as response:
+                response.raise_for_status()
+                total = safe_int(response.headers.get("Content-Length")) or safe_int(total_bytes_hint)
                 if total and total > 0:
-                    ratio = min(downloaded / total, 1.0)
+                    update_task(task_id, progress=0.0, message=progress_message, downloaded_bytes=0, total_bytes=total)
+                with destination.open("wb") as out_file:
+                    for chunk in response.iter_bytes(chunk_size=DOWNLOAD_STREAM_CHUNK_BYTES):
+                        ensure_task_not_cancelled(task_id)
+                        if not chunk:
+                            continue
+                        out_file.write(chunk)
+                        downloaded += len(chunk)
+                        now = time.time()
+                        should_report = (downloaded - last_reported >= (2 * DOWNLOAD_STREAM_CHUNK_BYTES)) or (
+                            (now - last_reported_ts) >= 1.0
+                        )
+                        if should_report:
+                            last_reported = downloaded
+                            last_reported_ts = now
+                            if total and total > 0:
+                                ratio = min(downloaded / total, 1.0)
+                                update_task(
+                                    task_id,
+                                    progress=min(ratio, 0.99),
+                                    message=progress_message,
+                                    downloaded_bytes=downloaded,
+                                    total_bytes=total,
+                                )
+                            else:
+                                update_task(
+                                    task_id,
+                                    progress=min(0.95, (downloaded / (200 * 1024 * 1024))),
+                                    message=progress_message,
+                                    downloaded_bytes=downloaded,
+                                    total_bytes=None,
+                                )
+                if total and total > 0:
                     update_task(
                         task_id,
-                        progress=min(ratio, 0.99),
+                        progress=min(0.99, downloaded / total),
                         message=progress_message,
                         downloaded_bytes=downloaded,
                         total_bytes=total,
@@ -3765,11 +3808,17 @@ def stream_http_download(
                         downloaded_bytes=downloaded,
                         total_bytes=None,
                     )
-    if total and total > 0:
-        update_task(task_id, progress=min(0.99, downloaded / total), message=progress_message, downloaded_bytes=downloaded, total_bytes=total)
-    else:
-        update_task(task_id, progress=min(0.95, (downloaded / (200 * 1024 * 1024))), message=progress_message, downloaded_bytes=downloaded, total_bytes=None)
-    return downloaded
+                return downloaded
+        except TaskCancelledError:
+            if destination.exists():
+                destination.unlink(missing_ok=True)
+            raise
+        except Exception as exc:
+            last_error = exc
+            if attempt >= retry_count:
+                break
+            time.sleep(max(0.1, retry_backoff_sec) * (2**attempt))
+    raise RuntimeError(f"download failed: {last_error}")
 
 
 class Text2ImageRequest(BaseModel):
@@ -3856,6 +3905,10 @@ class RevealLocalModelRequest(BaseModel):
     base_dir: Optional[str] = None
 
 
+class CancelTaskRequest(BaseModel):
+    task_id: str = Field(min_length=1)
+
+
 def text2image_worker(task_id: str, payload: Text2ImageRequest) -> None:
     settings = settings_store.get()
     ensure_runtime_dirs(settings)
@@ -3877,55 +3930,59 @@ def text2image_worker(task_id: str, payload: Text2ImageRequest) -> None:
     )
     pipeline_cache_key: Optional[str] = None
     try:
+        ensure_task_not_cancelled(task_id)
         cleanup_before_generation_load(kind="text-to-image", model_ref=model_ref, settings=settings, clear_vaes=True)
         update_task(task_id, status="running", progress=0.05, message="Loading model")
-        pipe = get_pipeline_for_inference("text-to-image", model_ref, settings)
-        pipeline_cache_key = str(getattr(pipe, "_videogen_cache_key", "") or "")
-        device, dtype = get_device_and_dtype()
-        update_task(task_id, progress=0.1, message="Loading model")
-        apply_vae_to_pipeline(pipe, vae_ref, settings, device=device, dtype=dtype)
-        update_task(task_id, progress=0.15, message="Applying LoRA")
-        apply_loras_to_pipeline(pipe, lora_refs, payload.lora_scale, settings)
-        update_task(task_id, progress=0.2, message=f"Generating image (0/{payload.num_inference_steps})")
-        generator = None
-        if payload.seed is not None:
-            gen_device = "cuda" if device == "cuda" else "cpu"
-            generator = torch.Generator(device=gen_device).manual_seed(payload.seed)
-        step_progress_kwargs = build_step_progress_kwargs(
-            pipe=pipe,
-            task_id=task_id,
-            num_inference_steps=payload.num_inference_steps,
-            start_progress=0.2,
-            end_progress=0.9,
-            message="Generating image",
-        )
-        LOGGER.info(
-            "text2image inference start task_id=%s model=%s steps=%s guidance=%s size=%sx%s callback_keys=%s",
-            task_id,
-            model_ref,
-            payload.num_inference_steps,
-            payload.guidance_scale,
-            payload.width,
-            payload.height,
-            ",".join(sorted(step_progress_kwargs.keys())) if step_progress_kwargs else "(none)",
-        )
-        gen_started = time.perf_counter()
-        out = call_with_supported_kwargs(
-            pipe,
-            {
-                "prompt": payload.prompt,
-                "negative_prompt": payload.negative_prompt or None,
-                "num_inference_steps": payload.num_inference_steps,
-                "guidance_scale": payload.guidance_scale,
-                "width": payload.width,
-                "height": payload.height,
-                "generator": generator,
-                "output_type": "pil",
-                "cross_attention_kwargs": {"scale": payload.lora_scale} if len(lora_refs) == 1 else None,
-                **step_progress_kwargs,
-            },
-        )
-        LOGGER.info("text2image inference done task_id=%s elapsed_ms=%.1f", task_id, (time.perf_counter() - gen_started) * 1000)
+        with GPU_GENERATION_SEMAPHORE:
+            ensure_task_not_cancelled(task_id)
+            pipe = get_pipeline_for_inference("text-to-image", model_ref, settings)
+            pipeline_cache_key = str(getattr(pipe, "_videogen_cache_key", "") or "")
+            device, dtype = get_device_and_dtype()
+            update_task(task_id, progress=0.1, message="Loading model")
+            apply_vae_to_pipeline(pipe, vae_ref, settings, device=device, dtype=dtype)
+            update_task(task_id, progress=0.15, message="Applying LoRA")
+            apply_loras_to_pipeline(pipe, lora_refs, payload.lora_scale, settings)
+            ensure_task_not_cancelled(task_id)
+            update_task(task_id, progress=0.2, message=f"Generating image (0/{payload.num_inference_steps})")
+            generator = None
+            if payload.seed is not None:
+                gen_device = "cuda" if device == "cuda" else "cpu"
+                generator = torch.Generator(device=gen_device).manual_seed(payload.seed)
+            step_progress_kwargs = build_step_progress_kwargs(
+                pipe=pipe,
+                task_id=task_id,
+                num_inference_steps=payload.num_inference_steps,
+                start_progress=0.2,
+                end_progress=0.9,
+                message="Generating image",
+            )
+            LOGGER.info(
+                "text2image inference start task_id=%s model=%s steps=%s guidance=%s size=%sx%s callback_keys=%s",
+                task_id,
+                model_ref,
+                payload.num_inference_steps,
+                payload.guidance_scale,
+                payload.width,
+                payload.height,
+                ",".join(sorted(step_progress_kwargs.keys())) if step_progress_kwargs else "(none)",
+            )
+            gen_started = time.perf_counter()
+            out = call_with_supported_kwargs(
+                pipe,
+                {
+                    "prompt": payload.prompt,
+                    "negative_prompt": payload.negative_prompt or None,
+                    "num_inference_steps": payload.num_inference_steps,
+                    "guidance_scale": payload.guidance_scale,
+                    "width": payload.width,
+                    "height": payload.height,
+                    "generator": generator,
+                    "output_type": "pil",
+                    "cross_attention_kwargs": {"scale": payload.lora_scale} if len(lora_refs) == 1 else None,
+                    **step_progress_kwargs,
+                },
+            )
+            LOGGER.info("text2image inference done task_id=%s elapsed_ms=%.1f", task_id, (time.perf_counter() - gen_started) * 1000)
         images: list[Any]
         raw_images = out.images
         if isinstance(raw_images, list) and raw_images and isinstance(raw_images[0], Image.Image):
@@ -3977,6 +4034,9 @@ def text2image_worker(task_id: str, payload: Text2ImageRequest) -> None:
             result={"image_file": output_name, "model": model_ref, "loras": lora_refs, "vae": vae_ref or None},
         )
         LOGGER.info("text2image done task_id=%s output=%s", task_id, str(output_path))
+    except TaskCancelledError:
+        LOGGER.info("text2image cancelled task_id=%s", task_id)
+        update_task(task_id, status="cancelled", progress=1.0, message="Cancelled")
     except Exception as exc:
         trace = format_exception_trace()
         LOGGER.exception("text2image failed task_id=%s model=%s diagnostics=%s", task_id, model_ref, runtime_diagnostics())
@@ -4023,7 +4083,9 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
         payload.seed,
     )
     pipeline_cache_key: Optional[str] = None
+    semaphore_acquired = False
     try:
+        ensure_task_not_cancelled(task_id)
         if effective_backend == "npu":
             if lora_refs:
                 raise RuntimeError("NPU backend for text-to-video does not support LoRA yet.")
@@ -4057,6 +4119,8 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
             )
             return
 
+        GPU_GENERATION_SEMAPHORE.acquire()
+        semaphore_acquired = True
         cleanup_before_generation_load(kind="text-to-video", model_ref=model_ref, settings=settings, clear_vaes=True)
         update_task(task_id, status="running", progress=0.05, message="Loading model")
         try:
@@ -4095,11 +4159,12 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
         sample_shape: Optional[tuple[int, ...]] = None
         sample_dtype: Optional[str] = None
         try:
-            writer, encoder_name, normalize_frame = open_hardware_video_writer(output_path, fps=int(payload.fps))
+            writer, encoder_name, normalize_frame = open_video_writer_with_policy(output_path, fps=int(payload.fps))
             gen_device = "cuda" if device == "cuda" else "cpu"
             framepack_context_arg = detect_framepack_context_arg(pipe)
             carry_image: Optional[Any] = None
             for segment in framepack_segments:
+                ensure_task_not_cancelled(task_id)
                 segment_index = int(segment["index"])
                 request_frames = int(segment["request_frames"])
                 trim_head_frames = int(segment["trim_head_frames"])
@@ -4230,6 +4295,9 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
             },
         )
         LOGGER.info("text2video done task_id=%s backend=cuda output=%s", task_id, str(output_path))
+    except TaskCancelledError:
+        LOGGER.info("text2video cancelled task_id=%s", task_id)
+        update_task(task_id, status="cancelled", progress=1.0, message="Cancelled")
     except Exception as exc:
         if "output_path" in locals() and isinstance(output_path, Path) and output_path.exists():
             with contextlib.suppress(Exception):
@@ -4244,6 +4312,8 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
         )
         update_task(task_id, status="error", message="Generation failed", error=str(exc), error_trace=trace)
     finally:
+        if semaphore_acquired:
+            GPU_GENERATION_SEMAPHORE.release()
         release_pipeline_usage(pipeline_cache_key)
 
 
@@ -4287,7 +4357,11 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
         payload.get("seed"),
     )
     pipeline_cache_key: Optional[str] = None
+    semaphore_acquired = False
     try:
+        ensure_task_not_cancelled(task_id)
+        GPU_GENERATION_SEMAPHORE.acquire()
+        semaphore_acquired = True
         cleanup_before_generation_load(kind="image-to-video", model_ref=model_ref, settings=settings, clear_vaes=True)
         update_task(task_id, status="running", progress=0.05, message="Loading model")
         pipe = get_pipeline_for_inference("image-to-video", model_ref, settings)
@@ -4327,9 +4401,10 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
         sample_shape: Optional[tuple[int, ...]] = None
         sample_dtype: Optional[str] = None
         try:
-            writer, encoder_name, normalize_frame = open_hardware_video_writer(output_path, fps=int(payload["fps"]))
+            writer, encoder_name, normalize_frame = open_video_writer_with_policy(output_path, fps=int(payload["fps"]))
             current_image = image
             for segment in framepack_segments:
+                ensure_task_not_cancelled(task_id)
                 segment_index = int(segment["index"])
                 request_frames = int(segment["request_frames"])
                 trim_head_frames = int(segment["trim_head_frames"])
@@ -4457,6 +4532,9 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
             },
         )
         LOGGER.info("image2video done task_id=%s output=%s", task_id, str(output_path))
+    except TaskCancelledError:
+        LOGGER.info("image2video cancelled task_id=%s", task_id)
+        update_task(task_id, status="cancelled", progress=1.0, message="Cancelled")
     except Exception as exc:
         if "output_path" in locals() and isinstance(output_path, Path) and output_path.exists():
             with contextlib.suppress(Exception):
@@ -4465,6 +4543,8 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
         LOGGER.exception("image2video failed task_id=%s model=%s diagnostics=%s", task_id, model_ref, runtime_diagnostics())
         update_task(task_id, status="error", message="Generation failed", error=str(exc), error_trace=trace)
     finally:
+        if semaphore_acquired:
+            GPU_GENERATION_SEMAPHORE.release()
         release_pipeline_usage(pipeline_cache_key)
         if image_path.exists():
             image_path.unlink(missing_ok=True)
@@ -4494,7 +4574,11 @@ def image2image_worker(task_id: str, payload: Dict[str, Any]) -> None:
         payload.get("seed"),
     )
     pipeline_cache_key: Optional[str] = None
+    semaphore_acquired = False
     try:
+        ensure_task_not_cancelled(task_id)
+        GPU_GENERATION_SEMAPHORE.acquire()
+        semaphore_acquired = True
         cleanup_before_generation_load(kind="image-to-image", model_ref=model_ref, settings=settings, clear_vaes=True)
         update_task(task_id, status="running", progress=0.05, message="Loading model")
         pipe = get_pipeline_for_inference("image-to-image", model_ref, settings)
@@ -4601,11 +4685,16 @@ def image2image_worker(task_id: str, payload: Dict[str, Any]) -> None:
             result={"image_file": output_name, "model": model_ref, "loras": lora_refs, "vae": vae_ref or None},
         )
         LOGGER.info("image2image done task_id=%s output=%s", task_id, str(output_path))
+    except TaskCancelledError:
+        LOGGER.info("image2image cancelled task_id=%s", task_id)
+        update_task(task_id, status="cancelled", progress=1.0, message="Cancelled")
     except Exception as exc:
         trace = format_exception_trace()
         LOGGER.exception("image2image failed task_id=%s model=%s diagnostics=%s", task_id, model_ref, runtime_diagnostics())
         update_task(task_id, status="error", message="Generation failed", error=str(exc), error_trace=trace)
     finally:
+        if semaphore_acquired:
+            GPU_GENERATION_SEMAPHORE.release()
         release_pipeline_usage(pipeline_cache_key)
         if image_path.exists():
             image_path.unlink(missing_ok=True)
@@ -4673,13 +4762,25 @@ def select_civitai_download_file(
 
 
 def download_preview_image(preview_url: str, destination: Path) -> None:
-    req = UrlRequest(preview_url, headers={"User-Agent": "ROCm-VideoGen/1.0"})
-    with contextlib.closing(urlopen(req, timeout=20)) as resp, destination.open("wb") as out_file:
-        while True:
-            chunk = resp.read(1024 * 256)
-            if not chunk:
-                break
-            out_file.write(chunk)
+    if getattr(urlopen, "__module__", "") != "urllib.request":
+        req = UrlRequest(preview_url, headers={"User-Agent": "ROCm-VideoGen/1.0"})
+        with contextlib.closing(urlopen(req, timeout=20)) as resp, destination.open("wb") as out_file:
+            while True:
+                chunk = resp.read(1024 * 256)
+                if not chunk:
+                    break
+                out_file.write(chunk)
+        return
+    settings = settings_store.get()
+    timeout_sec = float(settings.get("server", {}).get("request_timeout_sec", 20.0))
+    response = httpx.get(
+        preview_url,
+        headers={"User-Agent": "ROCm-VideoGen/1.0"},
+        timeout=httpx.Timeout(timeout_sec, connect=min(timeout_sec, 10.0)),
+        follow_redirects=True,
+    )
+    response.raise_for_status()
+    destination.write_bytes(response.content)
 
 
 def normalize_download_model_kind(value: str) -> str:
@@ -4779,12 +4880,14 @@ def download_model_worker(task_id: str, req: DownloadRequest) -> None:
     requested_model_kind = str(req.model_kind or "").strip()
     LOGGER.info("download start task_id=%s repo=%s revision=%s target=%s", task_id, repo_id, revision or "main", str(model_dir))
     try:
+        ensure_task_not_cancelled(task_id)
         update_task(task_id, status="running", progress=0.0, message=f"Preparing download {repo_id}", downloaded_bytes=0, total_bytes=None)
 
         explicit_source = str(req.source or "").strip().lower()
         civitai_model_id = req.civitai_model_id or parse_civitai_model_id(repo_id)
         is_civitai = explicit_source == "civitai" or civitai_model_id is not None
         if civitai_model_id is not None:
+            ensure_task_not_cancelled(task_id)
             payload = civitai_request_json(f"models/{int(civitai_model_id)}")
             selected_version, selected_file = select_civitai_download_file(
                 payload,
@@ -4881,6 +4984,8 @@ def download_model_worker(task_id: str, req: DownloadRequest) -> None:
             worker.start()
             last_reported_bytes = -1
             while worker.is_alive():
+                if is_task_cancelled(task_id):
+                    LOGGER.warning("HF snapshot download cancellation requested but cannot interrupt once started task_id=%s", task_id)
                 downloaded_now = directory_size_bytes(model_dir)
                 if downloaded_now != last_reported_bytes:
                     last_reported_bytes = downloaded_now
@@ -4931,6 +5036,9 @@ def download_model_worker(task_id: str, req: DownloadRequest) -> None:
         )
         invalidate_local_tree_cache(models_dir)
         LOGGER.info("download done task_id=%s repo=%s local_path=%s", task_id, repo_id, str(model_dir.resolve()))
+    except TaskCancelledError:
+        LOGGER.info("download cancelled task_id=%s repo=%s", task_id, repo_id)
+        update_task(task_id, status="cancelled", progress=1.0, message="Cancelled")
     except Exception as exc:
         trace = format_exception_trace()
         LOGGER.exception("download failed task_id=%s repo=%s target=%s", task_id, repo_id, str(model_dir))
@@ -5023,6 +5131,11 @@ def system_info() -> Dict[str, Any]:
     return detect_runtime()
 
 
+@app.get("/api/runtime")
+def runtime_info() -> Dict[str, Any]:
+    return detect_runtime()
+
+
 @app.get("/api/system/preload")
 def system_preload_state() -> Dict[str, Any]:
     return get_preload_state()
@@ -5103,8 +5216,18 @@ def update_settings(payload: Dict[str, Any]) -> Dict[str, Any]:
     updated = settings_store.update(payload)
     ensure_runtime_dirs(updated)
     setup_logger(updated)
+    refresh_gpu_generation_semaphore(updated)
+    desired_aotriton = "1" if parse_bool_setting(updated.get("server", {}).get("rocm_aotriton_experimental", True), True) else "0"
+    current_aotriton = str(os.environ.get("TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL", "")).strip()
+    if current_aotriton != desired_aotriton:
+        os.environ["TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL"] = desired_aotriton
+        LOGGER.warning(
+            "updated TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL in current process to match settings (%s). "
+            "Some runtimes still require process restart for full effect.",
+            desired_aotriton,
+        )
     LOGGER.info(
-        "settings updated models_dir=%s outputs_dir=%s tmp_dir=%s logs_dir=%s log_level=%s listen_port=%s rocm_aotriton_experimental=%s require_gpu=%s allow_cpu_fallback=%s preload_default_t2i_on_startup=%s t2v_backend=%s t2v_npu_runner=%s t2v_npu_model_dir=%s",
+        "settings updated models_dir=%s outputs_dir=%s tmp_dir=%s logs_dir=%s log_level=%s listen_port=%s rocm_aotriton_experimental=%s require_gpu=%s allow_cpu_fallback=%s preload_default_t2i_on_startup=%s t2v_backend=%s t2v_npu_runner=%s t2v_npu_model_dir=%s preferred_dtype=%s gpu_max_concurrency=%s allow_software_video_fallback=%s",
         updated["paths"].get("models_dir"),
         updated["paths"].get("outputs_dir"),
         updated["paths"].get("tmp_dir"),
@@ -5118,6 +5241,9 @@ def update_settings(payload: Dict[str, Any]) -> Dict[str, Any]:
         updated.get("server", {}).get("t2v_backend"),
         updated.get("server", {}).get("t2v_npu_runner"),
         updated.get("server", {}).get("t2v_npu_model_dir"),
+        updated.get("server", {}).get("preferred_dtype"),
+        updated.get("server", {}).get("gpu_max_concurrency"),
+        updated.get("server", {}).get("allow_software_video_fallback"),
     )
     return updated
 
@@ -5904,23 +6030,23 @@ def list_tasks(
     status: str = "all",
     limit: int = 30,
 ) -> Dict[str, Any]:
-    normalized_task_type = str(task_type or "").strip().lower()
     normalized_status = str(status or "all").strip().lower()
-    capped_limit = min(max(int(limit), 1), 200)
-    allowed_status = {"all", "queued", "running", "completed", "error"}
+    allowed_status = {"all", "queued", "running", "completed", "error", "cancelled"}
     if normalized_status not in allowed_status:
         raise HTTPException(status_code=400, detail="Invalid status")
-    with TASKS_LOCK:
-        values = [copy.deepcopy(task) for task in TASKS.values()]
-    filtered: list[Dict[str, Any]] = []
-    for task in values:
-        if normalized_task_type and str(task.get("task_type") or "").strip().lower() != normalized_task_type:
-            continue
-        if normalized_status != "all" and str(task.get("status") or "").strip().lower() != normalized_status:
-            continue
-        filtered.append(task)
-    filtered.sort(key=lambda task: str(task.get("updated_at") or task.get("created_at") or ""), reverse=True)
-    return {"tasks": filtered[:capped_limit]}
+    return {"tasks": TASK_MANAGER.list(task_type=task_type, status=status, limit=limit)}
+
+
+@app.post("/api/tasks/cancel")
+def cancel_task(req: CancelTaskRequest) -> Dict[str, Any]:
+    task_id = str(req.task_id or "").strip()
+    if not task_id:
+        raise HTTPException(status_code=400, detail="task_id is required")
+    try:
+        task = TASK_MANAGER.request_cancel(task_id)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail="Task not found") from exc
+    return {"status": "ok", "task": task}
 
 
 @app.get("/api/outputs")
