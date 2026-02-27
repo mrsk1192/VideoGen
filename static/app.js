@@ -80,6 +80,9 @@ const I18N = {
     labelDefaultT2VBackend: "Default T2V Backend",
     labelT2VNpuRunner: "T2V NPU Runner",
     labelT2VNpuModelDir: "T2V NPU Model Directory",
+    labelVramDirectThresholdGb: "VRAM Direct Load Threshold (GB)",
+    labelEnableDeviceMapAuto: "Enable device_map='auto'",
+    labelEnableModelCpuOffload: "Enable CPU Offload Fallback",
     labelDefaultTextModel: "Default: Text to Video",
     labelDefaultImageModel: "Default: Image to Video",
     labelDefaultTextImageModel: "Default: Text to Image",
@@ -407,6 +410,24 @@ const I18N = {
     statusCompleted: "completed",
     statusError: "error",
     labelTaskLog: "Task Log",
+    labelTaskStep: "Step",
+    taskStepUnknown: "Step: idle",
+    stepQueued: "queued",
+    stepModelLoad: "loading model",
+    stepModelLoadGpu: "loading to VRAM",
+    stepModelLoadAutoMap: "loading with auto device_map",
+    stepModelLoadCpuOffload: "enabling CPU offload",
+    stepModelLoadCpu: "loading with low CPU memory mode",
+    stepLoraApply: "applying LoRA",
+    stepPrepare: "preparing",
+    stepInference: "inferencing",
+    stepDecode: "decoding",
+    stepEncode: "encoding",
+    stepSave: "saving",
+    stepMemoryCleanup: "releasing memory",
+    stepDone: "done",
+    stepFailed: "failed",
+    stepCancelled: "cancelled",
     statusCancelled: "cancelled",
     btnCancelTask: "Cancel Task",
     msgTaskCancelRequested: "Cancellation requested for task={id}",
@@ -430,6 +451,10 @@ const I18N = {
     serverGenerationQueued: "Generation queued",
     serverDownloadQueued: "Download queued",
     serverLoadingModel: "Loading model",
+    serverLoadingModelVram: "Loading model to VRAM",
+    serverLoadingModelAutoMap: "Loading with auto device_map",
+    serverLoadingModelCpuOffload: "Enabling CPU offload",
+    serverLoadingModelCpuLowMem: "Loading with low CPU memory mode",
     serverLoadingLora: "Applying LoRA",
     serverPreparingImage: "Preparing image",
     serverGeneratingImage: "Generating image",
@@ -438,6 +463,7 @@ const I18N = {
     serverDecodingLatentsCpuFallback: "Decoding latents",
     serverPostprocessingImage: "Postprocessing image",
     serverEncoding: "Encoding mp4",
+    serverMemoryCleanup: "Releasing memory",
     serverSavingPng: "Saving png",
     serverDone: "Done",
     serverGenerationFailed: "Generation failed",
@@ -517,6 +543,9 @@ const I18N = {
     labelDefaultT2VBackend: "既定T2Vバックエンド",
     labelT2VNpuRunner: "T2V NPUランナー",
     labelT2VNpuModelDir: "T2V NPUモデルディレクトリ",
+    labelVramDirectThresholdGb: "VRAM直ロードしきい値(GB)",
+    labelEnableDeviceMapAuto: "device_map='auto' を有効化",
+    labelEnableModelCpuOffload: "CPUオフロードフォールバックを有効化",
     labelDefaultTextModel: "既定: テキスト→動画",
     labelDefaultImageModel: "既定: 画像→動画",
     labelDefaultTextImageModel: "既定: テキスト→画像",
@@ -844,6 +873,24 @@ const I18N = {
     statusCompleted: "完了",
     statusError: "エラー",
     labelTaskLog: "タスクログ",
+    labelTaskStep: "ステップ",
+    taskStepUnknown: "ステップ: 待機",
+    stepQueued: "待機中",
+    stepModelLoad: "モデル読込中",
+    stepModelLoadGpu: "VRAMへロード中",
+    stepModelLoadAutoMap: "auto device_mapでロード中",
+    stepModelLoadCpuOffload: "CPUオフロード有効化中",
+    stepModelLoadCpu: "CPU低メモリモードでロード中",
+    stepLoraApply: "LoRA適用中",
+    stepPrepare: "準備中",
+    stepInference: "推論中",
+    stepDecode: "デコード中",
+    stepEncode: "エンコード中",
+    stepSave: "保存中",
+    stepMemoryCleanup: "メモリ解放中",
+    stepDone: "完了",
+    stepFailed: "失敗",
+    stepCancelled: "キャンセル",
     statusCancelled: "キャンセル",
     btnCancelTask: "タスクをキャンセル",
     msgTaskCancelRequested: "タスクのキャンセルを要求しました: {id}",
@@ -867,6 +914,10 @@ const I18N = {
     serverGenerationQueued: "生成キューに追加",
     serverDownloadQueued: "ダウンロードキューに追加",
     serverLoadingModel: "モデルを読み込み中",
+    serverLoadingModelVram: "VRAMにロード中",
+    serverLoadingModelAutoMap: "自動device_mapでロード中",
+    serverLoadingModelCpuOffload: "CPUオフロード有効化中",
+    serverLoadingModelCpuLowMem: "CPU低メモリモードでロード中",
     serverLoadingLora: "LoRAを適用中",
     serverPreparingImage: "画像を準備中",
     serverGeneratingImage: "画像を生成中",
@@ -875,6 +926,7 @@ const I18N = {
     serverDecodingLatentsCpuFallback: "潜在表現をデコード中",
     serverPostprocessingImage: "画像を後処理中",
     serverEncoding: "mp4に変換中",
+    serverMemoryCleanup: "メモリ解放中",
     serverSavingPng: "pngを保存中",
     serverDone: "完了",
     serverGenerationFailed: "生成に失敗",
@@ -1705,6 +1757,45 @@ function translateTaskStatus(status) {
   return status || t("taskTypeUnknown");
 }
 
+function translateTaskStep(step) {
+  const stepMap = {
+    queued: t("stepQueued"),
+    model_load: t("stepModelLoad"),
+    model_load_gpu: t("stepModelLoadGpu"),
+    model_load_auto_map: t("stepModelLoadAutoMap"),
+    model_load_cpu_offload: t("stepModelLoadCpuOffload"),
+    model_load_cpu: t("stepModelLoadCpu"),
+    lora_apply: t("stepLoraApply"),
+    prepare: t("stepPrepare"),
+    inference: t("stepInference"),
+    decode: t("stepDecode"),
+    encode: t("stepEncode"),
+    save: t("stepSave"),
+    memory_cleanup: t("stepMemoryCleanup"),
+    done: t("stepDone"),
+    failed: t("stepFailed"),
+    cancelled: t("stepCancelled"),
+  };
+  const normalized = String(step || "").trim();
+  return stepMap[normalized] || normalized || t("taskStepUnknown");
+}
+
+function renderTaskStep(task) {
+  const row = el("taskStepRow");
+  const label = el("taskStepLabel");
+  if (!row || !label) return;
+  if (!task) {
+    row.className = "task-step-row idle";
+    label.textContent = t("taskStepUnknown");
+    return;
+  }
+  const status = String(task.status || "");
+  const rowStatusClass =
+    status === "completed" ? "done" : status === "error" ? "failed" : status === "cancelled" ? "cancelled" : "running";
+  row.className = `task-step-row ${rowStatusClass}`;
+  label.textContent = `${t("labelTaskStep")}: ${translateTaskStep(task.step)}`;
+}
+
 function translateServerMessage(message) {
   const raw = (message || "").trim();
   if (!raw) return "";
@@ -1720,6 +1811,11 @@ function translateServerMessage(message) {
     "Generation queued": t("serverGenerationQueued"),
     "Download queued": t("serverDownloadQueued"),
     "Loading model": t("serverLoadingModel"),
+    "VRAMにロード中 (device_map={'': 'cuda'})": t("serverLoadingModelVram"),
+    "VRAMにロード中 (device_map='cuda')": t("serverLoadingModelVram"),
+    "自動device_mapでロード中": t("serverLoadingModelAutoMap"),
+    "CPUオフロード有効化中": t("serverLoadingModelCpuOffload"),
+    "CPU低メモリモードでロード中": t("serverLoadingModelCpuLowMem"),
     "Applying LoRA": t("serverLoadingLora"),
     "Preparing image": t("serverPreparingImage"),
     "Generating image": t("serverGeneratingImage"),
@@ -1728,6 +1824,7 @@ function translateServerMessage(message) {
     "Decoding latents (CPU fallback)": t("serverDecodingLatents"),
     "Postprocessing image": t("serverPostprocessingImage"),
     "Encoding mp4": t("serverEncoding"),
+    "メモリ解放中": t("serverMemoryCleanup"),
     "Saving png": t("serverSavingPng"),
     Done: t("serverDone"),
     "Generation failed": t("serverGenerationFailed"),
@@ -1753,6 +1850,25 @@ async function loadRuntimeInfo() {
     if (info.torch_version) flags.push(`${t("runtimeTorch")}=${info.torch_version}`);
     if (info.dtype) flags.push(`dtype=${info.dtype}`);
     if (info.bf16_supported !== undefined) flags.push(`bf16_supported=${info.bf16_supported}`);
+    if (info.hardware_profile) {
+      const hw = info.hardware_profile;
+      if (hw.gpu_total_bytes) {
+        flags.push(`VRAM=${formatModelSize(hw.gpu_free_bytes)}/${formatModelSize(hw.gpu_total_bytes)}`);
+      }
+      if (hw.host_total_bytes) {
+        flags.push(`RAM=${formatModelSize(hw.host_available_bytes)}/${formatModelSize(hw.host_total_bytes)}`);
+      }
+      if (hw.gpu_name) {
+        flags.push(`GPU=${hw.gpu_name}`);
+      }
+    }
+    if (info.load_policy_preview?.selected_policy_name) {
+      flags.push(`load_policy=${info.load_policy_preview.selected_policy_name}`);
+      flags.push(`vram_threshold_gb=${info.load_policy_preview.vram_gpu_direct_load_threshold_gb}`);
+    }
+    if (info.last_load_policy?.policy?.name) {
+      flags.push(`last_load_policy=${info.last_load_policy.policy.name}`);
+    }
     if (info.npu_reason) flags.push(`${t("runtimeNpuReason")}=${info.npu_reason}`);
     if (info.aotriton_mismatch?.warning) flags.push(`AOTriton=${info.aotriton_mismatch.warning}`);
     if (info.import_error) flags.push(`${t("runtimeError")}=${info.import_error}`);
@@ -1803,8 +1919,17 @@ function applySettings(settings) {
     el("cfgRocmAotriton").checked = serverSettings?.rocm_aotriton_experimental !== false;
   }
   if (el("cfgPreferredDtype")) {
-    const preferred = String(serverSettings?.preferred_dtype || "float16").toLowerCase();
-    el("cfgPreferredDtype").value = preferred === "bf16" ? "bf16" : "float16";
+    const preferred = String(serverSettings?.preferred_dtype || "bf16").toLowerCase();
+    el("cfgPreferredDtype").value = preferred === "float16" ? "float16" : "bf16";
+  }
+  if (el("cfgVramDirectThresholdGb")) {
+    el("cfgVramDirectThresholdGb").value = Number(serverSettings?.vram_gpu_direct_load_threshold_gb || 48);
+  }
+  if (el("cfgEnableDeviceMapAuto")) {
+    el("cfgEnableDeviceMapAuto").checked = serverSettings?.enable_device_map_auto !== false;
+  }
+  if (el("cfgEnableModelCpuOffload")) {
+    el("cfgEnableModelCpuOffload").checked = serverSettings?.enable_model_cpu_offload !== false;
   }
   if (el("cfgGpuMaxConcurrency")) {
     el("cfgGpuMaxConcurrency").value = Number(serverSettings?.gpu_max_concurrency || 1);
@@ -2134,7 +2259,10 @@ async function saveSettings(event) {
     server: {
       listen_port: Number(el("cfgListenPort").value),
       rocm_aotriton_experimental: Boolean(el("cfgRocmAotriton")?.checked),
-      preferred_dtype: (el("cfgPreferredDtype")?.value || "float16").trim(),
+      preferred_dtype: (el("cfgPreferredDtype")?.value || "bf16").trim(),
+      vram_gpu_direct_load_threshold_gb: Number(el("cfgVramDirectThresholdGb")?.value || 48),
+      enable_device_map_auto: Boolean(el("cfgEnableDeviceMapAuto")?.checked),
+      enable_model_cpu_offload: Boolean(el("cfgEnableModelCpuOffload")?.checked),
       gpu_max_concurrency: Number(el("cfgGpuMaxConcurrency")?.value || 1),
       allow_software_video_fallback: Boolean(el("cfgSoftwareVideoFallback")?.checked),
       t2v_backend: (el("cfgT2VBackend")?.value || "auto").trim(),
@@ -3531,10 +3659,12 @@ async function generateImage2Image(event) {
 function renderTask(task) {
   if (!task) {
     state.currentTaskSnapshot = null;
+    renderTaskStep(null);
     setGenerationBusy(false);
     return;
   }
   state.currentTaskSnapshot = task || null;
+  renderTaskStep(task);
   renderTaskProgress(task);
   showTaskErrorPopup(task);
   const suppressDownloadProgressText =
@@ -3790,6 +3920,7 @@ async function bootstrap() {
   state.language = detectInitialLanguage();
   bindLanguageSelector();
   setLanguage(state.language);
+  renderTaskStep(null);
   setTabs();
   bindModelSelectors();
   state.localViewMode = el("localViewMode")?.value === "flat" ? "flat" : "tree";

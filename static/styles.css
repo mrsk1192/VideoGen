@@ -1316,7 +1316,38 @@ button.is-busy {
   font-family: "IBM Plex Mono", monospace;
   font-size: 0.85rem;
   color: #d2e4f2;
+  margin-bottom: 0.35rem;
+}
+
+.task-step-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.75rem;
+  color: #9ac5dc;
   margin-bottom: 0.7rem;
+}
+
+.task-step-spinner {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #2dd4bf;
+  animation: spin 0.85s linear infinite;
+}
+
+.task-step-row.idle .task-step-spinner {
+  animation: none;
+  opacity: 0.35;
+}
+
+.task-step-row.done .task-step-spinner,
+.task-step-row.failed .task-step-spinner,
+.task-step-row.cancelled .task-step-spinner {
+  animation: none;
+  opacity: 0.55;
 }
 
 .task-progress-wrap {

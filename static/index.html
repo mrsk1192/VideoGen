@@ -400,9 +400,21 @@
           <label>
             <span>Preferred DType</span>
             <select id="cfgPreferredDtype">
-              <option value="float16">float16</option>
               <option value="bf16">bf16</option>
+              <option value="float16">float16</option>
             </select>
+          </label>
+          <label>
+            <span data-i18n="labelVramDirectThresholdGb">VRAM Direct Load Threshold (GB)</span>
+            <input id="cfgVramDirectThresholdGb" type="number" min="1" max="256" step="1" value="48" />
+          </label>
+          <label>
+            <span data-i18n="labelEnableDeviceMapAuto">Enable device_map='auto'</span>
+            <input id="cfgEnableDeviceMapAuto" type="checkbox" checked />
+          </label>
+          <label>
+            <span data-i18n="labelEnableModelCpuOffload">Enable CPU Offload Fallback</span>
+            <input id="cfgEnableModelCpuOffload" type="checkbox" checked />
           </label>
           <label>
             <span>GPU Max Concurrency</span>
@@ -485,6 +497,10 @@
 
     <section class="status">
       <div id="taskStatus" data-i18n="statusNoTask">No task running.</div>
+      <div id="taskStepRow" class="task-step-row">
+        <span id="taskStepSpinner" class="task-step-spinner" aria-hidden="true"></span>
+        <span id="taskStepLabel" data-i18n="taskStepUnknown">Step: idle</span>
+      </div>
       <button id="cancelCurrentTaskBtn" type="button" class="ghost-btn" disabled>Cancel Task</button>
       <div id="taskProgressWrap" class="task-progress-wrap" aria-live="polite">
         <div id="taskProgressBar" class="task-progress-bar"></div>
