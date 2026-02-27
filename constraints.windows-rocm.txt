@@ -1,5 +1,6 @@
 # Windows + ROCm + VideoGen crash-triage baseline
-# Use with: pip install -r requirements.txt -c constraints.windows-rocm.txt
+# Use with: pip install -r requirements.windows-rocm.txt
+# NOTE: ROCm torch wheels are provided via direct URL in requirements.windows-rocm.txt.
 torch==2.9.0+rocmsdk20251116
 torchvision==0.24.0+rocmsdk20251116
 safetensors==0.6.2

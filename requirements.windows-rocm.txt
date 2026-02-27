@@ -1,0 +1,8 @@
+# Windows + ROCm (ROCm SDK 7.1.1) bootstrap requirements.
+# This file must be used instead of `requirements.txt` when creating a clean venv.
+# `torch==2.9.0+rocmsdk20251116` is not published on the default PyPI index.
+https://repo.radeon.com/rocm/windows/rocm-rel-7.1.1/torch-2.9.0+rocmsdk20251116-cp312-cp312-win_amd64.whl
+https://repo.radeon.com/rocm/windows/rocm-rel-7.1.1/torchvision-0.24.0+rocmsdk20251116-cp312-cp312-win_amd64.whl
+
+-r requirements.txt
+-c constraints.windows-rocm.txt

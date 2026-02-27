@@ -53,6 +53,18 @@ setup_rocm72.bat
 - ROCm 7.2 対応 `torch/torchaudio/torchvision` インストール
 - `requirements.txt` インストール
 
+## クリーンvenv手動セットアップ（Windows + ROCm）
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip setuptools wheel
+python -m pip install -r requirements.windows-rocm.txt
+```
+
+`torch==2.9.0+rocmsdk20251116` は通常の PyPI にはないため、
+`requirements.txt` + `constraints.windows-rocm.txt` だけでは解決できません。
+
 ## 起動
 
 ```bash

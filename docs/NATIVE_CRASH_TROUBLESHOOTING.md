@@ -22,11 +22,15 @@ cd C:\AI\VideoGen
 py -3.12 -m venv .venv_clean
 .\.venv_clean\Scripts\Activate.ps1
 python -m pip install --upgrade pip setuptools wheel
-python -m pip install -r requirements.txt -c constraints.windows-rocm.txt
+python -m pip install -r requirements.windows-rocm.txt
 python -m pip check
 python -m compileall .
-python -m ruff check .
+python -m ruff check main.py videogen scripts tests
 ```
+
+Note:
+- `torch==2.9.0+rocmsdk20251116` is provided from Radeon's wheel URL, not from the default PyPI index.
+- Installing `requirements.txt` with only `-c constraints.windows-rocm.txt` will fail on clean environments.
 
 ## Version-difference probe for safetensors
 Use an isolated venv with system packages visible to quickly test only safetensors delta:
