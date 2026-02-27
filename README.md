@@ -163,6 +163,21 @@ VAE は `Text to Image` / `Image to Image` タブで選択できます。
     - Windows: `{status:\"ok\", path:\"...\"}`
     - 非Windows: `{status:\"not_supported\", reason:\"...\"}`
 
+## Runtime / Task Ops API（追加）
+
+- `GET /api/runtime`
+  - ROCm/CUDA 利用可否、dtype 方針、AOTriton/allocator env、GPUメモリ情報を返します。
+  - `GET /api/system/info` は後方互換で維持されています。
+
+- `POST /api/tasks/cancel`
+  - body:
+    - `task_id`（必須）
+  - response:
+    - `{status: "ok", task: {...}}`
+  - 備考:
+    - 生成系・CivitAIストリームDLはキャンセル反映されます。
+    - HF `snapshot_download` は処理開始後に即中断できない場合があります（サーバログに明示）。
+
 ## 手動テスト手順（Model Search）
 
 1. `start.bat` で起動し、`Models` タブを開く
@@ -199,10 +214,22 @@ VAE は `Text to Image` / `Image to Image` タブで選択できます。
 
 - 設定: `data/settings.json`
   - `server.rocm_aotriton_experimental`: `true/false`（`start.bat` 起動時に `TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=1/0` へ反映）
+  - `server.preferred_dtype`: `float16|bf16`
+  - `server.gpu_max_concurrency`: 生成系の同時実行上限（既定 `1`）
+  - `server.allow_software_video_fallback`: `true` の場合、AMF失敗時に `libx264` へフォールバック
+  - `server.request_timeout_sec` / `server.request_retry_count` / `server.request_retry_backoff_sec`
 - モデル: `models/`
 - 生成画像/動画: `outputs/`
 - 一時画像: `tmp/`
 - ログ: `logs/YYYYMMDD_HHMMSS_videogen_pid<process-id>.log`（起動プロセスごとに作成、`data/settings.json` の `paths.logs_dir` で変更可）
+
+## 開発ツール
+
+- `ruff` / `black` を導入（`pyproject.toml`）
+- 依存:
+  - `requirements-test.txt` に `ruff`, `black` を追加
+  - `requirements.txt` に `httpx` を追加
+- 設計判断の詳細: `docs/ARCHITECTURE.md`
 
 ## ログ確認
 

@@ -3,8 +3,8 @@ import os
 import time
 from pathlib import Path
 
-import pytest
 import numpy as np
+import pytest
 from fastapi.testclient import TestClient
 from PIL import Image
 
@@ -1080,3 +1080,21 @@ def test_clear_hf_cache_endpoint(client: TestClient, tmp_path: Path, monkeypatch
     assert str(transformers.resolve()) in body["removed_paths"]
     assert not hub.exists()
     assert not transformers.exists()
+
+
+def test_runtime_endpoint(client: TestClient) -> None:
+    resp = client.get("/api/runtime")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert "rocm_aotriton_env" in body
+    assert "preferred_dtype" in body
+
+
+def test_cancel_task_endpoint(client: TestClient) -> None:
+    task_id = main.create_task("download", "queued")
+    main.update_task(task_id, status="running", progress=0.1, message="running")
+    resp = client.post("/api/tasks/cancel", json={"task_id": task_id})
+    assert resp.status_code == 200
+    task = client.get(f"/api/tasks/{task_id}")
+    assert task.status_code == 200
+    assert task.json()["cancel_requested"] is True
