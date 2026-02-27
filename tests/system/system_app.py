@@ -1,10 +1,9 @@
+import json
 from pathlib import Path
 
-import json
 from PIL import Image
 
 import main
-
 
 BASE = Path(__file__).resolve().parents[2]
 RUNTIME = BASE / "artifacts" / "tests" / "system_runtime"

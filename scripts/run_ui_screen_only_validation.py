@@ -385,8 +385,8 @@ def run() -> int:
             set_text(driver, "t2iWidth", "512")
             set_text(driver, "t2iHeight", "512")
             if use_lora_vae:
-                l = select_first_non_empty(driver, "t2iLoraSelect")
-                set_multi_values(driver, "t2iLoraSelect", [l] if l else [])
+                selected_lora = select_first_non_empty(driver, "t2iLoraSelect")
+                set_multi_values(driver, "t2iLoraSelect", [selected_lora] if selected_lora else [])
                 set_text(driver, "t2iLoraScale", "0.8")
                 select_first_non_empty(driver, "t2iVaeSelect")
             else:
@@ -415,8 +415,8 @@ def run() -> int:
             set_text(driver, "i2iWidth", "512")
             set_text(driver, "i2iHeight", "512")
             if use_lora_vae:
-                l = select_first_non_empty(driver, "i2iLoraSelect")
-                set_multi_values(driver, "i2iLoraSelect", [l] if l else [])
+                selected_lora = select_first_non_empty(driver, "i2iLoraSelect")
+                set_multi_values(driver, "i2iLoraSelect", [selected_lora] if selected_lora else [])
                 set_text(driver, "i2iLoraScale", "0.8")
                 select_first_non_empty(driver, "i2iVaeSelect")
             else:

@@ -13,7 +13,6 @@ from selenium.webdriver.edge.options import Options as EdgeOptions
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
 
-
 ARTIFACTS = Path(__file__).resolve().parents[2] / "artifacts" / "tests" / "system"
 ARTIFACTS.mkdir(parents=True, exist_ok=True)
 

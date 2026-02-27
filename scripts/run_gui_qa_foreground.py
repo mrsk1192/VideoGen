@@ -18,7 +18,7 @@ from urllib.parse import unquote, urlparse
 import requests
 from PIL import Image, ImageFilter, ImageStat
 from selenium import webdriver
-from selenium.common.exceptions import TimeoutException, WebDriverException
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.options import Options as EdgeOptions
 from selenium.webdriver.support import expected_conditions as EC
@@ -239,10 +239,13 @@ def select_first_non_empty(driver: Any, elem_id: str) -> Optional[str]:
 
 def select_preferred_option(driver: Any, elem_id: str, preferred_keys: list[str]) -> Optional[str]:
     elem = driver.find_element(By.ID, elem_id)
-    rows = driver.execute_script(
-        "return Array.from(arguments[0].options).map(o => ({value: o.value || '', text: o.text || ''}));",
-        elem,
-    ) or []
+    rows = (
+        driver.execute_script(
+            "return Array.from(arguments[0].options).map(o => ({value: o.value || '', text: o.text || ''}));",
+            elem,
+        )
+        or []
+    )
     keys = [str(k).strip().lower() for k in preferred_keys if str(k).strip()]
     for row in rows:
         value = str((row or {}).get("value") or "").strip()

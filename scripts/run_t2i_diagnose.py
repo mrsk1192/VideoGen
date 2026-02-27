@@ -19,7 +19,6 @@ from selenium.webdriver.edge.options import Options as EdgeOptions
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
 
-
 ROOT = Path(__file__).resolve().parents[1]
 START_BAT = ROOT / "start.bat"
 ART_DIR = ROOT / "artifacts" / "t2i_diagnose" / datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -150,10 +149,13 @@ def wait_new_task_id(driver: Any, prev: str, timeout_sec: int = 120) -> str:
 
 def choose_model(driver: Any, select_id: str, token: str) -> bool:
     elem = driver.find_element(By.ID, select_id)
-    options: list[dict[str, str]] = driver.execute_script(
-        "return Array.from(arguments[0].options).map(o => ({value:o.value,text:o.textContent||''}));",
-        elem,
-    ) or []
+    options: list[dict[str, str]] = (
+        driver.execute_script(
+            "return Array.from(arguments[0].options).map(o => ({value:o.value,text:o.textContent||''}));",
+            elem,
+        )
+        or []
+    )
     token_lower = token.lower()
     for opt in options:
         value = str(opt.get("value") or "")
@@ -226,9 +228,7 @@ def summarize_monitor(rows: list[dict[str, Any]]) -> dict[str, Any]:
     t98 = first_time(lambda r: (r.get("progress") or 0) >= 0.98)
     t100 = first_time(lambda r: r.get("status") == "completed")
     max_cpu = max((float(r.get("server_cpu_percent") or 0.0) for r in rows), default=0.0)
-    avg_cpu = (
-        sum(float(r.get("server_cpu_percent") or 0.0) for r in rows) / len(rows) if rows else 0.0
-    )
+    avg_cpu = sum(float(r.get("server_cpu_percent") or 0.0) for r in rows) / len(rows) if rows else 0.0
     max_rss = max((int(r.get("server_rss_bytes") or 0) for r in rows), default=0)
     return {
         "first_progress_90": t90,
@@ -276,9 +276,7 @@ def main() -> int:
         click_tab(wait, "settings")
         models_dir = driver.find_element(By.ID, "cfgModelsDir").get_attribute("value")
         result["models_dir"] = models_dir
-        current_log_level = (
-            driver.find_element(By.ID, "cfgLogLevel").get_attribute("value") or "INFO"
-        ).strip()
+        current_log_level = (driver.find_element(By.ID, "cfgLogLevel").get_attribute("value") or "INFO").strip()
         result["log_level"] = current_log_level
 
         click_tab(wait, "models")
@@ -327,8 +325,7 @@ def main() -> int:
         set_value(driver, "t2iHeight", "640")
         set_value(driver, "t2iSeed", "42")
         set_value(driver, "t2iLoraScale", "1.0")
-        driver.execute_script(
-            """
+        driver.execute_script("""
             const lora = document.getElementById('t2iLoraSelect');
             if (lora) {
               for (const opt of lora.options) opt.selected = false;
@@ -339,8 +336,7 @@ def main() -> int:
               vae.value = '';
               vae.dispatchEvent(new Event('change',{bubbles:true}));
             }
-            """
-        )
+            """)
         selected = refresh_and_wait_model(
             driver,
             "refreshT2IModels",
