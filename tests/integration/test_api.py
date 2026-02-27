@@ -1140,6 +1140,8 @@ def test_runtime_endpoint(client: TestClient) -> None:
     body = resp.json()
     assert "rocm_aotriton_env" in body
     assert "preferred_dtype" in body
+    assert "hardware_profile" in body
+    assert "load_policy_preview" in body
 
 
 def test_cancel_task_endpoint(client: TestClient) -> None:

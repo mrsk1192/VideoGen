@@ -47,9 +47,9 @@ def select_device_and_dtype(
     server_settings = settings.get("server", {})
     require_gpu = parse_bool_setting(server_settings.get("require_gpu", True), default=True)
     allow_cpu_fallback = parse_bool_setting(server_settings.get("allow_cpu_fallback", False), default=False)
-    preferred_dtype = str(server_settings.get("preferred_dtype", "float16")).strip().lower()
+    preferred_dtype = str(server_settings.get("preferred_dtype", "bf16")).strip().lower()
     if preferred_dtype not in {"float16", "bf16"}:
-        preferred_dtype = "float16"
+        preferred_dtype = "bf16"
 
     cuda_available = bool(torch_module.cuda.is_available())
     if not cuda_available:
@@ -95,7 +95,10 @@ def runtime_diagnostics(
         "pytorch_alloc_conf": os.environ.get("PYTORCH_ALLOC_CONF", ""),
         "require_gpu": parse_bool_setting(server_settings.get("require_gpu", True), default=True),
         "allow_cpu_fallback": parse_bool_setting(server_settings.get("allow_cpu_fallback", False), default=False),
-        "preferred_dtype": str(server_settings.get("preferred_dtype", "float16")).strip().lower(),
+        "preferred_dtype": str(server_settings.get("preferred_dtype", "bf16")).strip().lower(),
+        "vram_gpu_direct_load_threshold_gb": float(server_settings.get("vram_gpu_direct_load_threshold_gb", 48.0) or 48.0),
+        "enable_device_map_auto": parse_bool_setting(server_settings.get("enable_device_map_auto", True), default=True),
+        "enable_model_cpu_offload": parse_bool_setting(server_settings.get("enable_model_cpu_offload", True), default=True),
         "allow_software_video_fallback": parse_bool_setting(server_settings.get("allow_software_video_fallback", False), default=False),
         "gpu_max_concurrency": int(server_settings.get("gpu_max_concurrency", 1) or 1),
     }
@@ -119,7 +122,7 @@ def runtime_diagnostics(
         )
         output["device"] = selected_device
         output["dtype"] = selected_dtype
-        preferred_dtype = str(server_settings.get("preferred_dtype", "float16")).strip().lower()
+        preferred_dtype = str(server_settings.get("preferred_dtype", "bf16")).strip().lower()
         if preferred_dtype == "bf16" and selected_dtype != "bf16":
             output["dtype_warning"] = "bf16 was requested but not supported. Falling back to float16."
     except Exception as exc:

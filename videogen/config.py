@@ -23,7 +23,10 @@ DEFAULT_SETTINGS: Dict[str, Any] = {
         "t2v_npu_runner": "",
         "t2v_npu_model_dir": "",
         "gpu_max_concurrency": 1,
-        "preferred_dtype": "float16",
+        "preferred_dtype": "bf16",
+        "vram_gpu_direct_load_threshold_gb": 48.0,
+        "enable_device_map_auto": True,
+        "enable_model_cpu_offload": True,
         "allow_software_video_fallback": False,
         "request_timeout_sec": 20,
         "request_retry_count": 2,
@@ -119,8 +122,15 @@ def sanitize_settings(payload: Dict[str, Any]) -> Dict[str, Any]:
         gpu_max_concurrency = 1
     server["gpu_max_concurrency"] = max(1, min(gpu_max_concurrency, 8))
 
-    preferred_dtype = str(server.get("preferred_dtype", "float16")).strip().lower()
-    server["preferred_dtype"] = preferred_dtype if preferred_dtype in {"float16", "bf16"} else "float16"
+    preferred_dtype = str(server.get("preferred_dtype", "bf16")).strip().lower()
+    server["preferred_dtype"] = preferred_dtype if preferred_dtype in {"float16", "bf16"} else "bf16"
+    server["enable_device_map_auto"] = parse_bool_setting(server.get("enable_device_map_auto", True), default=True)
+    server["enable_model_cpu_offload"] = parse_bool_setting(server.get("enable_model_cpu_offload", True), default=True)
+    try:
+        threshold_gb = float(server.get("vram_gpu_direct_load_threshold_gb", 48.0))
+    except Exception:
+        threshold_gb = 48.0
+    server["vram_gpu_direct_load_threshold_gb"] = max(1.0, min(threshold_gb, 256.0))
 
     try:
         timeout_sec = float(server.get("request_timeout_sec", 20))

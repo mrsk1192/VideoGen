@@ -27,6 +27,7 @@ class TaskManager:
                 "id": task_id,
                 "task_type": task_type,
                 "status": "queued",
+                "step": "queued",
                 "progress": 0.0,
                 "message": message,
                 "created_at": now,
@@ -85,6 +86,7 @@ class TaskManager:
             if status in {"completed", "error", "cancelled"}:
                 return copy.deepcopy(task)
             task["cancel_requested"] = True
+            task["step"] = "cancel_requested"
             task["message"] = "Cancellation requested"
             task["updated_at"] = utc_now()
             return copy.deepcopy(task)
@@ -144,4 +146,3 @@ def task_progress_heartbeat(
     finally:
         stop_event.set()
         heartbeat.join(timeout=2.0)
-

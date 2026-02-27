@@ -55,6 +55,12 @@ from videogen.config import (
 from videogen.config import (
     sanitize_settings as config_sanitize_settings,
 )
+from videogen.model_loader import (
+    build_load_policies,
+    build_load_policy_preview,
+    detect_hardware_profile,
+    resolve_offload_dir,
+)
 from videogen.runtime import (
     apply_pre_torch_env,
     select_device_and_dtype,
@@ -127,6 +133,8 @@ PRELOAD_STATE: Dict[str, Any] = {
     "last_error": None,
     "last_model": None,
 }
+LAST_LOAD_POLICY_LOCK = threading.Lock()
+LAST_LOAD_POLICY: Dict[str, Dict[str, Any]] = {}
 PROCESS_LOG_TIMESTAMP = time.strftime("%Y%m%d_%H%M%S", time.localtime())
 LOG_FILE_NAME = f"{PROCESS_LOG_TIMESTAMP}_videogen_pid{os.getpid()}.log"
 LOG_FILE_MAX_BYTES = 10 * 1024 * 1024
@@ -485,6 +493,14 @@ def detach_exception_state(exc: BaseException) -> None:
 
 
 def clear_cuda_allocator_cache(reason: str) -> None:
+    """
+    CUDA/HIP allocator cacheを明示解放する。
+
+    乱用すると再確保コストで遅くなるため、基本は
+    - OOMリカバリ直後
+    - 大きなパイプライン切替直前/直後
+    のようなメモリ断片化対策が必要な場面に限定して呼ぶ。
+    """
     if TORCH_IMPORT_ERROR or not torch.cuda.is_available():
         return
     with contextlib.suppress(Exception):
@@ -826,6 +842,16 @@ def detect_runtime() -> Dict[str, Any]:
         t2v_backend_default=configured_t2v_backend,
         t2v_npu_runner_configured=npu_runner_configured,
     )
+    hardware_profile = detect_hardware_profile(torch_module=torch, import_error=TORCH_IMPORT_ERROR)
+    runtime_info["hardware_profile"] = hardware_profile.to_dict()
+    runtime_info["load_policy_preview"] = build_load_policy_preview(
+        settings=settings,
+        hardware=hardware_profile,
+        offload_dir=resolve_offload_dir(BASE_DIR),
+    )
+    last_policy = latest_load_policy()
+    if last_policy:
+        runtime_info["last_load_policy"] = last_policy
     runtime_info["pre_torch_env"] = PRE_TORCH_ENV
     runtime_info["gpu_max_concurrency_effective"] = GPU_SEMAPHORE_LIMIT
     expected_aotriton = "1" if parse_bool_setting(settings.get("server", {}).get("rocm_aotriton_experimental", True), True) else "0"
@@ -1167,6 +1193,57 @@ def load_diffusers_components() -> Dict[str, Any]:
     return DIFFUSERS_COMPONENTS
 
 
+def record_last_load_policy(cache_key: str, policy: Dict[str, Any]) -> None:
+    key = str(cache_key or "").strip()
+    if not key:
+        return
+    with LAST_LOAD_POLICY_LOCK:
+        LAST_LOAD_POLICY[key] = {
+            **policy,
+            "updated_at": utc_now(),
+        }
+
+
+def latest_load_policy() -> Optional[Dict[str, Any]]:
+    with LAST_LOAD_POLICY_LOCK:
+        values = list(LAST_LOAD_POLICY.values())
+    if not values:
+        return None
+    values.sort(key=lambda item: str(item.get("updated_at") or ""), reverse=True)
+    return values[0]
+
+
+def infer_task_step_from_message(message: str) -> str:
+    text = str(message or "").strip().lower()
+    if not text:
+        return "queued"
+    if "vramにロード中" in text or "device_map='cuda'" in text or "device_map={'': 'cuda'}" in text:
+        return "model_load_gpu"
+    if "自動device_map" in text or "device_map='auto'" in text:
+        return "model_load_auto_map"
+    if "cpuオフロード" in text:
+        return "model_load_cpu_offload"
+    if "loading model" in text or "cpu低メモリモードでロード中" in text:
+        return "model_load"
+    if "applying lora" in text:
+        return "lora_apply"
+    if "preparing" in text:
+        return "prepare"
+    if "generating" in text:
+        return "inference"
+    if "decoding" in text:
+        return "decode"
+    if "encoding" in text or "encoded framepack" in text:
+        return "encode"
+    if "saving" in text:
+        return "save"
+    if "cleanup" in text or "解放" in text:
+        return "memory_cleanup"
+    if "done" in text:
+        return "done"
+    return "running"
+
+
 def create_task(task_type: str, message: str = "Queued") -> str:
     task_id = TASK_MANAGER.create(task_type, message)
     LOGGER.info("task created id=%s type=%s message=%s", task_id, task_type, message)
@@ -1174,8 +1251,19 @@ def create_task(task_type: str, message: str = "Queued") -> str:
 
 
 def update_task(task_id: str, **updates: Any) -> None:
+    normalized_updates = dict(updates)
+    if "status" in normalized_updates and "step" not in normalized_updates:
+        status_text = str(normalized_updates.get("status") or "")
+        if status_text == "completed":
+            normalized_updates["step"] = "done"
+        elif status_text == "error":
+            normalized_updates["step"] = "failed"
+        elif status_text == "cancelled":
+            normalized_updates["step"] = "cancelled"
+    if "message" in normalized_updates and "step" not in normalized_updates:
+        normalized_updates["step"] = infer_task_step_from_message(str(normalized_updates.get("message") or ""))
     previous = TASK_MANAGER.get(task_id)
-    TASK_MANAGER.update(task_id, **updates)
+    TASK_MANAGER.update(task_id, **normalized_updates)
     current = TASK_MANAGER.get(task_id)
     if not previous or not current:
         return
@@ -1189,8 +1277,24 @@ def update_task(task_id: str, **updates: Any) -> None:
             float(current.get("progress") or 0.0),
             current.get("message"),
         )
-    if updates.get("error"):
-        LOGGER.error("task error id=%s error=%s", task_id, updates.get("error"))
+    if normalized_updates.get("error"):
+        LOGGER.error("task error id=%s error=%s", task_id, normalized_updates.get("error"))
+
+
+def build_model_load_status_callback(task_id: str) -> Callable[[str, str], None]:
+    step_progress = {
+        "model_load": 0.06,
+        "model_load_gpu": 0.08,
+        "model_load_auto_map": 0.10,
+        "model_load_cpu_offload": 0.12,
+        "model_load_cpu": 0.11,
+    }
+
+    def _callback(step: str, message: str) -> None:
+        progress = step_progress.get(str(step or "").strip(), 0.08)
+        update_task(task_id, progress=progress, step=step, message=message)
+
+    return _callback
 
 
 @contextlib.contextmanager
@@ -1229,6 +1333,17 @@ def is_task_cancelled(task_id: str) -> bool:
 
 def ensure_task_not_cancelled(task_id: str) -> None:
     TASK_MANAGER.check_cancelled(task_id)
+
+
+def mark_task_memory_cleanup_if_active(task_id: str) -> None:
+    task = get_task(task_id)
+    if not task:
+        return
+    status = str(task.get("status") or "")
+    if status not in {"queued", "running"}:
+        return
+    progress = float(task.get("progress") or 0.0)
+    update_task(task_id, progress=max(progress, 0.95), step="memory_cleanup", message="メモリ解放中")
 
 
 def resolve_model_source(model_ref: str, settings: Dict[str, Any]) -> str:
@@ -1466,7 +1581,7 @@ def get_vae(vae_ref: str, settings: Dict[str, Any], device: str, dtype: Any) -> 
             return cached
     components = load_diffusers_components()
     AutoencoderKL = components["AutoencoderKL"]
-    vae = AutoencoderKL.from_pretrained(source, torch_dtype=dtype)
+    vae = AutoencoderKL.from_pretrained(source, torch_dtype=dtype, low_cpu_mem_usage=True)
     vae = vae.to(device)
     with VAES_LOCK:
         VAES[source] = vae
@@ -1557,60 +1672,25 @@ def load_pipeline_from_pretrained_with_strategy(
     dtype: Any,
     prefer_gpu_device_map: bool,
     kind: str,
+    settings: Dict[str, Any],
+    cache_key: str = "",
+    status_callback: Optional[Callable[[str, str], None]] = None,
 ) -> Any:
-    base_kwargs: Dict[str, Any] = {"torch_dtype": dtype}
-    offload_dir_raw = os.environ.get("VIDEOGEN_PRETRAINED_OFFLOAD_DIR", "").strip()
-    if offload_dir_raw:
-        offload_dir = resolve_path(offload_dir_raw)
-    else:
-        offload_dir = resolve_path("tmp") / "pretrained_offload"
-    with contextlib.suppress(Exception):
-        offload_dir.mkdir(parents=True, exist_ok=True)
-
-    gpu_first_base_kwargs: Dict[str, Any] = {
-        **base_kwargs,
-        "low_cpu_mem_usage": True,
-        "offload_state_dict": True,
-        "offload_folder": str(offload_dir),
-    }
-    attempts: list[tuple[str, Dict[str, Any]]] = []
-    allow_fallback = parse_bool_setting(os.environ.get("VIDEOGEN_ALLOW_PRETRAINED_LOAD_FALLBACK", "0"), default=False)
-    if prefer_gpu_device_map:
-        attempts.append(
-            (
-                "device_map_cuda_safetensors",
-                {
-                    **gpu_first_base_kwargs,
-                    "device_map": "cuda",
-                    "use_safetensors": True,
-                },
-            )
-        )
-        attempts.append(
-            (
-                "device_map_cuda",
-                {
-                    **gpu_first_base_kwargs,
-                    "device_map": "cuda",
-                },
-            )
-        )
-    if (not prefer_gpu_device_map) or allow_fallback:
-        attempts.append(
-            (
-                "low_cpu_mem_usage",
-                {
-                    **base_kwargs,
-                    "low_cpu_mem_usage": True,
-                    "offload_state_dict": True,
-                    "offload_folder": str(offload_dir),
-                },
-            )
-        )
-        attempts.append(("baseline", dict(base_kwargs)))
-
+    offload_dir = resolve_offload_dir(BASE_DIR)
+    hardware_profile = detect_hardware_profile(torch_module=torch, import_error=TORCH_IMPORT_ERROR)
+    policies = build_load_policies(
+        settings=settings,
+        hardware=hardware_profile,
+        prefer_gpu_device_map=prefer_gpu_device_map,
+        offload_dir=offload_dir,
+    )
     last_error: Optional[Exception] = None
-    for strategy_name, kwargs in attempts:
+    for policy in policies:
+        strategy_name = policy.name
+        kwargs = policy.loader_kwargs(dtype)
+        if status_callback is not None:
+            with contextlib.suppress(Exception):
+                status_callback(policy.task_step, policy.task_message)
         with contextlib.suppress(Exception):
             gc.collect()
         clear_cuda_allocator_cache(reason=f"pretrained-load-before:{kind}:{strategy_name}")
@@ -1624,6 +1704,29 @@ def load_pipeline_from_pretrained_with_strategy(
                 ",".join(sorted(kwargs.keys())),
             )
             pipe = loader(source, **kwargs)
+            if policy.enable_model_cpu_offload and hasattr(pipe, "enable_model_cpu_offload"):
+                if status_callback is not None:
+                    with contextlib.suppress(Exception):
+                        status_callback("model_load_cpu_offload", "CPUオフロード有効化中")
+                with contextlib.suppress(Exception):
+                    pipe.enable_model_cpu_offload()
+                with contextlib.suppress(Exception):
+                    setattr(pipe, "_videogen_enable_cpu_offload", True)
+            else:
+                with contextlib.suppress(Exception):
+                    setattr(pipe, "_videogen_enable_cpu_offload", False)
+            with contextlib.suppress(Exception):
+                setattr(pipe, "_videogen_load_policy", policy.to_dict())
+            record_last_load_policy(
+                cache_key or f"{kind}:{source}",
+                {
+                    "cache_key": cache_key or f"{kind}:{source}",
+                    "kind": kind,
+                    "source": source,
+                    "policy": policy.to_dict(),
+                    "hardware_profile": hardware_profile.to_dict(),
+                },
+            )
             LOGGER.info(
                 "pipeline pretrained load success kind=%s strategy=%s source=%s",
                 kind,
@@ -1663,11 +1766,6 @@ def load_pipeline_from_pretrained_with_strategy(
             log_memory_snapshot("after-failure", kind=kind, source=source, strategy=strategy_name)
             continue
     if last_error is not None:
-        if prefer_gpu_device_map and not allow_fallback:
-            raise RuntimeError(
-                "GPU-first pipeline loading failed and CPU-heavy fallback is disabled. "
-                "Set VIDEOGEN_ALLOW_PRETRAINED_LOAD_FALLBACK=1 to allow fallback loading."
-            ) from last_error
         raise last_error
     raise RuntimeError(f"failed to load pipeline kind={kind} source={source}")
 
@@ -1678,6 +1776,7 @@ def get_pipeline(
     settings: Dict[str, Any],
     *,
     acquire_usage: bool = False,
+    status_callback: Optional[Callable[[str, str], None]] = None,
 ) -> Any:
     source = resolve_model_source(model_ref, settings)
     source_path = Path(source)
@@ -1736,7 +1835,16 @@ def get_pipeline(
                             kwargs["config"] = config
                         return StableDiffusionXLPipeline.from_single_file(source, **kwargs)
                     return StableDiffusionPipeline.from_single_file(source, torch_dtype=dtype)
-                return AutoPipelineForText2Image.from_pretrained(source, torch_dtype=dtype)
+                return load_pipeline_from_pretrained_with_strategy(
+                    loader=lambda src, **kwargs: AutoPipelineForText2Image.from_pretrained(src, **kwargs),
+                    source=source,
+                    dtype=dtype,
+                    prefer_gpu_device_map=True,
+                    kind=kind,
+                    settings=settings,
+                    cache_key=cache_key,
+                    status_callback=status_callback,
+                )
             if kind == "image-to-image":
                 if source_is_single_file:
                     family = infer_single_file_family(source_path)
@@ -1747,7 +1855,16 @@ def get_pipeline(
                             kwargs["config"] = config
                         return StableDiffusionXLImg2ImgPipeline.from_single_file(source, **kwargs)
                     return StableDiffusionImg2ImgPipeline.from_single_file(source, torch_dtype=dtype)
-                return AutoPipelineForImage2Image.from_pretrained(source, torch_dtype=dtype)
+                return load_pipeline_from_pretrained_with_strategy(
+                    loader=lambda src, **kwargs: AutoPipelineForImage2Image.from_pretrained(src, **kwargs),
+                    source=source,
+                    dtype=dtype,
+                    prefer_gpu_device_map=True,
+                    kind=kind,
+                    settings=settings,
+                    cache_key=cache_key,
+                    status_callback=status_callback,
+                )
             if kind == "text-to-video":
                 loaded = load_pipeline_from_pretrained_with_strategy(
                     loader=lambda src, **kwargs: DiffusionPipeline.from_pretrained(src, **kwargs),
@@ -1755,6 +1872,9 @@ def get_pipeline(
                     dtype=dtype,
                     prefer_gpu_device_map=True,
                     kind=kind,
+                    settings=settings,
+                    cache_key=cache_key,
+                    status_callback=status_callback,
                 )
                 if isinstance(loaded, TextToVideoSDPipeline) and hasattr(loaded, "scheduler") and hasattr(loaded.scheduler, "config"):
                     loaded.scheduler = DPMSolverMultistepScheduler.from_config(loaded.scheduler.config)
@@ -1770,6 +1890,9 @@ def get_pipeline(
                     dtype=dtype,
                     prefer_gpu_device_map=True,
                     kind=kind,
+                    settings=settings,
+                    cache_key=cache_key,
+                    status_callback=status_callback,
                 )
             return load_pipeline_from_pretrained_with_strategy(
                 loader=lambda src, **kwargs: I2VGenXLPipeline.from_pretrained(src, **kwargs),
@@ -1777,6 +1900,9 @@ def get_pipeline(
                 dtype=dtype,
                 prefer_gpu_device_map=True,
                 kind=kind,
+                settings=settings,
+                cache_key=cache_key,
+                status_callback=status_callback,
             )
 
         pipe: Any
@@ -1800,15 +1926,17 @@ def get_pipeline(
             else:
                 raise
         hf_device_map = getattr(pipe, "hf_device_map", None)
-        if not hf_device_map:
+        use_cpu_offload = bool(getattr(pipe, "_videogen_enable_cpu_offload", False))
+        if (not hf_device_map) and (not use_cpu_offload):
             pipe = pipe.to(device)
         else:
             with contextlib.suppress(Exception):
                 LOGGER.info(
-                    "pipeline uses hf_device_map kind=%s source=%s entries=%s",
+                    "pipeline placement is managed kind=%s source=%s hf_device_map_entries=%s cpu_offload=%s",
                     kind,
                     source,
                     len(hf_device_map) if isinstance(hf_device_map, dict) else 1,
+                    use_cpu_offload,
                 )
         if hasattr(pipe, "set_progress_bar_config"):
             with contextlib.suppress(Exception):
@@ -1842,14 +1970,23 @@ def get_pipeline_for_inference(
     kind: Literal["text-to-image", "image-to-image", "text-to-video", "image-to-video"],
     model_ref: str,
     settings: Dict[str, Any],
+    status_callback: Optional[Callable[[str, str], None]] = None,
 ) -> Any:
     try:
-        return get_pipeline(kind, model_ref, settings, acquire_usage=True)
+        return get_pipeline(
+            kind,
+            model_ref,
+            settings,
+            acquire_usage=True,
+            status_callback=status_callback,
+        )
     except TypeError as exc:
         text = str(exc)
-        if ("acquire_usage" not in text) or ("unexpected keyword argument" not in text):
+        if "unexpected keyword argument" not in text:
             raise
-        LOGGER.debug("get_pipeline compatibility fallback used kind=%s model_ref=%s", kind, model_ref)
+        LOGGER.debug("get_pipeline compatibility fallback used kind=%s model_ref=%s error=%s", kind, model_ref, text)
+        with contextlib.suppress(TypeError):
+            return get_pipeline(kind, model_ref, settings, acquire_usage=True)
         return get_pipeline(kind, model_ref, settings)
 
 
@@ -3965,7 +4102,12 @@ def text2image_worker(task_id: str, payload: Text2ImageRequest) -> None:
         update_task(task_id, status="running", progress=0.05, message="Loading model")
         with GPU_GENERATION_SEMAPHORE:
             ensure_task_not_cancelled(task_id)
-            pipe = get_pipeline_for_inference("text-to-image", model_ref, settings)
+            pipe = get_pipeline_for_inference(
+                "text-to-image",
+                model_ref,
+                settings,
+                status_callback=build_model_load_status_callback(task_id),
+            )
             pipeline_cache_key = str(getattr(pipe, "_videogen_cache_key", "") or "")
             device, dtype = get_device_and_dtype()
             update_task(task_id, progress=0.1, message="Loading model")
@@ -4073,6 +4215,7 @@ def text2image_worker(task_id: str, payload: Text2ImageRequest) -> None:
         LOGGER.exception("text2image failed task_id=%s model=%s diagnostics=%s", task_id, model_ref, runtime_diagnostics())
         update_task(task_id, status="error", message="Generation failed", error=format_user_friendly_error(exc), error_trace=trace)
     finally:
+        mark_task_memory_cleanup_if_active(task_id)
         release_pipeline_usage(pipeline_cache_key)
 
 
@@ -4155,7 +4298,12 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
         cleanup_before_generation_load(kind="text-to-video", model_ref=model_ref, settings=settings, clear_vaes=True)
         update_task(task_id, status="running", progress=0.05, message="Loading model")
         try:
-            pipe = get_pipeline_for_inference("text-to-video", model_ref, settings)
+            pipe = get_pipeline_for_inference(
+                "text-to-video",
+                model_ref,
+                settings,
+                status_callback=build_model_load_status_callback(task_id),
+            )
         except Exception as load_error:
             if effective_backend == "cuda" and is_gpu_oom_error(load_error):
                 raise RuntimeError(f"Failed to load selected text-to-video model on GPU due to out-of-memory: {model_ref}") from load_error
@@ -4279,7 +4427,8 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
                 with contextlib.suppress(Exception):
                     del request_payload
                 with contextlib.suppress(Exception):
-                    if torch.cuda.is_available():
+                    # 断片化対策として、一定間隔または最終パック時のみ明示解放する。
+                    if torch.cuda.is_available() and (segment_index % 3 == 0 or segment_index == pack_count):
                         torch.cuda.empty_cache()
         finally:
             if writer is not None:
@@ -4344,6 +4493,7 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
     finally:
         if semaphore_acquired:
             GPU_GENERATION_SEMAPHORE.release()
+        mark_task_memory_cleanup_if_active(task_id)
         release_pipeline_usage(pipeline_cache_key)
 
 
@@ -4394,7 +4544,12 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
         semaphore_acquired = True
         cleanup_before_generation_load(kind="image-to-video", model_ref=model_ref, settings=settings, clear_vaes=True)
         update_task(task_id, status="running", progress=0.05, message="Loading model")
-        pipe = get_pipeline_for_inference("image-to-video", model_ref, settings)
+        pipe = get_pipeline_for_inference(
+            "image-to-video",
+            model_ref,
+            settings,
+            status_callback=build_model_load_status_callback(task_id),
+        )
         pipeline_cache_key = str(getattr(pipe, "_videogen_cache_key", "") or "")
         update_task(task_id, progress=0.15, message="Applying LoRA")
         try:
@@ -4518,7 +4673,8 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
                 with contextlib.suppress(Exception):
                     del chunk_frames
                 with contextlib.suppress(Exception):
-                    if torch.cuda.is_available():
+                    # 断片化対策として、一定間隔または最終パック時のみ明示解放する。
+                    if torch.cuda.is_available() and (segment_index % 3 == 0 or segment_index == pack_count):
                         torch.cuda.empty_cache()
         finally:
             if writer is not None:
@@ -4576,6 +4732,7 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
     finally:
         if semaphore_acquired:
             GPU_GENERATION_SEMAPHORE.release()
+        mark_task_memory_cleanup_if_active(task_id)
         release_pipeline_usage(pipeline_cache_key)
         if image_path.exists():
             image_path.unlink(missing_ok=True)
@@ -4612,7 +4769,12 @@ def image2image_worker(task_id: str, payload: Dict[str, Any]) -> None:
         semaphore_acquired = True
         cleanup_before_generation_load(kind="image-to-image", model_ref=model_ref, settings=settings, clear_vaes=True)
         update_task(task_id, status="running", progress=0.05, message="Loading model")
-        pipe = get_pipeline_for_inference("image-to-image", model_ref, settings)
+        pipe = get_pipeline_for_inference(
+            "image-to-image",
+            model_ref,
+            settings,
+            status_callback=build_model_load_status_callback(task_id),
+        )
         pipeline_cache_key = str(getattr(pipe, "_videogen_cache_key", "") or "")
         device, dtype = get_device_and_dtype()
         update_task(task_id, progress=0.1, message="Loading model")
@@ -4727,6 +4889,7 @@ def image2image_worker(task_id: str, payload: Dict[str, Any]) -> None:
     finally:
         if semaphore_acquired:
             GPU_GENERATION_SEMAPHORE.release()
+        mark_task_memory_cleanup_if_active(task_id)
         release_pipeline_usage(pipeline_cache_key)
         if image_path.exists():
             image_path.unlink(missing_ok=True)
@@ -5273,7 +5436,7 @@ def update_settings(payload: Dict[str, Any]) -> Dict[str, Any]:
             desired_aotriton,
         )
     LOGGER.info(
-        "settings updated models_dir=%s outputs_dir=%s tmp_dir=%s logs_dir=%s log_level=%s listen_port=%s rocm_aotriton_experimental=%s require_gpu=%s allow_cpu_fallback=%s preload_default_t2i_on_startup=%s t2v_backend=%s t2v_npu_runner=%s t2v_npu_model_dir=%s preferred_dtype=%s gpu_max_concurrency=%s allow_software_video_fallback=%s",
+        "settings updated models_dir=%s outputs_dir=%s tmp_dir=%s logs_dir=%s log_level=%s listen_port=%s rocm_aotriton_experimental=%s require_gpu=%s allow_cpu_fallback=%s preload_default_t2i_on_startup=%s t2v_backend=%s t2v_npu_runner=%s t2v_npu_model_dir=%s preferred_dtype=%s gpu_max_concurrency=%s allow_software_video_fallback=%s vram_gpu_direct_load_threshold_gb=%s enable_device_map_auto=%s enable_model_cpu_offload=%s",
         updated["paths"].get("models_dir"),
         updated["paths"].get("outputs_dir"),
         updated["paths"].get("tmp_dir"),
@@ -5290,6 +5453,9 @@ def update_settings(payload: Dict[str, Any]) -> Dict[str, Any]:
         updated.get("server", {}).get("preferred_dtype"),
         updated.get("server", {}).get("gpu_max_concurrency"),
         updated.get("server", {}).get("allow_software_video_fallback"),
+        updated.get("server", {}).get("vram_gpu_direct_load_threshold_gb"),
+        updated.get("server", {}).get("enable_device_map_auto"),
+        updated.get("server", {}).get("enable_model_cpu_offload"),
     )
     return updated
 
