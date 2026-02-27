@@ -78,3 +78,66 @@ def test_is_local_tree_item_directory_accepts_single_file_checkpoint(tmp_path: P
     base_model_dir.mkdir(parents=True)
     (base_model_dir / "model.safetensors").write_bytes(b"abc")
     assert main.is_local_tree_item_directory(base_model_dir, "BaseModel") is True
+
+
+def test_download_model_kind_normalization() -> None:
+    assert main.normalize_download_model_kind("lora") == "Lora"
+    assert main.normalize_download_model_kind("VAE") == "VAE"
+    assert main.normalize_download_model_kind("checkpoint") == "BaseModel"
+
+
+def test_resolve_framepack_plan_enables_long_mode(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("VIDEOGEN_FRAMEPACK_SEGMENT_FRAMES", raising=False)
+    monkeypatch.delenv("VIDEOGEN_VIDEO_CHUNK_FRAMES", raising=False)
+    monkeypatch.delenv("VIDEOGEN_FRAMEPACK_OVERLAP_FRAMES", raising=False)
+    monkeypatch.delenv("VIDEOGEN_FRAMEPACK_LONG_SEGMENT_FRAMES", raising=False)
+
+    # 30 minutes at 8fps => long-video mode threshold.
+    plan = main.resolve_framepack_plan(total_frames=30 * 60 * 8, fps=8)
+    assert plan["long_video_mode"] is True
+    assert int(plan["segment_frames"]) <= int(main.FRAMEPACK_LONG_SEGMENT_FRAMES_DEFAULT)
+    assert int(plan["overlap_frames"]) < int(plan["segment_frames"])
+    assert int(plan["pack_count"]) >= 1
+
+
+def test_iter_framepack_segments_preserves_total_frame_count() -> None:
+    segments = main.iter_framepack_segments(total_frames=25, segment_frames=8, overlap_frames=2)
+    assert len(segments) >= 1
+    assert segments[0]["trim_head_frames"] == 0
+    assert all(segment["request_frames"] <= 8 for segment in segments)
+    assert sum(segment["append_frames"] for segment in segments) == 25
+
+
+def test_call_with_supported_kwargs_recovers_from_wan_ftfy_name_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    class DummyPipe:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def __call__(self, prompt: str):
+            self.calls += 1
+            if self.calls == 1:
+                raise NameError("name 'ftfy' is not defined")
+            return {"ok": True, "prompt": prompt}
+
+    pipe = DummyPipe()
+    monkeypatch.setattr(main, "try_patch_wan_ftfy_dependency", lambda _pipe: True)
+    result = main.call_with_supported_kwargs(pipe, {"prompt": "hello"})
+    assert result["ok"] is True
+    assert pipe.calls == 2
+
+
+def test_call_with_supported_kwargs_reports_missing_wan_ftfy_dependency(monkeypatch: pytest.MonkeyPatch) -> None:
+    class DummyPipe:
+        def __call__(self, prompt: str):
+            raise NameError("name 'ftfy' is not defined")
+
+    monkeypatch.setattr(main, "try_patch_wan_ftfy_dependency", lambda _pipe: False)
+    with pytest.raises(RuntimeError, match="ftfy"):
+        main.call_with_supported_kwargs(DummyPipe(), {"prompt": "hello"})
+
+
+def test_is_gpu_oom_error_detects_wrapped_exception_chain() -> None:
+    inner = RuntimeError("HIP out of memory. Tried to allocate 50.00 MiB")
+    outer = RuntimeError("GPU-first pipeline loading failed and CPU-heavy fallback is disabled.")
+    outer.__cause__ = inner
+    assert main.is_gpu_oom_error(outer) is True

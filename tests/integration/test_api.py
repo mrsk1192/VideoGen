@@ -82,6 +82,43 @@ def test_delete_local_model_rejects_non_model_directory(client: TestClient, tmp_
     assert resp.status_code == 400
 
 
+def test_delete_local_model_by_path_nested_directory(client: TestClient, tmp_path: Path) -> None:
+    base = tmp_path / "delete-by-path-nested"
+    model_dir = base / "T2I" / "SDXL1.0" / "BaseModel" / "nested-model"
+    model_dir.mkdir(parents=True)
+    (model_dir / "model_index.json").write_text(json.dumps({"_class_name": "StableDiffusionXLPipeline"}), encoding="utf-8")
+    (model_dir / "model.safetensors").write_bytes(b"abc")
+
+    tree_resp = client.get("/api/models/local/tree", params={"dir": str(base)})
+    assert tree_resp.status_code == 200
+    flat_items = tree_resp.json().get("flat_items", [])
+    nested_item = next(item for item in flat_items if Path(item["path"]).name == "nested-model")
+    assert nested_item["can_delete"] is True
+
+    resp = client.post(
+        "/api/models/local/delete",
+        json={"path": nested_item["path"], "base_dir": str(base)},
+    )
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "ok"
+    assert not model_dir.exists()
+
+
+def test_delete_local_model_by_path_file(client: TestClient, tmp_path: Path) -> None:
+    base = tmp_path / "delete-by-path-file"
+    model_file = base / "T2I" / "SD1.5" / "BaseModel" / "single-model.safetensors"
+    model_file.parent.mkdir(parents=True, exist_ok=True)
+    model_file.write_bytes(b"abc")
+
+    resp = client.post(
+        "/api/models/local/delete",
+        json={"path": str(model_file.relative_to(base)), "base_dir": str(base)},
+    )
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "ok"
+    assert not model_file.exists()
+
+
 def test_outputs_list_and_delete(client: TestClient, tmp_path: Path) -> None:
     outputs_dir = tmp_path / "outputs"
     outputs_dir.mkdir(parents=True, exist_ok=True)
@@ -291,6 +328,59 @@ def test_models_search2_returns_page_info_and_installed(client: TestClient, tmp_
     assert body["page_info"]["page"] == 1
     assert body["next_cursor"] == "2"
     assert body["items"][0]["installed"] is True
+
+
+def test_models_search2_filters_by_size_mb(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        main,
+        "search_hf_models_v2",
+        lambda **_kwargs: {
+            "items": [
+                {"id": "hf/small", "title": "hf/small", "pipeline_tag": "text-to-image", "size_bytes": 400 * 1024 * 1024, "source": "huggingface"},
+                {"id": "hf/mid", "title": "hf/mid", "pipeline_tag": "text-to-image", "size_bytes": 1500 * 1024 * 1024, "source": "huggingface"},
+                {"id": "hf/unknown", "title": "hf/unknown", "pipeline_tag": "text-to-image", "size_bytes": None, "source": "huggingface"},
+            ],
+            "has_next": False,
+        },
+    )
+    monkeypatch.setattr(
+        main,
+        "search_civitai_models_v2",
+        lambda **_kwargs: {
+            "items": [
+                {"id": "civitai/large", "title": "civitai/large", "pipeline_tag": "text-to-image", "size_bytes": 2500 * 1024 * 1024, "source": "civitai"},
+                {"id": "civitai/huge", "title": "civitai/huge", "pipeline_tag": "text-to-image", "size_bytes": 5000 * 1024 * 1024, "source": "civitai"},
+            ],
+            "has_next": False,
+        },
+    )
+
+    resp = client.get(
+        "/api/models/search2",
+        params={
+            "task": "text-to-image",
+            "query": "",
+            "source": "all",
+            "size_min_mb": 1000,
+            "size_max_mb": 3000,
+        },
+    )
+    assert resp.status_code == 200
+    ids = [item["id"] for item in resp.json()["items"]]
+    assert "hf/mid" in ids
+    assert "civitai/large" in ids
+    assert "hf/small" not in ids
+    assert "hf/unknown" not in ids
+    assert "civitai/huge" not in ids
+
+
+def test_models_search2_rejects_invalid_size_range(client: TestClient) -> None:
+    resp = client.get(
+        "/api/models/search2",
+        params={"task": "text-to-image", "query": "", "size_min_mb": 3000, "size_max_mb": 1000},
+    )
+    assert resp.status_code == 400
+    assert "size_max_mb" in str(resp.json().get("detail") or "")
 
 
 def test_models_detail_endpoints(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -599,6 +689,35 @@ def test_local_models_tree_structure_and_vea_alias(client: TestClient, tmp_path:
     assert v2v_item["task_api"] == "image-to-video"
 
 
+def test_local_models_tree_includes_legacy_root_layout(client: TestClient, tmp_path: Path) -> None:
+    models_dir = tmp_path / "models_legacy_root"
+    legacy_dir = models_dir / "legacy-download-model"
+    legacy_dir.mkdir(parents=True)
+    (legacy_dir / "model_index.json").write_text(json.dumps({"_class_name": "StableDiffusionXLPipeline"}), encoding="utf-8")
+    (legacy_dir / "videogen_meta.json").write_text(
+        json.dumps(
+            {
+                "source": "huggingface",
+                "repo_id": "org/legacy-model",
+                "task": "text-to-image",
+                "base_model": "StableDiffusion XL",
+                "category": "BaseModel",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    resp = client.get("/api/models/local/tree", params={"dir": str(models_dir)})
+    assert resp.status_code == 200
+    tasks = {task["task"]: task for task in resp.json()["tasks"]}
+    assert "T2I" in tasks
+    imported_base = next((base for base in tasks["T2I"]["bases"] if base["base_name"] == "Imported"), None)
+    assert imported_base is not None
+    base_category = next((cat for cat in imported_base["categories"] if cat["category"] == "BaseModel"), None)
+    assert base_category is not None
+    assert any(item["name"] == "legacy-download-model" for item in base_category["items"])
+
+
 def test_local_models_tree_rescan_reflects_new_item(client: TestClient, tmp_path: Path) -> None:
     models_dir = tmp_path / "models_tree_rescan"
     base_dir = models_dir / "T2I" / "SD1" / "BaseModel"
@@ -641,6 +760,26 @@ def test_local_models_reveal_endpoint(client: TestClient, tmp_path: Path, monkey
         resp = client.post("/api/models/local/reveal", json={"path": str(model_dir), "base_dir": str(models_dir)})
         assert resp.status_code == 200
         assert resp.json()["status"] == "not_supported"
+
+
+def test_tasks_list_endpoint_filters_and_orders(client: TestClient) -> None:
+    t1 = main.create_task("download", "queued")
+    t2 = main.create_task("download", "queued")
+    main.update_task(t1, status="running", progress=0.3, message="Downloading")
+    time.sleep(0.01)
+    main.update_task(t2, status="completed", progress=1.0, message="Download complete")
+
+    resp_all = client.get("/api/tasks", params={"task_type": "download", "status": "all", "limit": 10})
+    assert resp_all.status_code == 200
+    tasks_all = resp_all.json()["tasks"]
+    assert any(task["id"] == t1 for task in tasks_all)
+    assert any(task["id"] == t2 for task in tasks_all)
+
+    resp_running = client.get("/api/tasks", params={"task_type": "download", "status": "running", "limit": 10})
+    assert resp_running.status_code == 200
+    running_ids = {task["id"] for task in resp_running.json()["tasks"]}
+    assert t1 in running_ids
+    assert t2 not in running_ids
 
 
 def test_text2image_task_lifecycle_and_image_endpoint(client: TestClient, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -804,7 +943,7 @@ def test_lora_catalog_filters_by_base_model(client: TestClient, tmp_path: Path) 
     assert "author/other-lora" not in ids
 
 
-def test_lora_catalog_filters_unknown_video_lora_by_lineage(client: TestClient, tmp_path: Path) -> None:
+def test_lora_catalog_allows_unknown_video_lora_for_manual_selection(client: TestClient, tmp_path: Path) -> None:
     models_dir = tmp_path / "models_video_lora_filter"
     models_dir.mkdir(parents=True)
     # No adapter_config.json, so this LoRA has no explicit base hint.
@@ -821,7 +960,7 @@ def test_lora_catalog_filters_unknown_video_lora_by_lineage(client: TestClient, 
     resp = client.get("/api/models/loras/catalog", params={"task": "text-to-video", "model_ref": "damo-vilab/text-to-video-ms-1.7b"})
     assert resp.status_code == 200
     ids = {item["id"] for item in resp.json()["items"]}
-    assert "author/lcm-lora-sdxl" not in ids
+    assert "author/lcm-lora-sdxl" in ids
 
 
 def test_text2video_worker_skips_incompatible_lora(client: TestClient, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -871,6 +1010,47 @@ def test_text2video_worker_skips_incompatible_lora(client: TestClient, tmp_path:
     assert last["status"] == "completed"
     assert last["result"]["loras"] == []
     assert (outputs_dir / last["result"]["video_file"]).exists()
+
+
+def test_image2video_accepts_duration_seconds_form_value(client: TestClient, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    captured: dict[str, object] = {}
+
+    def fake_worker(task_id: str, payload: dict[str, object]) -> None:
+        captured["task_id"] = task_id
+        captured["payload"] = dict(payload)
+
+    monkeypatch.setattr(main, "image2video_worker", fake_worker)
+
+    image_path = tmp_path / "input.png"
+    Image.new("RGB", (16, 16), color=(10, 20, 30)).save(image_path)
+    with image_path.open("rb") as handle:
+        resp = client.post(
+            "/api/generate/image2video",
+            data={
+                "prompt": "test prompt",
+                "negative_prompt": "",
+                "model_id": "",
+                "lora_id": "",
+                "num_inference_steps": "2",
+                "duration_seconds": "12.5",
+                "guidance_scale": "9.0",
+                "fps": "8",
+                "width": "256",
+                "height": "256",
+            },
+            files={"image": ("input.png", handle, "image/png")},
+        )
+    assert resp.status_code == 200
+
+    deadline = time.time() + 2
+    while time.time() < deadline and "payload" not in captured:
+        time.sleep(0.05)
+
+    assert "payload" in captured
+    payload = captured["payload"]
+    assert isinstance(payload, dict)
+    assert float(payload["duration_seconds"]) == 12.5
+    assert payload["num_frames"] is None
 
 
 def test_recent_logs_endpoint(client: TestClient) -> None:

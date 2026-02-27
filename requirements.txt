@@ -11,3 +11,4 @@ python-multipart>=0.0.9
 imageio>=2.35.0
 imageio-ffmpeg>=0.5.1
 sentencepiece>=0.2.0
+ftfy>=6.2.0

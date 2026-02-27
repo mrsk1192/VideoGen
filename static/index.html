@@ -18,6 +18,19 @@
         <p data-i18n="appSubtitle">Text-to-Image / Image-to-Image / Text-to-Video / Image-to-Video</p>
       </div>
       <div class="top-right">
+        <div class="downloads-widget">
+          <button id="downloadsToggle" type="button" class="downloads-toggle">
+            <span data-i18n="downloadsLabel">Downloads</span>
+            <span id="downloadsBadge" class="downloads-badge">0</span>
+          </button>
+          <div id="downloadsPopover" class="downloads-popover">
+            <div class="downloads-popover-head">
+              <strong data-i18n="downloadsLabel">Downloads</strong>
+              <button id="downloadsRefreshBtn" type="button" data-i18n="btnRefreshModels">Refresh</button>
+            </div>
+            <div id="downloadsList" class="downloads-list fancy-scroll"></div>
+          </div>
+        </div>
         <label class="lang-picker">
           <span data-i18n="languageLabel" class="has-help" data-help-key="helpLanguage" tabindex="0">Language</span>
           <select id="languageSelect">
@@ -167,7 +180,7 @@
         </label>
         <div class="grid">
           <label><span data-i18n="labelSteps" class="has-help" data-help-key="helpStepsText2Video" tabindex="0">Steps</span> <input id="t2vSteps" type="number" min="1" max="120" value="30" /></label>
-          <label><span data-i18n="labelFrames" class="has-help" data-help-key="helpFramesText2Video" tabindex="0">Frames</span> <input id="t2vFrames" type="number" min="8" max="128" value="16" /></label>
+          <label><span>Duration (sec)</span> <input id="t2vFrames" type="number" min="0.1" max="10800" step="0.1" value="2.0" /></label>
           <label><span data-i18n="labelGuidance" class="has-help" data-help-key="helpGuidanceText2Video" tabindex="0">Guidance</span> <input id="t2vGuidance" type="number" min="0" max="30" step="0.1" value="9.0" /></label>
           <label><span data-i18n="labelLoraScale" class="has-help" data-help-key="helpLoraScale" tabindex="0">LoRA Scale</span> <input id="t2vLoraScale" type="number" min="0" max="2" step="0.05" value="1.0" /></label>
           <label><span data-i18n="labelFps" class="has-help" data-help-key="helpFpsText2Video" tabindex="0">FPS</span> <input id="t2vFps" type="number" min="1" max="60" value="8" /></label>
@@ -216,7 +229,7 @@
         </label>
         <div class="grid">
           <label><span data-i18n="labelSteps" class="has-help" data-help-key="helpStepsImage2Video" tabindex="0">Steps</span> <input id="i2vSteps" type="number" min="1" max="120" value="30" /></label>
-          <label><span data-i18n="labelFrames" class="has-help" data-help-key="helpFramesImage2Video" tabindex="0">Frames</span> <input id="i2vFrames" type="number" min="8" max="128" value="16" /></label>
+          <label><span>Duration (sec)</span> <input id="i2vFrames" type="number" min="0.1" max="10800" step="0.1" value="2.0" /></label>
           <label><span data-i18n="labelGuidance" class="has-help" data-help-key="helpGuidanceImage2Video" tabindex="0">Guidance</span> <input id="i2vGuidance" type="number" min="0" max="30" step="0.1" value="9.0" /></label>
           <label><span data-i18n="labelLoraScale" class="has-help" data-help-key="helpLoraScale" tabindex="0">LoRA Scale</span> <input id="i2vLoraScale" type="number" min="0" max="2" step="0.05" value="1.0" /></label>
           <label><span data-i18n="labelFps" class="has-help" data-help-key="helpFpsImage2Video" tabindex="0">FPS</span> <input id="i2vFps" type="number" min="1" max="60" value="8" /></label>
@@ -278,6 +291,14 @@
             </select>
           </label>
           <label>
+            <span data-i18n="labelSearchSizeMinMb" class="has-help" data-help-key="helpSearchSizeMinMb" tabindex="0">Min Size (GB)</span>
+            <input id="searchSizeMinMb" type="number" min="0" step="0.1" placeholder="0" />
+          </label>
+          <label>
+            <span data-i18n="labelSearchSizeMaxMb" class="has-help" data-help-key="helpSearchSizeMaxMb" tabindex="0">Max Size (GB)</span>
+            <input id="searchSizeMaxMb" type="number" min="0" step="0.1" placeholder="0" />
+          </label>
+          <label>
             <span data-i18n="labelLimit" class="has-help" data-help-key="helpLimit" tabindex="0">Limit</span>
             <input id="searchLimit" type="number" min="1" max="100" value="30" />
           </label>
@@ -308,17 +329,13 @@
           <div class="model-filter-note" id="searchFilterNote"></div>
         </aside>
         <section class="model-results-pane">
-          <div id="searchCards" class="model-card-grid"></div>
+          <div id="searchCards" class="model-card-grid fancy-scroll"></div>
           <div class="model-pagination">
             <button id="searchPrevBtn" type="button">Prev</button>
             <span id="searchPageInfo">page 1</span>
             <button id="searchNextBtn" type="button">Next</button>
           </div>
         </section>
-        <aside id="modelDetailPane" class="model-detail-pane">
-          <div id="modelDetailEmpty" class="model-detail-empty" data-i18n="msgModelDetailEmpty">Select a model to view detail.</div>
-          <div id="modelDetailContent" class="model-detail-content"></div>
-        </aside>
       </div>
     </section>
 
@@ -348,6 +365,7 @@
       <div class="local-tree-toolbar">
         <button id="refreshLocalModels" type="button" data-i18n="btnRefreshLocalList">Refresh Local List</button>
         <button id="rescanLocalModels" type="button" data-i18n="btnRescanLocalModels">Rescan</button>
+        <button id="expandAllLocalTree" type="button" data-i18n="btnExpandAllLocalTree">Expand All</button>
       </div>
       <div id="localModelsTree" class="local-tree"></div>
       <div id="localModelSelection" class="local-selection"></div>
@@ -406,7 +424,7 @@
           <label><span data-i18n="labelDefaultTextImageModel" class="has-help" data-help-key="helpDefaultTextImageModel" tabindex="0">Default: Text to Image</span> <select id="cfgTextImageModel"></select></label>
           <label><span data-i18n="labelDefaultImageImageModel" class="has-help" data-help-key="helpDefaultImageImageModel" tabindex="0">Default: Image to Image</span> <select id="cfgImageImageModel"></select></label>
           <label><span data-i18n="labelDefaultSteps" class="has-help" data-help-key="helpDefaultSteps" tabindex="0">Default Steps</span> <input id="cfgSteps" type="number" min="1" max="120" /></label>
-          <label><span data-i18n="labelDefaultFrames" class="has-help" data-help-key="helpDefaultFrames" tabindex="0">Default Frames</span> <input id="cfgFrames" type="number" min="8" max="128" /></label>
+          <label><span data-i18n="labelDefaultFrames" class="has-help" data-help-key="helpDefaultFrames" tabindex="0">Default Duration (sec)</span> <input id="cfgFrames" type="number" min="0.1" max="10800" step="0.1" /></label>
           <label><span data-i18n="labelDefaultGuidance" class="has-help" data-help-key="helpDefaultGuidance" tabindex="0">Default Guidance</span> <input id="cfgGuidance" type="number" min="0" max="30" step="0.1" /></label>
           <label><span data-i18n="labelDefaultFps" class="has-help" data-help-key="helpDefaultFps" tabindex="0">Default FPS</span> <input id="cfgFps" type="number" min="1" max="60" /></label>
           <label><span data-i18n="labelDefaultWidth" class="has-help" data-help-key="helpDefaultWidth" tabindex="0">Default Width</span> <input id="cfgWidth" type="number" min="128" max="2048" step="64" /></label>
@@ -430,6 +448,15 @@
       <video id="preview" controls></video>
     </section>
   </main>
+  <div id="modelDetailModal" class="modal-overlay">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modelDetailModalTitle" data-i18n="msgModelDetailEmpty">Select a model to view detail.</h3>
+        <button id="modelDetailModalClose" type="button" class="modal-close" aria-label="close">x</button>
+      </div>
+      <div id="modelDetailModalContent" class="modal-body fancy-scroll"></div>
+    </div>
+  </div>
   <script src="/static/app.js"></script>
 </body>
 </html>

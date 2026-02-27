@@ -84,7 +84,9 @@ if not "%HIP_VER%"=="" (
 echo [INFO] Starting server at http://localhost:%PORT%
 set "TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=%ROCM_AOTRITON_EXPERIMENTAL%"
 echo [INFO] TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=%TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL%
-if "%PYTORCH_CUDA_ALLOC_CONF%"=="" set "PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:128,garbage_collection_threshold:0.8"
+if "%PYTORCH_ALLOC_CONF%"=="" if "%PYTORCH_CUDA_ALLOC_CONF%"=="" set "PYTORCH_ALLOC_CONF=max_split_size_mb:128,garbage_collection_threshold:0.8,expandable_segments:True"
+if "%PYTORCH_ALLOC_CONF%"=="" if not "%PYTORCH_CUDA_ALLOC_CONF%"=="" set "PYTORCH_ALLOC_CONF=%PYTORCH_CUDA_ALLOC_CONF%"
+if "%PYTORCH_CUDA_ALLOC_CONF%"=="" if not "%PYTORCH_ALLOC_CONF%"=="" set "PYTORCH_CUDA_ALLOC_CONF=%PYTORCH_ALLOC_CONF%"
 if not "%AUTO_OPEN_BROWSER%"=="0" (
   start "" /B "%PYTHON_EXE%" "scripts\open_browser_when_ready.py" --url "http://localhost:%PORT%" --timeout 120 --interval 0.5
 )

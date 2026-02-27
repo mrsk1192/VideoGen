@@ -1,6 +1,6 @@
 # ROCm VideoGen Web App
 
-ROCm 環境で動作する `Text-to-Image` / `Image-to-Image` / `Text-to-Video` / `Image-to-Video` の Web アプリです。
+ROCm 環境で動作する `Text-to-Image` / `Image-to-Image` / `Text-to-Video` / `Image-to-Video` の Web アプリ（開発中）です。
 
 ## 機能
 
@@ -13,6 +13,8 @@ ROCm 環境で動作する `Text-to-Image` / `Image-to-Image` / `Text-to-Video` 
 - Hugging Face モデル検索
 - CivitAI モデル検索（画像系タスク）
 - Model Search のカードUI（Grid/List）、詳細ペイン、ページング
+- Model Search の詳細モーダル表示（詳細ボタン）
+- 右上 Downloads ウィジェット（進捗一覧・ステータス確認）
 - Model Search の詳細表示（説明、タグ、プレビュー、バージョン/ファイル選択）
 - Hugging Face / CivitAI のモデルダウンロード
 - 検索語なしでもモデル検索可能（タスク別の人気順）
@@ -24,6 +26,7 @@ ROCm 環境で動作する `Text-to-Image` / `Image-to-Image` / `Text-to-Video` 
 - 設定値保存 (`data/settings.json`)
 - 生成/ダウンロード失敗時の詳細ログ出力（スタックトレース含む）
 - 生成ジョブの進捗表示と動画/画像プレビュー
+- 動画生成は FramePack 方式（小パック逐次生成 + 逐次エンコード）で実行
 - Web GUI 多言語表示（`en`, `ja`, `es`, `fr`, `de`, `it`, `pt`, `ru`, `ar`）
 - モデル保存先をフルパスで指定可能
 - ローカルモデル一覧にサムネイル表示、系譜ドロップダウン絞り込み、生成タスクへ適用ボタン
@@ -121,6 +124,15 @@ VAE は `Text to Image` / `Image to Image` タブで選択できます。
     - `civitai_model_id`, `civitai_version_id`, `civitai_file_id`
   - 省略時は従来動作
   - ダウンロード後に `model_meta.json` を保存（CivitAIは `civitai_model.json` も保存）
+  - `videogen_meta.json` を保存（task/base_model/category/source など）
+
+- `GET /api/tasks`（新規）
+  - query:
+    - `task_type`（任意）
+    - `status`（`all|queued|running|completed|error`）
+    - `limit`（1-200）
+  - response:
+    - `tasks[]`（`id,task_type,status,progress,message,created_at,updated_at,downloaded_bytes,total_bytes,result,error`）
 
 ## Local Models Tree API（新規）
 
@@ -200,5 +212,15 @@ VAE は `Text to Image` / `Image to Image` タブで選択できます。
 ## 注意
 
 - 初回モデル読み込みは時間がかかります。
-- VRAM 使用量が大きいため、`frames` や `steps` を調整してください。
+- VRAM 使用量が大きいため、`duration_seconds` や `steps` を調整してください。
 - 入力モデルIDは Hugging Face repo ID またはローカルパスを使用できます。
+
+## FramePack チューニング
+
+- `VIDEOGEN_FRAMEPACK_SEGMENT_FRAMES`（既定: `16`）
+  - 1パックあたりの生成フレーム数（小さいほどVRAMピークを抑制）
+- `VIDEOGEN_FRAMEPACK_OVERLAP_FRAMES`（既定: `2`）
+  - パック間の重なりフレーム数（接続滑らかさ用）
+- `VIDEOGEN_FRAMEPACK_LONG_SEGMENT_FRAMES`（既定: `8`）
+  - 長尺（30分以上）時に適用する最大パック長
+- 後方互換として `VIDEOGEN_VIDEO_CHUNK_FRAMES` も引き続き利用可能です。

@@ -1,11 +1,14 @@
 import copy
 import contextlib
+import ctypes
 import dataclasses
+import gc
 import hashlib
 import importlib.util
 import logging
 import inspect
 import json
+import math
 import os
 import re
 import shutil
@@ -28,6 +31,17 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from huggingface_hub import HfApi, hf_hub_download, snapshot_download
 from pydantic import BaseModel, Field
+
+# Keep allocator settings consistent even when users launch uvicorn directly
+# (without start.bat), which otherwise can worsen HIP/CUDA fragmentation.
+_default_alloc_conf = "max_split_size_mb:128,garbage_collection_threshold:0.8,expandable_segments:True"
+if not os.environ.get("PYTORCH_ALLOC_CONF") and not os.environ.get("PYTORCH_CUDA_ALLOC_CONF"):
+    os.environ["PYTORCH_ALLOC_CONF"] = _default_alloc_conf
+    os.environ["PYTORCH_CUDA_ALLOC_CONF"] = _default_alloc_conf
+elif os.environ.get("PYTORCH_ALLOC_CONF") and not os.environ.get("PYTORCH_CUDA_ALLOC_CONF"):
+    os.environ["PYTORCH_CUDA_ALLOC_CONF"] = os.environ["PYTORCH_ALLOC_CONF"]
+elif os.environ.get("PYTORCH_CUDA_ALLOC_CONF") and not os.environ.get("PYTORCH_ALLOC_CONF"):
+    os.environ["PYTORCH_ALLOC_CONF"] = os.environ["PYTORCH_CUDA_ALLOC_CONF"]
 
 TORCH_IMPORT_ERROR: Optional[str] = None
 DIFFUSERS_IMPORT_ERROR: Optional[str] = None
@@ -78,6 +92,7 @@ DEFAULT_SETTINGS: Dict[str, Any] = {
         "image2video_model": "ali-vilab/i2vgen-xl",
         "num_inference_steps": 30,
         "num_frames": 16,
+        "duration_seconds": 2.0,
         "guidance_scale": 9.0,
         "fps": 8,
         "width": 512,
@@ -90,6 +105,7 @@ TASKS_LOCK = threading.Lock()
 PIPELINES: Dict[str, Any] = {}
 PIPELINES_LOCK = threading.Lock()
 PIPELINE_LOAD_LOCK = threading.Lock()
+PIPELINE_USAGE_COUNTS: Dict[str, int] = {}
 VAES: Dict[str, Any] = {}
 VAES_LOCK = threading.Lock()
 MODEL_SIZE_CACHE: Dict[str, Dict[str, Any]] = {}
@@ -134,6 +150,7 @@ HIGH_VALUE_ENDPOINTS = {
     "/api/models/local/tree",
     "/api/models/local/rescan",
     "/api/models/local/reveal",
+    "/api/tasks",
     "/api/outputs/delete",
     "/api/settings",
     "/api/cache/hf/clear",
@@ -151,7 +168,7 @@ SUPPORTED_LOCAL_PIPELINE_CLASSES: Dict[str, set[str]] = {
         "LatentConsistencyModelPipeline",
         "AuraFlowPipeline",
     },
-    "text-to-video": {"TextToVideoSDPipeline"},
+    "text-to-video": {"TextToVideoSDPipeline", "WanPipeline"},
     "image-to-image": {
         "StableDiffusionImg2ImgPipeline",
         "StableDiffusionXLImg2ImgPipeline",
@@ -191,6 +208,7 @@ LOCAL_TREE_TASK_TO_API = {
     "T2V": "text-to-video",
     "V2V": "image-to-video",
 }
+LOCAL_TREE_API_TO_TASK = {value: key for key, value in LOCAL_TREE_TASK_TO_API.items()}
 LOCAL_TREE_TASK_ALIASES = {
     "T2I": "T2I",
     "TEXT2IMAGE": "T2I",
@@ -207,6 +225,18 @@ LOCAL_TREE_TASK_ALIASES = {
     "IMAGE_TO_VIDEO": "V2V",
 }
 LOCAL_TREE_CATEGORY_ORDER = ["BaseModel", "Lora", "VAE"]
+VIDEO_DURATION_SECONDS_DEFAULT = 2.0
+VIDEO_DURATION_SECONDS_MAX = 10800.0
+FRAMEPACK_SEGMENT_FRAMES_DEFAULT = 16
+FRAMEPACK_SEGMENT_FRAMES_MIN = 4
+FRAMEPACK_SEGMENT_FRAMES_MAX = 128
+FRAMEPACK_OVERLAP_FRAMES_DEFAULT = 2
+FRAMEPACK_LONG_VIDEO_SECONDS_THRESHOLD = 30.0 * 60.0
+FRAMEPACK_LONG_SEGMENT_FRAMES_DEFAULT = 8
+# Backward-compatible aliases for existing environment variables and diagnostics.
+VIDEO_CHUNK_FRAMES_DEFAULT = FRAMEPACK_SEGMENT_FRAMES_DEFAULT
+VIDEO_CHUNK_FRAMES_MIN = FRAMEPACK_SEGMENT_FRAMES_MIN
+VIDEO_CHUNK_FRAMES_MAX = FRAMEPACK_SEGMENT_FRAMES_MAX
 
 
 @dataclasses.dataclass
@@ -271,6 +301,28 @@ def sanitize_settings(payload: Dict[str, Any]) -> Dict[str, Any]:
     logging_config = cleaned.setdefault("logging", {})
     raw_level = str(logging_config.get("level", "INFO")).strip().upper()
     logging_config["level"] = raw_level if raw_level in VALID_LOG_LEVELS else "INFO"
+    defaults = cleaned.setdefault("defaults", {})
+    try:
+        fps = int(defaults.get("fps", 8))
+    except Exception:
+        fps = 8
+    fps = max(1, min(60, fps))
+    defaults["fps"] = fps
+    duration_raw = defaults.get("duration_seconds")
+    if duration_raw is None:
+        try:
+            legacy_frames = int(defaults.get("num_frames", 16))
+        except Exception:
+            legacy_frames = 16
+        duration_seconds = max(0.1, float(legacy_frames) / float(max(1, fps)))
+    else:
+        try:
+            duration_seconds = float(duration_raw)
+        except Exception:
+            duration_seconds = VIDEO_DURATION_SECONDS_DEFAULT
+    duration_seconds = max(0.1, min(VIDEO_DURATION_SECONDS_MAX, duration_seconds))
+    defaults["duration_seconds"] = duration_seconds
+    defaults["num_frames"] = max(1, int(duration_seconds * fps + 0.5))
     return cleaned
 
 
@@ -371,6 +423,66 @@ def runtime_diagnostics() -> Dict[str, Any]:
     return details
 
 
+def host_memory_stats() -> Dict[str, int]:
+    stats: Dict[str, int] = {}
+    # Windows: use GlobalMemoryStatusEx for available physical memory.
+    if os.name == "nt":
+        with contextlib.suppress(Exception):
+            class MEMORYSTATUSEX(ctypes.Structure):
+                _fields_ = [
+                    ("dwLength", ctypes.c_ulong),
+                    ("dwMemoryLoad", ctypes.c_ulong),
+                    ("ullTotalPhys", ctypes.c_ulonglong),
+                    ("ullAvailPhys", ctypes.c_ulonglong),
+                    ("ullTotalPageFile", ctypes.c_ulonglong),
+                    ("ullAvailPageFile", ctypes.c_ulonglong),
+                    ("ullTotalVirtual", ctypes.c_ulonglong),
+                    ("ullAvailVirtual", ctypes.c_ulonglong),
+                    ("ullAvailExtendedVirtual", ctypes.c_ulonglong),
+                ]
+
+            status = MEMORYSTATUSEX()
+            status.dwLength = ctypes.sizeof(MEMORYSTATUSEX)
+            if ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(status)):
+                stats["host_total_bytes"] = int(status.ullTotalPhys)
+                stats["host_available_bytes"] = int(status.ullAvailPhys)
+                return stats
+    # POSIX fallback.
+    with contextlib.suppress(Exception):
+        page_size = int(os.sysconf("SC_PAGE_SIZE"))
+        total_pages = int(os.sysconf("SC_PHYS_PAGES"))
+        avail_pages = int(os.sysconf("SC_AVPHYS_PAGES"))
+        if page_size > 0 and total_pages > 0:
+            stats["host_total_bytes"] = page_size * total_pages
+            stats["host_available_bytes"] = max(0, page_size * max(0, avail_pages))
+    return stats
+
+
+def memory_stats_snapshot() -> Dict[str, int]:
+    stats = host_memory_stats()
+    stats.update(gpu_memory_stats())
+    return stats
+
+
+def log_memory_snapshot(label: str, *, kind: str, source: str, strategy: str) -> None:
+    stats = memory_stats_snapshot()
+    if not stats:
+        return
+    LOGGER.info(
+        "pipeline load memory kind=%s strategy=%s stage=%s source=%s host_avail=%s host_total=%s gpu_free=%s gpu_total=%s allocated=%s reserved=%s",
+        kind,
+        strategy,
+        label,
+        source,
+        stats.get("host_available_bytes"),
+        stats.get("host_total_bytes"),
+        stats.get("gpu_free_bytes"),
+        stats.get("gpu_total_bytes"),
+        stats.get("torch_allocated_bytes"),
+        stats.get("torch_reserved_bytes"),
+    )
+
+
 def gpu_memory_stats() -> Dict[str, int]:
     stats: Dict[str, int] = {}
     if TORCH_IMPORT_ERROR or not torch.cuda.is_available():
@@ -405,6 +517,152 @@ def log_gpu_memory_stats(label: str, task_id: str) -> None:
         stats.get("torch_allocated_bytes"),
         stats.get("torch_reserved_bytes"),
     )
+
+
+def iter_exception_chain(exc: BaseException) -> list[BaseException]:
+    chain: list[BaseException] = []
+    visited: set[int] = set()
+    current: Optional[BaseException] = exc
+    while current is not None:
+        marker = id(current)
+        if marker in visited:
+            break
+        visited.add(marker)
+        chain.append(current)
+        current = current.__cause__ or current.__context__
+    return chain
+
+
+def is_gpu_oom_error(exc: BaseException) -> bool:
+    for current in iter_exception_chain(exc):
+        if TORCH_IMPORT_ERROR is None:
+            with contextlib.suppress(Exception):
+                if isinstance(current, torch.OutOfMemoryError):
+                    return True
+        text = str(current).lower()
+        if "out of memory" not in text:
+            continue
+        if ("cuda" in text) or ("hip" in text) or ("vram" in text) or ("hbm" in text):
+            return True
+    return False
+
+
+def detach_exception_state(exc: BaseException) -> None:
+    with contextlib.suppress(Exception):
+        tb = exc.__traceback__
+        if tb is not None:
+            traceback.clear_frames(tb)
+    with contextlib.suppress(Exception):
+        exc.__traceback__ = None
+    with contextlib.suppress(Exception):
+        exc.__cause__ = None
+    with contextlib.suppress(Exception):
+        exc.__context__ = None
+
+
+def clear_cuda_allocator_cache(reason: str) -> None:
+    if TORCH_IMPORT_ERROR or not torch.cuda.is_available():
+        return
+    with contextlib.suppress(Exception):
+        torch.cuda.empty_cache()
+    with contextlib.suppress(Exception):
+        torch.cuda.ipc_collect()
+    LOGGER.info("cuda allocator cache cleared reason=%s", reason)
+
+
+def _increment_pipeline_usage_locked(cache_key: str) -> None:
+    PIPELINE_USAGE_COUNTS[cache_key] = int(PIPELINE_USAGE_COUNTS.get(cache_key, 0)) + 1
+
+
+def release_pipeline_usage(cache_key: Optional[str]) -> None:
+    key = str(cache_key or "").strip()
+    if not key:
+        return
+    with PIPELINES_LOCK:
+        current = int(PIPELINE_USAGE_COUNTS.get(key, 0))
+        if current <= 1:
+            PIPELINE_USAGE_COUNTS.pop(key, None)
+        else:
+            PIPELINE_USAGE_COUNTS[key] = current - 1
+
+
+def unload_unused_cached_components(
+    *,
+    keep_cache_keys: Optional[set[str]] = None,
+    clear_vaes: bool = False,
+    reason: str = "",
+) -> Dict[str, int]:
+    keep = keep_cache_keys or set()
+    evicted_items: list[tuple[str, Any]] = []
+    with PIPELINES_LOCK:
+        for cache_key in list(PIPELINES.keys()):
+            if cache_key in keep:
+                continue
+            if int(PIPELINE_USAGE_COUNTS.get(cache_key, 0)) > 0:
+                continue
+            pipe = PIPELINES.pop(cache_key)
+            evicted_items.append((cache_key, pipe))
+    for _, pipe in evicted_items:
+        with contextlib.suppress(Exception):
+            if hasattr(pipe, "to"):
+                pipe.to("cpu")
+        with contextlib.suppress(Exception):
+            if getattr(pipe, "_videogen_lora_loaded", False) and hasattr(pipe, "unload_lora_weights"):
+                pipe.unload_lora_weights()
+                pipe._videogen_lora_loaded = False
+    released_vaes = 0
+    if clear_vaes:
+        in_use_now = False
+        with PIPELINES_LOCK:
+            in_use_now = any(int(v) > 0 for v in PIPELINE_USAGE_COUNTS.values())
+        if not in_use_now:
+            vae_items: list[Any] = []
+            with VAES_LOCK:
+                for source in list(VAES.keys()):
+                    vae_items.append(VAES.pop(source))
+            released_vaes = len(vae_items)
+            for vae in vae_items:
+                with contextlib.suppress(Exception):
+                    if hasattr(vae, "to"):
+                        vae.to("cpu")
+    with contextlib.suppress(Exception):
+        gc.collect()
+    clear_cuda_allocator_cache(reason=f"{reason}:post-evict")
+    evicted_count = len(evicted_items)
+    if evicted_count or released_vaes:
+        LOGGER.info(
+            "released cached components reason=%s pipelines=%s vaes=%s keep=%s",
+            reason or "(none)",
+            evicted_count,
+            released_vaes,
+            len(keep),
+        )
+    return {"pipelines": evicted_count, "vaes": released_vaes}
+
+
+def cleanup_before_generation_load(
+    *,
+    kind: Literal["text-to-image", "image-to-image", "text-to-video", "image-to-video"],
+    model_ref: str,
+    settings: Dict[str, Any],
+    clear_vaes: bool = True,
+) -> Dict[str, int]:
+    source = resolve_model_source(model_ref, settings)
+    keep_cache_keys = {f"{kind}:{source}"}
+    released = unload_unused_cached_components(
+        keep_cache_keys=keep_cache_keys,
+        clear_vaes=clear_vaes,
+        reason=f"before-generate:{kind}",
+    )
+    LOGGER.info(
+        "pre-generation cleanup kind=%s model_ref=%s source=%s released_pipelines=%s released_vaes=%s",
+        kind,
+        model_ref,
+        source,
+        released.get("pipelines"),
+        released.get("vaes"),
+    )
+    return released
 
 
 def normalize_user_path(path_like: str) -> Path:
@@ -478,6 +736,16 @@ def is_deletable_model_dir(model_dir: Path) -> bool:
         return True
     if any(model_dir.glob("*.safetensors")):
         return True
+    return False
+
+
+def is_deletable_local_model_path(target: Path) -> bool:
+    if not target.exists():
+        return False
+    if target.is_file():
+        return is_local_tree_model_file(target)
+    if target.is_dir():
+        return is_legacy_local_model_candidate(target) or is_deletable_model_dir(target)
     return False
 
 
@@ -664,6 +932,122 @@ def resolve_text2video_backend(requested_backend: str, settings: Dict[str, Any])
     return "cuda"
 
 
+def resolve_video_timing(
+    *,
+    fps: int,
+    duration_seconds: Optional[float],
+    legacy_num_frames: Optional[int],
+) -> tuple[int, float]:
+    fps_value = max(1, int(fps))
+    legacy_frames = int(legacy_num_frames) if legacy_num_frames is not None else 0
+    if legacy_frames > 0:
+        total_frames = legacy_frames
+        resolved_duration = float(total_frames) / float(fps_value)
+        return total_frames, resolved_duration
+    raw_duration = VIDEO_DURATION_SECONDS_DEFAULT if duration_seconds is None else float(duration_seconds)
+    resolved_duration = max(0.1, min(VIDEO_DURATION_SECONDS_MAX, raw_duration))
+    total_frames = max(1, int(resolved_duration * float(fps_value) + 0.5))
+    resolved_duration = float(total_frames) / float(fps_value)
+    return total_frames, resolved_duration
+
+
+def resolve_framepack_plan(*, total_frames: int, fps: int) -> Dict[str, Any]:
+    total = max(1, int(total_frames))
+    fps_value = max(1, int(fps))
+    long_video_threshold_frames = max(1, int(FRAMEPACK_LONG_VIDEO_SECONDS_THRESHOLD * float(fps_value)))
+    long_video_mode = total >= long_video_threshold_frames
+
+    raw_segment = os.environ.get("VIDEOGEN_FRAMEPACK_SEGMENT_FRAMES", "").strip()
+    if not raw_segment:
+        # Keep compatibility with previous naming.
+        raw_segment = os.environ.get("VIDEOGEN_VIDEO_CHUNK_FRAMES", str(FRAMEPACK_SEGMENT_FRAMES_DEFAULT)).strip()
+    try:
+        segment_frames = int(raw_segment)
+    except Exception:
+        segment_frames = FRAMEPACK_SEGMENT_FRAMES_DEFAULT
+    segment_frames = max(FRAMEPACK_SEGMENT_FRAMES_MIN, min(FRAMEPACK_SEGMENT_FRAMES_MAX, segment_frames))
+
+    if long_video_mode:
+        raw_long_segment = os.environ.get(
+            "VIDEOGEN_FRAMEPACK_LONG_SEGMENT_FRAMES",
+            str(FRAMEPACK_LONG_SEGMENT_FRAMES_DEFAULT),
+        ).strip()
+        try:
+            long_segment_frames = int(raw_long_segment)
+        except Exception:
+            long_segment_frames = FRAMEPACK_LONG_SEGMENT_FRAMES_DEFAULT
+        long_segment_frames = max(
+            FRAMEPACK_SEGMENT_FRAMES_MIN,
+            min(FRAMEPACK_SEGMENT_FRAMES_MAX, long_segment_frames),
+        )
+        segment_frames = min(segment_frames, long_segment_frames)
+
+    segment_frames = min(segment_frames, total)
+
+    raw_overlap = os.environ.get(
+        "VIDEOGEN_FRAMEPACK_OVERLAP_FRAMES",
+        str(FRAMEPACK_OVERLAP_FRAMES_DEFAULT),
+    ).strip()
+    try:
+        overlap_frames = int(raw_overlap)
+    except Exception:
+        overlap_frames = FRAMEPACK_OVERLAP_FRAMES_DEFAULT
+    overlap_frames = max(0, min(overlap_frames, max(0, segment_frames - 1)))
+
+    usable_frames_per_pack = max(1, segment_frames - overlap_frames)
+    if total <= segment_frames:
+        pack_count = 1
+    else:
+        remaining_after_first = total - segment_frames
+        pack_count = 1 + ((remaining_after_first + usable_frames_per_pack - 1) // usable_frames_per_pack)
+    return {
+        "segment_frames": segment_frames,
+        "overlap_frames": overlap_frames,
+        "usable_frames_per_pack": usable_frames_per_pack,
+        "pack_count": pack_count,
+        "long_video_mode": long_video_mode,
+    }
+
+
+def configured_video_chunk_frames(total_frames: int) -> int:
+    # Legacy helper kept for compatibility; FramePack now drives video segmentation.
+    plan = resolve_framepack_plan(total_frames=total_frames, fps=1)
+    return int(plan["segment_frames"])
+
+
+def iter_framepack_segments(total_frames: int, segment_frames: int, overlap_frames: int) -> list[Dict[str, int]]:
+    total = max(1, int(total_frames))
+    segment = max(1, int(segment_frames))
+    overlap = max(0, min(int(overlap_frames), max(0, segment - 1)))
+    segments: list[Dict[str, int]] = []
+    produced = 0
+    index = 0
+    while produced < total:
+        if index == 0:
+            request_frames = min(segment, total)
+            trim_head_frames = 0
+        else:
+            remaining = total - produced
+            request_frames = min(segment, remaining + overlap)
+            trim_head_frames = min(overlap, max(0, request_frames - 1))
+        append_frames = max(1, request_frames - trim_head_frames)
+        if append_frames > (total - produced):
+            append_frames = total - produced
+            trim_head_frames = max(0, request_frames - append_frames)
+        segments.append(
+            {
+                "index": index + 1,
+                "request_frames": request_frames,
+                "trim_head_frames": trim_head_frames,
+                "append_frames": append_frames,
+                "produced_before": produced,
+            }
+        )
+        produced += append_frames
+        index += 1
+    return segments
+
+
 def run_text2video_npu_runner(task_id: str, payload: "Text2VideoRequest", settings: Dict[str, Any], model_ref: str) -> Dict[str, Any]:
     runner_raw = str(settings.get("server", {}).get("t2v_npu_runner", "")).strip()
     if not runner_raw:
@@ -691,6 +1075,11 @@ def run_text2video_npu_runner(task_id: str, payload: "Text2VideoRequest", settin
     tmp_dir = resolve_path(settings["paths"]["tmp_dir"])
     tmp_dir.mkdir(parents=True, exist_ok=True)
     req_path = tmp_dir / f"{task_id}_npu_t2v_request.json"
+    target_frames, resolved_duration_seconds = resolve_video_timing(
+        fps=int(payload.fps),
+        duration_seconds=payload.duration_seconds,
+        legacy_num_frames=payload.num_frames,
+    )
     req_payload = {
         "task_id": task_id,
         "prompt": payload.prompt,
@@ -698,7 +1087,8 @@ def run_text2video_npu_runner(task_id: str, payload: "Text2VideoRequest", settin
         "model_id": model_ref,
         "npu_model_dir": npu_model_dir,
         "num_inference_steps": int(payload.num_inference_steps),
-        "num_frames": int(payload.num_frames),
+        "duration_seconds": float(resolved_duration_seconds),
+        "num_frames": int(target_frames),
         "guidance_scale": float(payload.guidance_scale),
         "fps": int(payload.fps),
         "seed": payload.seed,
@@ -794,6 +1184,7 @@ def load_diffusers_components() -> Dict[str, Any]:
             AutoPipelineForText2Image,
             AutoencoderKL,
             DPMSolverMultistepScheduler,
+            DiffusionPipeline,
             I2VGenXLPipeline,
             StableDiffusionImg2ImgPipeline,
             StableDiffusionPipeline,
@@ -813,6 +1204,7 @@ def load_diffusers_components() -> Dict[str, Any]:
             "AutoPipelineForText2Image": AutoPipelineForText2Image,
             "AutoencoderKL": AutoencoderKL,
             "DPMSolverMultistepScheduler": DPMSolverMultistepScheduler,
+            "DiffusionPipeline": DiffusionPipeline,
             "I2VGenXLPipeline": I2VGenXLPipeline,
             "StableDiffusionImg2ImgPipeline": StableDiffusionImg2ImgPipeline,
             "StableDiffusionPipeline": StableDiffusionPipeline,
@@ -1261,7 +1653,135 @@ def should_apply_rocm_attention_override() -> bool:
     return parse_bool_setting(os.environ.get("VIDEOGEN_ROCM_ATTN_OVERRIDE", "0"), default=False)
 
 
-def get_pipeline(kind: Literal["text-to-image", "image-to-image", "text-to-video", "image-to-video"], model_ref: str, settings: Dict[str, Any]) -> Any:
+def load_pipeline_from_pretrained_with_strategy(
+    *,
+    loader: Callable[..., Any],
+    source: str,
+    dtype: Any,
+    prefer_gpu_device_map: bool,
+    kind: str,
+) -> Any:
+    base_kwargs: Dict[str, Any] = {"torch_dtype": dtype}
+    offload_dir_raw = os.environ.get("VIDEOGEN_PRETRAINED_OFFLOAD_DIR", "").strip()
+    if offload_dir_raw:
+        offload_dir = resolve_path(offload_dir_raw)
+    else:
+        offload_dir = resolve_path("tmp") / "pretrained_offload"
+    with contextlib.suppress(Exception):
+        offload_dir.mkdir(parents=True, exist_ok=True)
+
+    gpu_first_base_kwargs: Dict[str, Any] = {
+        **base_kwargs,
+        "low_cpu_mem_usage": True,
+        "offload_state_dict": True,
+        "offload_folder": str(offload_dir),
+    }
+    attempts: list[tuple[str, Dict[str, Any]]] = []
+    allow_fallback = parse_bool_setting(os.environ.get("VIDEOGEN_ALLOW_PRETRAINED_LOAD_FALLBACK", "0"), default=False)
+    if prefer_gpu_device_map:
+        attempts.append(
+            (
+                "device_map_cuda_safetensors",
+                {
+                    **gpu_first_base_kwargs,
+                    "device_map": "cuda",
+                    "use_safetensors": True,
+                },
+            )
+        )
+        attempts.append(
+            (
+                "device_map_cuda",
+                {
+                    **gpu_first_base_kwargs,
+                    "device_map": "cuda",
+                },
+            )
+        )
+    if (not prefer_gpu_device_map) or allow_fallback:
+        attempts.append(
+            (
+                "low_cpu_mem_usage",
+                {
+                    **base_kwargs,
+                    "low_cpu_mem_usage": True,
+                    "offload_state_dict": True,
+                    "offload_folder": str(offload_dir),
+                },
+            )
+        )
+        attempts.append(("baseline", dict(base_kwargs)))
+
+    last_error: Optional[Exception] = None
+    for strategy_name, kwargs in attempts:
+        with contextlib.suppress(Exception):
+            gc.collect()
+        clear_cuda_allocator_cache(reason=f"pretrained-load-before:{kind}:{strategy_name}")
+        log_memory_snapshot("before", kind=kind, source=source, strategy=strategy_name)
+        try:
+            LOGGER.info(
+                "pipeline pretrained load attempt kind=%s strategy=%s source=%s kwargs=%s",
+                kind,
+                strategy_name,
+                source,
+                ",".join(sorted(kwargs.keys())),
+            )
+            pipe = loader(source, **kwargs)
+            LOGGER.info(
+                "pipeline pretrained load success kind=%s strategy=%s source=%s",
+                kind,
+                strategy_name,
+                source,
+            )
+            log_memory_snapshot("after-success", kind=kind, source=source, strategy=strategy_name)
+            return pipe
+        except TypeError as exc:
+            # Some pipelines on older diffusers stacks reject strategy-specific kwargs.
+            last_error = RuntimeError(f"{exc.__class__.__name__}: {exc}")
+            LOGGER.warning(
+                "pipeline pretrained load unsupported kwargs kind=%s strategy=%s source=%s error=%s",
+                kind,
+                strategy_name,
+                source,
+                str(exc),
+            )
+            detach_exception_state(exc)
+            log_memory_snapshot("after-typeerror", kind=kind, source=source, strategy=strategy_name)
+            continue
+        except Exception as exc:
+            last_error = RuntimeError(f"{exc.__class__.__name__}: {exc}")
+            LOGGER.warning(
+                "pipeline pretrained load failed kind=%s strategy=%s source=%s error=%s",
+                kind,
+                strategy_name,
+                source,
+                str(exc),
+                exc_info=True,
+            )
+            if is_gpu_oom_error(exc):
+                with contextlib.suppress(Exception):
+                    gc.collect()
+                clear_cuda_allocator_cache(reason=f"pretrained-load-oom:{kind}:{strategy_name}")
+            detach_exception_state(exc)
+            log_memory_snapshot("after-failure", kind=kind, source=source, strategy=strategy_name)
+            continue
+    if last_error is not None:
+        if prefer_gpu_device_map and not allow_fallback:
+            raise RuntimeError(
+                "GPU-first pipeline loading failed and CPU-heavy fallback is disabled. "
+                "Set VIDEOGEN_ALLOW_PRETRAINED_LOAD_FALLBACK=1 to allow fallback loading."
+            ) from last_error
+        raise last_error
+    raise RuntimeError(f"failed to load pipeline kind={kind} source={source}")
+
+
+def get_pipeline(
+    kind: Literal["text-to-image", "image-to-image", "text-to-video", "image-to-video"],
+    model_ref: str,
+    settings: Dict[str, Any],
+    *,
+    acquire_usage: bool = False,
+) -> Any:
     source = resolve_model_source(model_ref, settings)
     source_path = Path(source)
     source_is_single_file = is_single_file_model(source_path)
@@ -1269,7 +1789,12 @@ def get_pipeline(kind: Literal["text-to-image", "image-to-image", "text-to-video
     with PIPELINES_LOCK:
         if cache_key in PIPELINES:
             LOGGER.info("pipeline cache hit kind=%s source=%s", kind, source)
-            return PIPELINES[cache_key]
+            cached = PIPELINES[cache_key]
+            with contextlib.suppress(Exception):
+                cached._videogen_cache_key = cache_key
+            if acquire_usage:
+                _increment_pipeline_usage_locked(cache_key)
+            return cached
     device, dtype = get_device_and_dtype()
     components = load_diffusers_components()
     AutoPipelineForText2Image = components["AutoPipelineForText2Image"]
@@ -1279,6 +1804,7 @@ def get_pipeline(kind: Literal["text-to-image", "image-to-image", "text-to-video
     StableDiffusionXLPipeline = components["StableDiffusionXLPipeline"]
     StableDiffusionXLImg2ImgPipeline = components["StableDiffusionXLImg2ImgPipeline"]
     TextToVideoSDPipeline = components["TextToVideoSDPipeline"]
+    DiffusionPipeline = components["DiffusionPipeline"]
     I2VGenXLPipeline = components["I2VGenXLPipeline"]
     WanImageToVideoPipeline = components["WanImageToVideoPipeline"]
     DPMSolverMultistepScheduler = components["DPMSolverMultistepScheduler"]
@@ -1289,47 +1815,104 @@ def get_pipeline(kind: Literal["text-to-image", "image-to-image", "text-to-video
             existing = PIPELINES.get(cache_key)
             if existing is not None:
                 LOGGER.info("pipeline cache hit(after-wait) kind=%s source=%s", kind, source)
+                with contextlib.suppress(Exception):
+                    existing._videogen_cache_key = cache_key
+                if acquire_usage:
+                    _increment_pipeline_usage_locked(cache_key)
                 return existing
-        if kind == "text-to-image":
-            if source_is_single_file:
-                family = infer_single_file_family(source_path)
-                if family == "sdxl":
-                    config = find_local_sdxl_base_config(settings)
-                    kwargs: Dict[str, Any] = {"torch_dtype": dtype}
-                    if config:
-                        kwargs["config"] = config
-                    pipe = StableDiffusionXLPipeline.from_single_file(source, **kwargs)
-                else:
-                    pipe = StableDiffusionPipeline.from_single_file(source, torch_dtype=dtype)
-            else:
-                pipe = AutoPipelineForText2Image.from_pretrained(source, torch_dtype=dtype)
-        elif kind == "image-to-image":
-            if source_is_single_file:
-                family = infer_single_file_family(source_path)
-                if family == "sdxl":
-                    config = find_local_sdxl_base_config(settings)
-                    kwargs = {"torch_dtype": dtype}
-                    if config:
-                        kwargs["config"] = config
-                    pipe = StableDiffusionXLImg2ImgPipeline.from_single_file(source, **kwargs)
-                else:
-                    pipe = StableDiffusionImg2ImgPipeline.from_single_file(source, torch_dtype=dtype)
-            else:
-                pipe = AutoPipelineForImage2Image.from_pretrained(source, torch_dtype=dtype)
-        elif kind == "text-to-video":
-            pipe = TextToVideoSDPipeline.from_pretrained(source, torch_dtype=dtype)
-            if hasattr(pipe, "scheduler") and hasattr(pipe.scheduler, "config"):
-                pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config)
-        else:
+        is_video_kind = kind in {"text-to-video", "image-to-video"}
+        if is_video_kind and device == "cuda":
+            unload_unused_cached_components(
+                keep_cache_keys={cache_key},
+                clear_vaes=True,
+                reason=f"before-load:{kind}",
+            )
+
+        def _instantiate_pipeline() -> Any:
+            if kind == "text-to-image":
+                if source_is_single_file:
+                    family = infer_single_file_family(source_path)
+                    if family == "sdxl":
+                        config = find_local_sdxl_base_config(settings)
+                        kwargs: Dict[str, Any] = {"torch_dtype": dtype}
+                        if config:
+                            kwargs["config"] = config
+                        return StableDiffusionXLPipeline.from_single_file(source, **kwargs)
+                    return StableDiffusionPipeline.from_single_file(source, torch_dtype=dtype)
+                return AutoPipelineForText2Image.from_pretrained(source, torch_dtype=dtype)
+            if kind == "image-to-image":
+                if source_is_single_file:
+                    family = infer_single_file_family(source_path)
+                    if family == "sdxl":
+                        config = find_local_sdxl_base_config(settings)
+                        kwargs = {"torch_dtype": dtype}
+                        if config:
+                            kwargs["config"] = config
+                        return StableDiffusionXLImg2ImgPipeline.from_single_file(source, **kwargs)
+                    return StableDiffusionImg2ImgPipeline.from_single_file(source, torch_dtype=dtype)
+                return AutoPipelineForImage2Image.from_pretrained(source, torch_dtype=dtype)
+            if kind == "text-to-video":
+                loaded = load_pipeline_from_pretrained_with_strategy(
+                    loader=lambda src, **kwargs: DiffusionPipeline.from_pretrained(src, **kwargs),
+                    source=source,
+                    dtype=dtype,
+                    prefer_gpu_device_map=True,
+                    kind=kind,
+                )
+                if isinstance(loaded, TextToVideoSDPipeline) and hasattr(loaded, "scheduler") and hasattr(loaded.scheduler, "config"):
+                    loaded.scheduler = DPMSolverMultistepScheduler.from_config(loaded.scheduler.config)
+                return loaded
             class_name = ""
             if source_path.exists() and source_path.is_dir():
                 model_index = load_local_model_index(source_path)
                 class_name = str((model_index or {}).get("_class_name") or "").strip()
             if class_name == "WanImageToVideoPipeline":
-                pipe = WanImageToVideoPipeline.from_pretrained(source, torch_dtype=dtype)
+                return load_pipeline_from_pretrained_with_strategy(
+                    loader=lambda src, **kwargs: WanImageToVideoPipeline.from_pretrained(src, **kwargs),
+                    source=source,
+                    dtype=dtype,
+                    prefer_gpu_device_map=True,
+                    kind=kind,
+                )
+            return load_pipeline_from_pretrained_with_strategy(
+                loader=lambda src, **kwargs: I2VGenXLPipeline.from_pretrained(src, **kwargs),
+                source=source,
+                dtype=dtype,
+                prefer_gpu_device_map=True,
+                kind=kind,
+            )
+
+        pipe: Any
+        try:
+            pipe = _instantiate_pipeline()
+        except Exception as exc:
+            if is_video_kind and device == "cuda" and is_gpu_oom_error(exc):
+                LOGGER.warning(
+                    "pipeline load OOM; evicting unused cache and retrying once kind=%s source=%s",
+                    kind,
+                    source,
+                    exc_info=True,
+                )
+                unload_unused_cached_components(
+                    keep_cache_keys={cache_key},
+                    clear_vaes=True,
+                    reason=f"retry-after-oom:{kind}",
+                )
+                detach_exception_state(exc)
+                pipe = _instantiate_pipeline()
             else:
-                pipe = I2VGenXLPipeline.from_pretrained(source, torch_dtype=dtype)
-        pipe = pipe.to(device)
+                raise
+        hf_device_map = getattr(pipe, "hf_device_map", None)
+        if not hf_device_map:
+            pipe = pipe.to(device)
+        else:
+            with contextlib.suppress(Exception):
+                LOGGER.info(
+                    "pipeline uses hf_device_map kind=%s source=%s entries=%s",
+                    kind,
+                    source,
+                    len(hf_device_map) if isinstance(hf_device_map, dict) else 1,
+                )
         if hasattr(pipe, "set_progress_bar_config"):
             with contextlib.suppress(Exception):
                 pipe.set_progress_bar_config(disable=True)
@@ -1349,9 +1932,28 @@ def get_pipeline(kind: Literal["text-to-image", "image-to-image", "text-to-video
             except Exception:
                 LOGGER.debug("channels_last optimization skipped", exc_info=True)
         with PIPELINES_LOCK:
+            with contextlib.suppress(Exception):
+                pipe._videogen_cache_key = cache_key
             PIPELINES[cache_key] = pipe
+            if acquire_usage:
+                _increment_pipeline_usage_locked(cache_key)
     LOGGER.info("pipeline load done kind=%s source=%s elapsed_ms=%.1f", kind, source, (time.perf_counter() - load_started) * 1000)
     return pipe
+
+
+def get_pipeline_for_inference(
+    kind: Literal["text-to-image", "image-to-image", "text-to-video", "image-to-video"],
+    model_ref: str,
+    settings: Dict[str, Any],
+) -> Any:
+    try:
+        return get_pipeline(kind, model_ref, settings, acquire_usage=True)
+    except TypeError as exc:
+        text = str(exc)
+        if ("acquire_usage" not in text) or ("unexpected keyword argument" not in text):
+            raise
+        LOGGER.debug("get_pipeline compatibility fallback used kind=%s model_ref=%s", kind, model_ref)
+        return get_pipeline(kind, model_ref, settings)
 
 
 def get_preload_state() -> Dict[str, Any]:
@@ -1407,105 +2009,154 @@ def start_preload_default_t2i(trigger: str) -> bool:
     return True
 
 
+def normalize_frame_to_uint8_rgb(frame: Any) -> Any:
+    import numpy as np
+
+    arr = np.asarray(frame)
+    if arr.ndim == 3 and arr.shape[0] in (1, 3, 4) and arr.shape[-1] not in (1, 3, 4):
+        arr = np.transpose(arr, (1, 2, 0))
+    if arr.ndim == 2:
+        arr = np.stack([arr, arr, arr], axis=-1)
+    if arr.ndim != 3:
+        raise RuntimeError(f"unsupported frame ndim={arr.ndim}")
+    if arr.shape[-1] == 4:
+        arr = arr[..., :3]
+    if arr.shape[-1] == 1:
+        arr = np.repeat(arr, 3, axis=-1)
+    if arr.dtype != np.uint8:
+        if np.issubdtype(arr.dtype, np.floating):
+            min_v = float(np.nanmin(arr))
+            max_v = float(np.nanmax(arr))
+            if min_v >= -0.01 and max_v <= 1.01:
+                arr = np.clip(arr, 0.0, 1.0) * 255.0
+            else:
+                arr = np.clip(arr, 0.0, 255.0)
+        else:
+            arr = np.clip(arr, 0, 255)
+        arr = arr.astype(np.uint8)
+    return arr
+
+
+def frame_to_pil_image(frame: Any) -> Any:
+    return Image.fromarray(normalize_frame_to_uint8_rgb(frame), mode="RGB")
+
+
+def detect_framepack_context_arg(pipe: Any) -> str:
+    signature = inspect.signature(pipe.__call__)
+    accepted = set(signature.parameters.keys())
+    for name in ("image", "init_image", "first_frame", "conditioning_image"):
+        if name in accepted:
+            return name
+    accepts_var_kwargs = any(param.kind == inspect.Parameter.VAR_KEYWORD for param in signature.parameters.values())
+    return "image" if accepts_var_kwargs else ""
+
+
+def open_hardware_video_writer(output_path: Path, fps: int) -> tuple[Any, str, Callable[[Any], Any]]:
+    if os.name != "nt":
+        raise RuntimeError("Hardware video encoding is only supported on Windows in this build.")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        import imageio.v2 as imageio  # type: ignore
+    except Exception as exc:
+        raise RuntimeError(f"Hardware video encoder runtime is unavailable: {exc}") from exc
+
+    def normalize_frame_for_encoder(frame: Any) -> Any:
+        return normalize_frame_to_uint8_rgb(frame)
+
+    codecs = ("h264_amf", "hevc_amf")
+    for codec in codecs:
+        try:
+            writer = imageio.get_writer(
+                str(output_path),
+                format="FFMPEG",
+                mode="I",
+                fps=int(fps),
+                codec=codec,
+                macro_block_size=1,
+                ffmpeg_log_level="error",
+                ffmpeg_params=["-pix_fmt", "yuv420p"],
+            )
+            return writer, codec, normalize_frame_for_encoder
+        except Exception:
+            LOGGER.warning("hardware writer open failed codec=%s path=%s", codec, str(output_path), exc_info=True)
+            continue
+    raise RuntimeError("No AMD hardware video codec was available (tried: h264_amf, hevc_amf).")
+
+
+def append_frames_to_video_writer(
+    writer: Any,
+    normalize_frame: Callable[[Any], Any],
+    frames: Any,
+    skip_head_frames: int = 0,
+) -> tuple[int, Optional[tuple[int, ...]], Optional[str]]:
+    appended = 0
+    sample_shape: Optional[tuple[int, ...]] = None
+    sample_dtype: Optional[str] = None
+    skip = max(0, int(skip_head_frames))
+    for frame_index, frame in enumerate(frames):
+        if frame_index < skip:
+            continue
+        norm = normalize_frame(frame)
+        writer.append_data(norm)
+        if appended == 0:
+            sample_shape = tuple(int(v) for v in norm.shape)
+            sample_dtype = str(norm.dtype)
+        appended += 1
+    return appended, sample_shape, sample_dtype
+
+
 def export_video_with_fallback(frames: Any, output_path: Path, fps: int) -> str:
     """
     Prefer AMD AMF hardware encoding on Windows to reduce CPU load.
     Software encoding is intentionally disabled to avoid hidden CPU fallback during diagnostics.
     """
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    if os.name == "nt":
-        try:
-            import numpy as np
-            import imageio.v2 as imageio  # type: ignore
+    writer: Any = None
+    encoder_name = ""
+    try:
+        writer, encoder_name, normalize_frame = open_hardware_video_writer(output_path, fps=int(fps))
+        frame_count, sample_shape, sample_dtype = append_frames_to_video_writer(writer, normalize_frame, frames)
+        if frame_count <= 0:
+            raise RuntimeError("no frames were generated to encode")
+        LOGGER.info(
+            "video encoded with hardware codec=%s path=%s frames=%s fps=%s sample_shape=%s sample_dtype=%s",
+            encoder_name,
+            str(output_path),
+            frame_count,
+            fps,
+            sample_shape,
+            sample_dtype,
+        )
+        return encoder_name
+    except Exception:
+        if output_path.exists():
+            output_path.unlink(missing_ok=True)
+        raise RuntimeError(
+            "Hardware video encoder is unavailable. CPU fallback is disabled for root-cause diagnostics."
+        )
+    finally:
+        if writer is not None:
+            with contextlib.suppress(Exception):
+                writer.close()
 
-            def normalize_frame_for_encoder(frame: Any) -> Any:
-                arr = np.asarray(frame)
-                if arr.ndim == 3 and arr.shape[0] in (1, 3, 4) and arr.shape[-1] not in (1, 3, 4):
-                    arr = np.transpose(arr, (1, 2, 0))
-                if arr.ndim == 2:
-                    arr = np.stack([arr, arr, arr], axis=-1)
-                if arr.ndim != 3:
-                    raise RuntimeError(f"unsupported frame ndim={arr.ndim}")
-                if arr.shape[-1] == 4:
-                    arr = arr[..., :3]
-                if arr.shape[-1] == 1:
-                    arr = np.repeat(arr, 3, axis=-1)
-                if arr.dtype != np.uint8:
-                    if np.issubdtype(arr.dtype, np.floating):
-                        min_v = float(np.nanmin(arr))
-                        max_v = float(np.nanmax(arr))
-                        if min_v >= -0.01 and max_v <= 1.01:
-                            arr = np.clip(arr, 0.0, 1.0) * 255.0
-                        else:
-                            arr = np.clip(arr, 0.0, 255.0)
-                    else:
-                        arr = np.clip(arr, 0, 255)
-                    arr = arr.astype(np.uint8)
-                return arr
 
-            frame_count = 0
-            sample_shape: Optional[tuple[int, ...]] = None
-            sample_dtype: Optional[str] = None
-            normalized_frames: list[Any] = []
-            for frame in frames:
-                norm = normalize_frame_for_encoder(frame)
-                if frame_count == 0:
-                    sample_shape = tuple(int(v) for v in norm.shape)
-                    sample_dtype = str(norm.dtype)
-                normalized_frames.append(norm)
-                frame_count += 1
-
-            if frame_count == 0:
-                raise RuntimeError("no frames were generated to encode")
-
-            codecs = ("h264_amf", "hevc_amf")
-            for codec in codecs:
-                try:
-                    writer = imageio.get_writer(
-                        str(output_path),
-                        format="FFMPEG",
-                        mode="I",
-                        fps=int(fps),
-                        codec=codec,
-                        macro_block_size=1,
-                        ffmpeg_log_level="error",
-                        ffmpeg_params=["-pix_fmt", "yuv420p"],
-                    )
-                    try:
-                        for frame in normalized_frames:
-                            writer.append_data(frame)
-                    finally:
-                        writer.close()
-                    LOGGER.info(
-                        "video encoded with hardware codec=%s path=%s frames=%s fps=%s sample_shape=%s sample_dtype=%s",
-                        codec,
-                        str(output_path),
-                        frame_count,
-                        fps,
-                        sample_shape,
-                        sample_dtype,
-                    )
-                    return codec
-                except Exception:
-                    LOGGER.warning(
-                        "hardware encode failed codec=%s path=%s frames=%s fps=%s sample_shape=%s sample_dtype=%s",
-                        codec,
-                        str(output_path),
-                        frame_count,
-                        fps,
-                        sample_shape,
-                        sample_dtype,
-                        exc_info=True,
-                    )
-                    if output_path.exists():
-                        output_path.unlink(missing_ok=True)
-                    continue
-        except Exception:
-            LOGGER.debug("hardware video encode path unavailable", exc_info=True)
-
-    raise RuntimeError(
-        "Hardware video encoder is unavailable. CPU fallback is disabled for root-cause diagnostics."
-    )
+def try_patch_wan_ftfy_dependency(pipe: Any) -> bool:
+    """Patch diffusers Wan pipeline module-level `ftfy` binding when missing."""
+    pipe_name = type(pipe).__name__
+    if pipe_name not in {"WanPipeline", "WanImageToVideoPipeline"}:
+        return False
+    try:
+        from diffusers.pipelines.wan import pipeline_wan as wan_module
+    except Exception:
+        return False
+    if getattr(wan_module, "ftfy", None) is not None:
+        return False
+    try:
+        import ftfy as ftfy_module  # type: ignore
+    except Exception:
+        return False
+    wan_module.ftfy = ftfy_module
+    LOGGER.info("patched diffusers Wan pipeline module with ftfy dependency")
+    return True
 
 
 def call_with_supported_kwargs(pipe: Any, kwargs: Dict[str, Any]) -> Any:
@@ -1528,12 +2179,29 @@ def call_with_supported_kwargs(pipe: Any, kwargs: Dict[str, Any]) -> Any:
             dropped[:20],
         )
     if not accepts_var_kwargs:
-        return pipe(**filtered)
+        try:
+            return pipe(**filtered)
+        except NameError as exc:
+            if "ftfy" not in str(exc):
+                raise
+            if try_patch_wan_ftfy_dependency(pipe):
+                return pipe(**filtered)
+            raise RuntimeError(
+                "Wan pipeline runtime dependency is missing: install `ftfy` in this environment."
+            ) from exc
     max_retry = 4
     current_kwargs = dict(filtered)
     for _ in range(max_retry):
         try:
             return pipe(**current_kwargs)
+        except NameError as exc:
+            if "ftfy" not in str(exc):
+                raise
+            if try_patch_wan_ftfy_dependency(pipe):
+                return pipe(**current_kwargs)
+            raise RuntimeError(
+                "Wan pipeline runtime dependency is missing: install `ftfy` in this environment."
+            ) from exc
         except TypeError as exc:
             # Some wrappers expose **kwargs but still reject unknown keys internally.
             if "unexpected keyword argument" not in str(exc):
@@ -1792,7 +2460,14 @@ def infer_base_model_label(*parts: Any) -> str:
     text = " ".join(str(part or "") for part in parts).strip().lower()
     if not text:
         return "Other"
-    if "stable-diffusion-xl" in text or "sdxl" in text or re.search(r"\bxl\b", text):
+    if (
+        "stable-diffusion-xl" in text
+        or "sdxl" in text
+        or "realvisxl" in text
+        or "-xl" in text
+        or "_xl" in text
+        or re.search(r"\bxl\b", text)
+    ):
         return "StableDiffusion XL"
     if "stable-diffusion-2-1" in text or "stable diffusion 2.1" in text or re.search(r"\b2\.1\b", text):
         return "StableDiffusion 2.1"
@@ -1973,6 +2648,42 @@ def safe_int(value: Any) -> Optional[int]:
     return parsed if parsed >= 0 else None
 
 
+def safe_non_negative_float(value: Any) -> Optional[float]:
+    try:
+        parsed = float(value)
+    except Exception:
+        return None
+    if not math.isfinite(parsed) or parsed < 0.0:
+        return None
+    return parsed
+
+
+def normalize_size_filter_bounds(size_min_mb: Optional[float], size_max_mb: Optional[float]) -> tuple[Optional[int], Optional[int]]:
+    min_mb = safe_non_negative_float(size_min_mb)
+    max_mb = safe_non_negative_float(size_max_mb)
+    min_bytes = int(min_mb * 1024 * 1024) if min_mb is not None and min_mb > 0 else None
+    max_bytes = int(max_mb * 1024 * 1024) if max_mb is not None and max_mb > 0 else None
+    if min_bytes is not None and max_bytes is not None and max_bytes < min_bytes:
+        raise ValueError("size_max_mb must be greater than or equal to size_min_mb")
+    return min_bytes, max_bytes
+
+
+def filter_models_by_size_bytes(items: list[Dict[str, Any]], min_bytes: Optional[int], max_bytes: Optional[int]) -> list[Dict[str, Any]]:
+    if min_bytes is None and max_bytes is None:
+        return items
+    filtered: list[Dict[str, Any]] = []
+    for item in items:
+        size_bytes = safe_int(item.get("size_bytes"))
+        if size_bytes is None:
+            continue
+        if min_bytes is not None and size_bytes < min_bytes:
+            continue
+        if max_bytes is not None and size_bytes > max_bytes:
+            continue
+        filtered.append(item)
+    return filtered
+
+
 def directory_size_bytes(root: Path) -> int:
     if not root.exists():
         return 0
@@ -2071,6 +2782,134 @@ def detect_model_provider_from_path(path: Path) -> Optional[str]:
     return None
 
 
+def load_local_videogen_meta(path: Path) -> Dict[str, Any]:
+    candidates: list[Path] = []
+    if path.is_dir():
+        candidates.append(path / "videogen_meta.json")
+    else:
+        candidates.append(path.parent / "videogen_meta.json")
+    for candidate in candidates:
+        if not candidate.exists() or not candidate.is_file():
+            continue
+        try:
+            payload = json.loads(candidate.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if isinstance(payload, dict):
+            return payload
+    return {}
+
+
+def normalize_local_tree_category_from_kind(kind: str, repo_hint: str = "") -> str:
+    raw = str(kind or "").strip().lower()
+    if raw in ("lora", "loras"):
+        return "Lora"
+    if raw in ("vae", "vea"):
+        return "VAE"
+    if raw in ("checkpoint", "basemodel", "base", "model"):
+        return "BaseModel"
+    hint = str(repo_hint or "").lower()
+    if "lora" in hint:
+        return "Lora"
+    if "vae" in hint or "vea" in hint:
+        return "VAE"
+    return "BaseModel"
+
+
+def legacy_item_category(path: Path) -> str:
+    if path.is_dir():
+        if is_local_lora_dir(path):
+            return "Lora"
+        if is_local_vae_dir(path):
+            return "VAE"
+        meta = load_local_videogen_meta(path)
+        if meta:
+            return normalize_local_tree_category_from_kind(str(meta.get("category") or meta.get("model_kind") or ""), path.name)
+    return "BaseModel"
+
+
+def legacy_item_task_dirs(path: Path) -> list[str]:
+    def append_task_if_valid(values: list[str], task_value: str) -> None:
+        canonical = LOCAL_TREE_API_TO_TASK.get(task_value)
+        if canonical and canonical not in values:
+            values.append(canonical)
+
+    def infer_task_dirs_from_hint(text: str) -> list[str]:
+        value = str(text or "").strip().lower()
+        if not value:
+            return []
+        inferred: list[str] = []
+        if any(token in value for token in ("i2v", "image2video", "image-to-video", "v2v")):
+            inferred.append("V2V")
+        if any(token in value for token in ("t2v", "text2video", "text-to-video", "texttovideo")):
+            inferred.append("T2V")
+        if any(token in value for token in ("i2i", "image2image", "image-to-image", "img2img")):
+            inferred.append("I2I")
+        if any(token in value for token in ("t2i", "text2image", "text-to-image", "txt2img")):
+            inferred.append("T2I")
+        return inferred
+
+    meta = load_local_videogen_meta(path)
+    task_values: list[str] = []
+    if meta:
+        task_value = str(meta.get("task") or "").strip().lower()
+        if task_value:
+            append_task_if_valid(task_values, task_value)
+    if path.is_file():
+        for task in single_file_model_compatible_tasks(path):
+            append_task_if_valid(task_values, task)
+        for inferred in infer_task_dirs_from_hint(path.name):
+            if inferred not in task_values:
+                task_values.append(inferred)
+        return task_values
+    if not task_values and path.is_dir():
+        model_meta = detect_local_model_meta(path)
+        for task in model_meta.compatible_tasks:
+            append_task_if_valid(task_values, task)
+    if not task_values and path.is_dir():
+        model_files = [child for child in path.iterdir() if is_local_tree_model_file(child)]
+        for child in model_files:
+            for task in single_file_model_compatible_tasks(child):
+                append_task_if_valid(task_values, task)
+            for inferred in infer_task_dirs_from_hint(child.name):
+                if inferred not in task_values:
+                    task_values.append(inferred)
+        if not task_values and model_files:
+            for inferred in infer_task_dirs_from_hint(path.name):
+                if inferred not in task_values:
+                    task_values.append(inferred)
+    if not task_values:
+        repo_hint = str(meta.get("repo_id") or path.name if isinstance(meta, dict) else path.name)
+        for inferred in infer_task_dirs_from_hint(repo_hint):
+            if inferred not in task_values:
+                task_values.append(inferred)
+    if not task_values:
+        category = legacy_item_category(path)
+        if category == "VAE":
+            task_values.extend(["T2I", "I2I"])
+        elif category == "Lora":
+            task_values.extend(["T2I", "I2I", "T2V", "V2V"])
+        elif category == "BaseModel":
+            task_values.extend(["T2I", "I2I"])
+    return task_values
+
+
+def is_legacy_local_model_candidate(path: Path) -> bool:
+    if path.is_file():
+        return is_local_tree_model_file(path)
+    if not path.is_dir():
+        return False
+    if (path / "videogen_meta.json").exists():
+        return True
+    if is_local_lora_dir(path) or is_local_vae_dir(path) or is_diffusers_model_directory(path):
+        return True
+    with contextlib.suppress(OSError):
+        for child in path.iterdir():
+            if is_local_tree_model_file(child):
+                return True
+    return False
+
+
 def model_item_preview_url(path: Path, model_root: Path) -> Optional[str]:
     if path.is_dir():
         preview_rel = find_local_preview_relpath(path, model_root)
@@ -2108,9 +2947,14 @@ def build_local_tree_item(
     task_api = LOCAL_TREE_TASK_TO_API.get(task_dir, "")
     class_name = ""
     model_id = item_path.stem if item_path.is_file() else desanitize_repo_id(item_path.name)
+    item_meta = load_local_videogen_meta(item_path)
     if is_dir:
         meta = detect_local_model_meta(item_path)
         class_name = meta.class_name
+        if not provider:
+            provider_value = str(item_meta.get("source") or "").strip().lower()
+            if provider_value in ("huggingface", "civitai"):
+                provider = provider_value
     else:
         class_name = "SingleFileModel" if item_path.suffix.lower() in SINGLE_FILE_MODEL_EXTENSIONS else "ModelFile"
     model_url = None
@@ -2131,7 +2975,13 @@ def build_local_tree_item(
         "category": category,
         "task_dir": task_dir,
         "task_api": task_api,
-        "apply_supported": bool(task_api and category == "BaseModel"),
+        "apply_supported": bool(
+            task_api
+            and (
+                category in ("BaseModel", "Lora")
+                or (category == "VAE" and task_api in ("text-to-image", "image-to-image"))
+            )
+        ),
         "model_id": model_id,
         "preview_url": model_item_preview_url(item_path, model_root),
         "model_url": model_url,
@@ -2140,7 +2990,7 @@ def build_local_tree_item(
         "is_vae": category == "VAE",
         "class_name": class_name,
         "repo_hint": model_id,
-        "can_delete": False,
+        "can_delete": is_deletable_local_model_path(item_path),
     }
 
 
@@ -2237,6 +3087,95 @@ def build_local_model_tree(model_root: Path) -> Dict[str, Any]:
                 "bases": bases_out,
             }
         )
+    # Backward compatibility:
+    # Include legacy models placed directly under model_root (old download layout)
+    # into a synthetic base branch under compatible task(s).
+    task_lookup: Dict[str, Dict[str, Any]] = {str(task.get("task") or ""): task for task in tasks_out}
+
+    def ensure_task_node(task_name: str) -> Dict[str, Any]:
+        existing = task_lookup.get(task_name)
+        if existing:
+            return existing
+        created = {
+            "task": task_name,
+            "path": str((model_root / task_name).resolve()),
+            "item_count": 0,
+            "bases": [],
+        }
+        task_lookup[task_name] = created
+        tasks_out.append(created)
+        return created
+
+    def ensure_base_node(task_node: Dict[str, Any], base_name: str) -> Dict[str, Any]:
+        bases = task_node.setdefault("bases", [])
+        for base in bases:
+            if str(base.get("base_name") or "") == base_name:
+                return base
+        created = {
+            "base_name": base_name,
+            "path": str(model_root.resolve()),
+            "item_count": 0,
+            "categories": [],
+        }
+        bases.append(created)
+        return created
+
+    def ensure_category_node(base_node: Dict[str, Any], category: str) -> Dict[str, Any]:
+        categories = base_node.setdefault("categories", [])
+        for entry in categories:
+            if str(entry.get("category") or "") == category:
+                return entry
+        created = {
+            "category": category,
+            "path": str(model_root.resolve()),
+            "source_paths": [str(model_root.resolve())],
+            "item_count": 0,
+            "items": [],
+        }
+        categories.append(created)
+        categories.sort(key=lambda item: LOCAL_TREE_CATEGORY_ORDER.index(str(item.get("category") or "")) if str(item.get("category") or "") in LOCAL_TREE_CATEGORY_ORDER else 999)
+        return created
+
+    for child in sorted(model_root.iterdir(), key=lambda path: (path.is_file(), path.name.lower())):
+        if normalize_local_tree_task_dir(child.name):
+            continue
+        if not is_legacy_local_model_candidate(child):
+            continue
+        category = legacy_item_category(child)
+        task_dirs = legacy_item_task_dirs(child)
+        if not task_dirs:
+            continue
+        for task_dir in task_dirs:
+            item = build_local_tree_item(
+                item_path=child,
+                model_root=model_root,
+                task_dir=task_dir,
+                base_name="Imported",
+                category=category,
+            )
+            item["imported"] = True
+            task_node = ensure_task_node(task_dir)
+            base_node = ensure_base_node(task_node, "Imported")
+            category_node = ensure_category_node(base_node, category)
+            category_items = category_node.setdefault("items", [])
+            if any(str(existing.get("path") or "") == item["path"] for existing in category_items):
+                continue
+            category_items.append(item)
+            category_items.sort(key=lambda entry: str(entry.get("name") or "").lower())
+            category_node["item_count"] = len(category_items)
+            base_node["item_count"] = int(base_node.get("item_count") or 0) + 1
+            task_node["item_count"] = int(task_node.get("item_count") or 0) + 1
+            flat_items.append(item)
+    tasks_out.sort(
+        key=lambda task: (
+            LOCAL_TREE_TASK_ORDER.index(str(task.get("task") or "")) if str(task.get("task") or "") in LOCAL_TREE_TASK_ORDER else 999,
+            str(task.get("task") or "").lower(),
+        )
+    )
+    for task in tasks_out:
+        bases = list(task.get("bases") or [])
+        bases.sort(key=lambda base: (0 if str(base.get("base_name") or "") != "Imported" else 1, str(base.get("base_name") or "").lower()))
+        task["bases"] = bases
     return {
         "model_root": str(model_root),
         "generated_at": utc_now(),
@@ -2856,7 +3795,8 @@ class Text2VideoRequest(BaseModel):
     lora_ids: list[str] = Field(default_factory=list)
     lora_scale: float = Field(default=1.0, ge=0.0, le=2.0)
     num_inference_steps: int = Field(default=30, ge=1, le=120)
-    num_frames: int = Field(default=16, ge=8, le=128)
+    duration_seconds: float = Field(default=VIDEO_DURATION_SECONDS_DEFAULT, gt=0.0, le=VIDEO_DURATION_SECONDS_MAX)
+    num_frames: Optional[int] = Field(default=None, ge=1, le=216000)
     guidance_scale: float = Field(default=9.0, ge=0.0, le=30.0)
     fps: int = Field(default=8, ge=1, le=60)
     seed: Optional[int] = Field(default=None, ge=0)
@@ -2888,10 +3828,14 @@ class DownloadRequest(BaseModel):
     civitai_model_id: Optional[int] = Field(default=None, ge=1)
     civitai_version_id: Optional[int] = Field(default=None, ge=1)
     civitai_file_id: Optional[int] = Field(default=None, ge=1)
+    task: Optional[Literal["text-to-image", "image-to-image", "text-to-video", "image-to-video"]] = None
+    base_model: Optional[str] = None
+    model_kind: Optional[str] = None
 
 
 class DeleteLocalModelRequest(BaseModel):
-    model_name: str = Field(min_length=1)
+    model_name: Optional[str] = None
+    path: Optional[str] = None
     base_dir: Optional[str] = None
 
 
@@ -2931,9 +3875,12 @@ def text2image_worker(task_id: str, payload: Text2ImageRequest) -> None:
         payload.height,
         payload.seed,
     )
+    pipeline_cache_key: Optional[str] = None
     try:
+        cleanup_before_generation_load(kind="text-to-image", model_ref=model_ref, settings=settings, clear_vaes=True)
         update_task(task_id, status="running", progress=0.05, message="Loading model")
-        pipe = get_pipeline("text-to-image", model_ref, settings)
+        pipe = get_pipeline_for_inference("text-to-image", model_ref, settings)
+        pipeline_cache_key = str(getattr(pipe, "_videogen_cache_key", "") or "")
         device, dtype = get_device_and_dtype()
         update_task(task_id, progress=0.1, message="Loading model")
         apply_vae_to_pipeline(pipe, vae_ref, settings, device=device, dtype=dtype)
@@ -3034,6 +3981,8 @@ def text2image_worker(task_id: str, payload: Text2ImageRequest) -> None:
         trace = format_exception_trace()
         LOGGER.exception("text2image failed task_id=%s model=%s diagnostics=%s", task_id, model_ref, runtime_diagnostics())
         update_task(task_id, status="error", message="Generation failed", error=str(exc), error_trace=trace)
+    finally:
+        release_pipeline_usage(pipeline_cache_key)
 
 
 def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
@@ -3042,8 +3991,20 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
     model_ref = payload.model_id or settings["defaults"]["text2video_model"]
     lora_refs = collect_lora_refs(payload.lora_id, payload.lora_ids)
     effective_backend = resolve_text2video_backend(payload.backend, settings)
+    total_frames, resolved_duration_seconds = resolve_video_timing(
+        fps=int(payload.fps),
+        duration_seconds=payload.duration_seconds,
+        legacy_num_frames=payload.num_frames,
+    )
+    framepack_plan = resolve_framepack_plan(total_frames=total_frames, fps=int(payload.fps))
+    framepack_segments = iter_framepack_segments(
+        total_frames=total_frames,
+        segment_frames=int(framepack_plan["segment_frames"]),
+        overlap_frames=int(framepack_plan["overlap_frames"]),
+    )
+    pack_count = len(framepack_segments)
     LOGGER.info(
-        "text2video start task_id=%s model=%s backend=%s requested_backend=%s loras=%s lora_scale=%s steps=%s frames=%s guidance=%s fps=%s seed=%s",
+        "text2video start task_id=%s model=%s backend=%s requested_backend=%s loras=%s lora_scale=%s steps=%s duration_sec=%.3f frames=%s fps=%s framepack_segment=%s framepack_overlap=%s framepack_packs=%s framepack_mode=%s guidance=%s seed=%s",
         task_id,
         model_ref,
         effective_backend,
@@ -3051,11 +4012,17 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
         ",".join(lora_refs) if lora_refs else "(none)",
         payload.lora_scale,
         payload.num_inference_steps,
-        payload.num_frames,
-        payload.guidance_scale,
+        resolved_duration_seconds,
+        total_frames,
         payload.fps,
+        framepack_plan["segment_frames"],
+        framepack_plan["overlap_frames"],
+        pack_count,
+        "long" if framepack_plan["long_video_mode"] else "standard",
+        payload.guidance_scale,
         payload.seed,
     )
+    pipeline_cache_key: Optional[str] = None
     try:
         if effective_backend == "npu":
             if lora_refs:
@@ -3074,6 +4041,12 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
                     "encoder": result.get("encoder"),
                     "backend": "npu",
                     "runner": result.get("runner"),
+                    "duration_seconds": resolved_duration_seconds,
+                    "total_frames": total_frames,
+                    "framepack_segment_frames": int(framepack_plan["segment_frames"]),
+                    "framepack_overlap_frames": int(framepack_plan["overlap_frames"]),
+                    "framepack_pack_count": pack_count,
+                    "framepack_mode": "npu_runner",
                 },
             )
             LOGGER.info(
@@ -3084,8 +4057,17 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
             )
             return
 
+        cleanup_before_generation_load(kind="text-to-video", model_ref=model_ref, settings=settings, clear_vaes=True)
         update_task(task_id, status="running", progress=0.05, message="Loading model")
-        pipe = get_pipeline("text-to-video", model_ref, settings)
+        try:
+            pipe = get_pipeline_for_inference("text-to-video", model_ref, settings)
+        except Exception as load_error:
+            if effective_backend == "cuda" and is_gpu_oom_error(load_error):
+                raise RuntimeError(
+                    f"Failed to load selected text-to-video model on GPU due to out-of-memory: {model_ref}"
+                ) from load_error
+            raise
+        pipeline_cache_key = str(getattr(pipe, "_videogen_cache_key", "") or "")
         update_task(task_id, progress=0.15, message="Applying LoRA")
         try:
             apply_loras_to_pipeline(pipe, lora_refs, payload.lora_scale, settings)
@@ -3102,69 +4084,156 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
                 update_task(task_id, progress=0.18, message="Applying LoRA (skipped)")
             else:
                 raise
-        update_task(task_id, progress=0.35, message=f"Generating frames (0/{payload.num_inference_steps})")
+        update_task(task_id, progress=0.26, message=f"Preparing video stream (0/{total_frames} frames)")
         device, _ = get_device_and_dtype()
-        generator = None
-        if payload.seed is not None:
-            gen_device = "cuda" if device == "cuda" else "cpu"
-            generator = torch.Generator(device=gen_device).manual_seed(payload.seed)
-        step_progress_kwargs = build_step_progress_kwargs(
-            pipe=pipe,
-            task_id=task_id,
-            num_inference_steps=payload.num_inference_steps,
-            start_progress=0.35,
-            end_progress=0.88,
-            message="Generating frames",
-        )
-        LOGGER.info(
-            "text2video inference start task_id=%s model=%s steps=%s frames=%s guidance=%s callback_keys=%s",
-            task_id,
-            model_ref,
-            payload.num_inference_steps,
-            payload.num_frames,
-            payload.guidance_scale,
-            ",".join(sorted(step_progress_kwargs.keys())) if step_progress_kwargs else "(none)",
-        )
-        gen_started = time.perf_counter()
-        out = call_with_supported_kwargs(
-            pipe,
-            {
-                "prompt": payload.prompt,
-                "negative_prompt": payload.negative_prompt or None,
-                "num_inference_steps": payload.num_inference_steps,
-                "num_frames": payload.num_frames,
-                "guidance_scale": payload.guidance_scale,
-                "generator": generator,
-                "cross_attention_kwargs": {"scale": payload.lora_scale} if len(lora_refs) == 1 else None,
-                **step_progress_kwargs,
-            },
-        )
-        LOGGER.info("text2video frame generation done task_id=%s elapsed_ms=%.1f", task_id, (time.perf_counter() - gen_started) * 1000)
-        frames = out.frames[0]
-        update_task(task_id, progress=0.9, message="Encoding mp4")
         output_name = f"text2video_{task_id}.mp4"
         output_path = resolve_path(settings["paths"]["outputs_dir"]) / output_name
-        enc_started = time.perf_counter()
-        LOGGER.info("text2video encoding start task_id=%s frames=%s fps=%s output=%s", task_id, len(frames), payload.fps, str(output_path))
-        with task_progress_heartbeat(
-            task_id,
-            start_progress=0.9,
-            end_progress=0.99,
-            message="Encoding mp4",
-            interval_sec=0.5,
-            estimated_duration_sec=max(8.0, min(180.0, len(frames) * 0.4)),
-        ):
-            encoder_name = export_video_with_fallback(frames, output_path, fps=int(payload.fps))
-        LOGGER.info("text2video encoding done task_id=%s encoder=%s elapsed_ms=%.1f", task_id, encoder_name, (time.perf_counter() - enc_started) * 1000)
+        writer: Any = None
+        encoder_name = ""
+        normalize_frame: Optional[Callable[[Any], Any]] = None
+        total_written = 0
+        sample_shape: Optional[tuple[int, ...]] = None
+        sample_dtype: Optional[str] = None
+        try:
+            writer, encoder_name, normalize_frame = open_hardware_video_writer(output_path, fps=int(payload.fps))
+            gen_device = "cuda" if device == "cuda" else "cpu"
+            framepack_context_arg = detect_framepack_context_arg(pipe)
+            carry_image: Optional[Any] = None
+            for segment in framepack_segments:
+                segment_index = int(segment["index"])
+                request_frames = int(segment["request_frames"])
+                trim_head_frames = int(segment["trim_head_frames"])
+                chunk_start = 0.3 + (0.62 * ((segment_index - 1) / max(pack_count, 1)))
+                chunk_end = 0.3 + (0.62 * (segment_index / max(pack_count, 1)))
+                update_task(
+                    task_id,
+                    progress=chunk_start,
+                    message=f"Generating framepack {segment_index}/{pack_count} ({total_written}/{total_frames} frames)",
+                )
+                generator = None
+                if payload.seed is not None:
+                    generator = torch.Generator(device=gen_device).manual_seed(int(payload.seed) + segment_index - 1)
+                step_progress_kwargs = build_step_progress_kwargs(
+                    pipe=pipe,
+                    task_id=task_id,
+                    num_inference_steps=payload.num_inference_steps,
+                    start_progress=chunk_start,
+                    end_progress=max(chunk_start, chunk_end - 0.02),
+                    message=f"Generating framepack {segment_index}/{pack_count}",
+                )
+                request_payload: Dict[str, Any] = {
+                    "prompt": payload.prompt,
+                    "negative_prompt": payload.negative_prompt or None,
+                    "num_inference_steps": payload.num_inference_steps,
+                    "num_frames": request_frames,
+                    "guidance_scale": payload.guidance_scale,
+                    "generator": generator,
+                    "cross_attention_kwargs": {"scale": payload.lora_scale} if len(lora_refs) == 1 else None,
+                    **step_progress_kwargs,
+                }
+                if carry_image is not None and framepack_context_arg:
+                    request_payload[framepack_context_arg] = carry_image
+                LOGGER.info(
+                    "text2video framepack start task_id=%s segment=%s/%s request_frames=%s trim_head=%s context_arg=%s callback_keys=%s",
+                    task_id,
+                    segment_index,
+                    pack_count,
+                    request_frames,
+                    trim_head_frames,
+                    framepack_context_arg or "(none)",
+                    ",".join(sorted(step_progress_kwargs.keys())) if step_progress_kwargs else "(none)",
+                )
+                gen_started = time.perf_counter()
+                out = call_with_supported_kwargs(
+                    pipe,
+                    request_payload,
+                )
+                chunk_frames = out.frames[0]
+                appended, chunk_shape, chunk_dtype = append_frames_to_video_writer(
+                    writer,
+                    normalize_frame,
+                    chunk_frames,
+                    skip_head_frames=trim_head_frames,
+                )
+                if appended <= 0:
+                    raise RuntimeError(f"No frames generated for framepack {segment_index}/{pack_count}")
+                if sample_shape is None:
+                    sample_shape = chunk_shape
+                    sample_dtype = chunk_dtype
+                total_written += appended
+                with contextlib.suppress(Exception):
+                    if isinstance(chunk_frames, list) and chunk_frames:
+                        carry_image = frame_to_pil_image(chunk_frames[-1])
+                LOGGER.info(
+                    "text2video framepack done task_id=%s segment=%s/%s appended=%s total_written=%s elapsed_ms=%.1f",
+                    task_id,
+                    segment_index,
+                    pack_count,
+                    appended,
+                    total_written,
+                    (time.perf_counter() - gen_started) * 1000,
+                )
+                update_task(
+                    task_id,
+                    progress=chunk_end,
+                    message=f"Encoded framepack {segment_index}/{pack_count} ({total_written}/{total_frames} frames)",
+                )
+                del out
+                with contextlib.suppress(Exception):
+                    del chunk_frames
+                with contextlib.suppress(Exception):
+                    del request_payload
+                with contextlib.suppress(Exception):
+                    if torch.cuda.is_available():
+                        torch.cuda.empty_cache()
+        finally:
+            if writer is not None:
+                with contextlib.suppress(Exception):
+                    writer.close()
+        if total_written <= 0:
+            raise RuntimeError("No frames were generated to encode")
+        if total_written != total_frames:
+            LOGGER.warning(
+                "text2video frame count mismatch task_id=%s expected=%s actual=%s",
+                task_id,
+                total_frames,
+                total_written,
+            )
+        LOGGER.info(
+            "video encoded with hardware codec=%s path=%s frames=%s fps=%s sample_shape=%s sample_dtype=%s",
+            encoder_name,
+            str(output_path),
+            total_written,
+            payload.fps,
+            sample_shape,
+            sample_dtype,
+        )
         update_task(
             task_id,
             status="completed",
             progress=1.0,
             message="Done",
-            result={"video_file": output_name, "model": model_ref, "loras": lora_refs, "encoder": encoder_name, "backend": "cuda"},
+            result={
+                "video_file": output_name,
+                "model": model_ref,
+                "loras": lora_refs,
+                "encoder": encoder_name,
+                "backend": "cuda",
+                "duration_seconds": resolved_duration_seconds,
+                "total_frames": total_frames,
+                "encoded_frames": total_written,
+                "chunk_frames": int(framepack_plan["segment_frames"]),
+                "framepack_segment_frames": int(framepack_plan["segment_frames"]),
+                "framepack_overlap_frames": int(framepack_plan["overlap_frames"]),
+                "framepack_pack_count": pack_count,
+                "framepack_mode": "long" if framepack_plan["long_video_mode"] else "standard",
+            },
         )
         LOGGER.info("text2video done task_id=%s backend=cuda output=%s", task_id, str(output_path))
     except Exception as exc:
+        if "output_path" in locals() and isinstance(output_path, Path) and output_path.exists():
+            with contextlib.suppress(Exception):
+                output_path.unlink(missing_ok=True)
         trace = format_exception_trace()
         LOGGER.exception(
             "text2video failed task_id=%s model=%s backend=%s diagnostics=%s",
@@ -3174,6 +4243,8 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
             runtime_diagnostics(),
         )
         update_task(task_id, status="error", message="Generation failed", error=str(exc), error_trace=trace)
+    finally:
+        release_pipeline_usage(pipeline_cache_key)
 
 
 def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
@@ -3183,24 +4254,44 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
     lora_refs = collect_lora_refs(payload.get("lora_id"), payload.get("lora_ids") or [])
     lora_scale = float(payload.get("lora_scale") or 1.0)
     image_path = Path(payload["image_path"])
+    total_frames, resolved_duration_seconds = resolve_video_timing(
+        fps=int(payload.get("fps") or 8),
+        duration_seconds=float(payload.get("duration_seconds") or VIDEO_DURATION_SECONDS_DEFAULT),
+        legacy_num_frames=int(payload.get("num_frames")) if payload.get("num_frames") not in (None, "") else None,
+    )
+    framepack_plan = resolve_framepack_plan(total_frames=total_frames, fps=int(payload.get("fps") or 8))
+    framepack_segments = iter_framepack_segments(
+        total_frames=total_frames,
+        segment_frames=int(framepack_plan["segment_frames"]),
+        overlap_frames=int(framepack_plan["overlap_frames"]),
+    )
+    pack_count = len(framepack_segments)
     LOGGER.info(
-        "image2video start task_id=%s model=%s loras=%s lora_scale=%s image=%s steps=%s frames=%s guidance=%s fps=%s size=%sx%s seed=%s",
+        "image2video start task_id=%s model=%s loras=%s lora_scale=%s image=%s steps=%s duration_sec=%.3f frames=%s fps=%s framepack_segment=%s framepack_overlap=%s framepack_packs=%s framepack_mode=%s guidance=%s size=%sx%s seed=%s",
         task_id,
         model_ref,
         ",".join(lora_refs) if lora_refs else "(none)",
         lora_scale,
         str(image_path),
         payload.get("num_inference_steps"),
-        payload.get("num_frames"),
-        payload.get("guidance_scale"),
+        resolved_duration_seconds,
+        total_frames,
         payload.get("fps"),
+        framepack_plan["segment_frames"],
+        framepack_plan["overlap_frames"],
+        pack_count,
+        "long" if framepack_plan["long_video_mode"] else "standard",
+        payload.get("guidance_scale"),
         payload.get("width"),
         payload.get("height"),
         payload.get("seed"),
     )
+    pipeline_cache_key: Optional[str] = None
     try:
+        cleanup_before_generation_load(kind="image-to-video", model_ref=model_ref, settings=settings, clear_vaes=True)
         update_task(task_id, status="running", progress=0.05, message="Loading model")
-        pipe = get_pipeline("image-to-video", model_ref, settings)
+        pipe = get_pipeline_for_inference("image-to-video", model_ref, settings)
+        pipeline_cache_key = str(getattr(pipe, "_videogen_cache_key", "") or "")
         update_task(task_id, progress=0.15, message="Applying LoRA")
         try:
             apply_loras_to_pipeline(pipe, lora_refs, lora_scale, settings)
@@ -3224,85 +4315,157 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
         if width > 0 and height > 0:
             image = image.resize((width, height))
         device, _ = get_device_and_dtype()
-        generator = None
-        if payload["seed"] is not None:
-            gen_device = "cuda" if device == "cuda" else "cpu"
-            generator = torch.Generator(device=gen_device).manual_seed(int(payload["seed"]))
+        gen_device = "cuda" if device == "cuda" else "cpu"
         step_count = int(payload["num_inference_steps"])
-        update_task(task_id, progress=0.45, message=f"Generating frames (0/{step_count})")
-        step_progress_kwargs = build_step_progress_kwargs(
-            pipe=pipe,
-            task_id=task_id,
-            num_inference_steps=step_count,
-            start_progress=0.45,
-            end_progress=0.88,
-            message="Generating frames",
-        )
-        LOGGER.info(
-            "image2video inference start task_id=%s model=%s steps=%s frames=%s guidance=%s size=%sx%s callback_keys=%s",
-            task_id,
-            model_ref,
-            payload["num_inference_steps"],
-            payload["num_frames"],
-            payload["guidance_scale"],
-            width,
-            height,
-            ",".join(sorted(step_progress_kwargs.keys())) if step_progress_kwargs else "(none)",
-        )
-        gen_started = time.perf_counter()
-        out = call_with_supported_kwargs(
-            pipe,
-            {
-                "prompt": payload["prompt"],
-                "negative_prompt": payload["negative_prompt"] or None,
-                "image": image,
-                "height": height,
-                "width": width,
-                "target_fps": int(payload["fps"]),
-                "num_inference_steps": int(payload["num_inference_steps"]),
-                "num_frames": int(payload["num_frames"]),
-                "guidance_scale": float(payload["guidance_scale"]),
-                "generator": generator,
-                "cross_attention_kwargs": {"scale": lora_scale} if len(lora_refs) == 1 else None,
-                **step_progress_kwargs,
-            },
-        )
-        LOGGER.info("image2video frame generation done task_id=%s elapsed_ms=%.1f", task_id, (time.perf_counter() - gen_started) * 1000)
-        frames = out.frames[0]
-        update_task(task_id, progress=0.9, message="Encoding mp4")
+        update_task(task_id, progress=0.3, message=f"Preparing video stream (0/{total_frames} frames)")
         output_name = f"image2video_{task_id}.mp4"
         output_path = resolve_path(settings["paths"]["outputs_dir"]) / output_name
-        enc_started = time.perf_counter()
+        writer: Any = None
+        encoder_name = ""
+        normalize_frame: Optional[Callable[[Any], Any]] = None
+        total_written = 0
+        sample_shape: Optional[tuple[int, ...]] = None
+        sample_dtype: Optional[str] = None
+        try:
+            writer, encoder_name, normalize_frame = open_hardware_video_writer(output_path, fps=int(payload["fps"]))
+            current_image = image
+            for segment in framepack_segments:
+                segment_index = int(segment["index"])
+                request_frames = int(segment["request_frames"])
+                trim_head_frames = int(segment["trim_head_frames"])
+                chunk_start = 0.34 + (0.58 * ((segment_index - 1) / max(pack_count, 1)))
+                chunk_end = 0.34 + (0.58 * (segment_index / max(pack_count, 1)))
+                update_task(
+                    task_id,
+                    progress=chunk_start,
+                    message=f"Generating framepack {segment_index}/{pack_count} ({total_written}/{total_frames} frames)",
+                )
+                chunk_generator = None
+                if payload["seed"] is not None:
+                    chunk_generator = torch.Generator(device=gen_device).manual_seed(int(payload["seed"]) + segment_index - 1)
+                step_progress_kwargs = build_step_progress_kwargs(
+                    pipe=pipe,
+                    task_id=task_id,
+                    num_inference_steps=step_count,
+                    start_progress=chunk_start,
+                    end_progress=max(chunk_start, chunk_end - 0.02),
+                    message=f"Generating framepack {segment_index}/{pack_count}",
+                )
+                LOGGER.info(
+                    "image2video framepack start task_id=%s segment=%s/%s request_frames=%s trim_head=%s callback_keys=%s",
+                    task_id,
+                    segment_index,
+                    pack_count,
+                    request_frames,
+                    trim_head_frames,
+                    ",".join(sorted(step_progress_kwargs.keys())) if step_progress_kwargs else "(none)",
+                )
+                gen_started = time.perf_counter()
+                out = call_with_supported_kwargs(
+                    pipe,
+                    {
+                        "prompt": payload["prompt"],
+                        "negative_prompt": payload["negative_prompt"] or None,
+                        "image": current_image,
+                        "height": height,
+                        "width": width,
+                        "target_fps": int(payload["fps"]),
+                        "num_inference_steps": step_count,
+                        "num_frames": request_frames,
+                        "guidance_scale": float(payload["guidance_scale"]),
+                        "generator": chunk_generator,
+                        "cross_attention_kwargs": {"scale": lora_scale} if len(lora_refs) == 1 else None,
+                        **step_progress_kwargs,
+                    },
+                )
+                chunk_frames = out.frames[0]
+                appended, chunk_shape, chunk_dtype = append_frames_to_video_writer(
+                    writer,
+                    normalize_frame,
+                    chunk_frames,
+                    skip_head_frames=trim_head_frames,
+                )
+                if appended <= 0:
+                    raise RuntimeError(f"No frames generated for framepack {segment_index}/{pack_count}")
+                if sample_shape is None:
+                    sample_shape = chunk_shape
+                    sample_dtype = chunk_dtype
+                total_written += appended
+                with contextlib.suppress(Exception):
+                    if isinstance(chunk_frames, list) and chunk_frames:
+                        current_image = frame_to_pil_image(chunk_frames[-1])
+                LOGGER.info(
+                    "image2video framepack done task_id=%s segment=%s/%s appended=%s total_written=%s elapsed_ms=%.1f",
+                    task_id,
+                    segment_index,
+                    pack_count,
+                    appended,
+                    total_written,
+                    (time.perf_counter() - gen_started) * 1000,
+                )
+                update_task(
+                    task_id,
+                    progress=chunk_end,
+                    message=f"Encoded framepack {segment_index}/{pack_count} ({total_written}/{total_frames} frames)",
+                )
+                del out
+                with contextlib.suppress(Exception):
+                    del chunk_frames
+                with contextlib.suppress(Exception):
+                    if torch.cuda.is_available():
+                        torch.cuda.empty_cache()
+        finally:
+            if writer is not None:
+                with contextlib.suppress(Exception):
+                    writer.close()
+        if total_written <= 0:
+            raise RuntimeError("No frames were generated to encode")
+        if total_written != total_frames:
+            LOGGER.warning(
+                "image2video frame count mismatch task_id=%s expected=%s actual=%s",
+                task_id,
+                total_frames,
+                total_written,
+            )
         LOGGER.info(
-            "image2video encoding start task_id=%s frames=%s fps=%s output=%s",
-            task_id,
-            len(frames),
-            payload["fps"],
+            "video encoded with hardware codec=%s path=%s frames=%s fps=%s sample_shape=%s sample_dtype=%s",
+            encoder_name,
             str(output_path),
+            total_written,
+            payload["fps"],
+            sample_shape,
+            sample_dtype,
         )
-        with task_progress_heartbeat(
-            task_id,
-            start_progress=0.9,
-            end_progress=0.99,
-            message="Encoding mp4",
-            interval_sec=0.5,
-            estimated_duration_sec=max(8.0, min(180.0, len(frames) * 0.4)),
-        ):
-            encoder_name = export_video_with_fallback(frames, output_path, fps=int(payload["fps"]))
-        LOGGER.info("image2video encoding done task_id=%s encoder=%s elapsed_ms=%.1f", task_id, encoder_name, (time.perf_counter() - enc_started) * 1000)
         update_task(
             task_id,
             status="completed",
             progress=1.0,
             message="Done",
-            result={"video_file": output_name, "model": model_ref, "loras": lora_refs, "encoder": encoder_name},
+            result={
+                "video_file": output_name,
+                "model": model_ref,
+                "loras": lora_refs,
+                "encoder": encoder_name,
+                "duration_seconds": resolved_duration_seconds,
+                "total_frames": total_frames,
+                "encoded_frames": total_written,
+                "chunk_frames": int(framepack_plan["segment_frames"]),
+                "framepack_segment_frames": int(framepack_plan["segment_frames"]),
+                "framepack_overlap_frames": int(framepack_plan["overlap_frames"]),
+                "framepack_pack_count": pack_count,
+                "framepack_mode": "long" if framepack_plan["long_video_mode"] else "standard",
+            },
         )
         LOGGER.info("image2video done task_id=%s output=%s", task_id, str(output_path))
     except Exception as exc:
+        if "output_path" in locals() and isinstance(output_path, Path) and output_path.exists():
+            with contextlib.suppress(Exception):
+                output_path.unlink(missing_ok=True)
         trace = format_exception_trace()
         LOGGER.exception("image2video failed task_id=%s model=%s diagnostics=%s", task_id, model_ref, runtime_diagnostics())
         update_task(task_id, status="error", message="Generation failed", error=str(exc), error_trace=trace)
     finally:
+        release_pipeline_usage(pipeline_cache_key)
         if image_path.exists():
             image_path.unlink(missing_ok=True)
 
@@ -3330,9 +4493,12 @@ def image2image_worker(task_id: str, payload: Dict[str, Any]) -> None:
         payload.get("height"),
         payload.get("seed"),
     )
+    pipeline_cache_key: Optional[str] = None
     try:
+        cleanup_before_generation_load(kind="image-to-image", model_ref=model_ref, settings=settings, clear_vaes=True)
         update_task(task_id, status="running", progress=0.05, message="Loading model")
-        pipe = get_pipeline("image-to-image", model_ref, settings)
+        pipe = get_pipeline_for_inference("image-to-image", model_ref, settings)
+        pipeline_cache_key = str(getattr(pipe, "_videogen_cache_key", "") or "")
         device, dtype = get_device_and_dtype()
         update_task(task_id, progress=0.1, message="Loading model")
         apply_vae_to_pipeline(pipe, vae_ref, settings, device=device, dtype=dtype)
@@ -3440,6 +4606,7 @@ def image2image_worker(task_id: str, payload: Dict[str, Any]) -> None:
         LOGGER.exception("image2image failed task_id=%s model=%s diagnostics=%s", task_id, model_ref, runtime_diagnostics())
         update_task(task_id, status="error", message="Generation failed", error=str(exc), error_trace=trace)
     finally:
+        release_pipeline_usage(pipeline_cache_key)
         if image_path.exists():
             image_path.unlink(missing_ok=True)
 
@@ -3515,6 +4682,61 @@ def download_preview_image(preview_url: str, destination: Path) -> None:
             out_file.write(chunk)
 
 
+def normalize_download_model_kind(value: str) -> str:
+    normalized = str(value or "").strip().lower()
+    if normalized in ("lora", "loras"):
+        return "Lora"
+    if normalized in ("vae", "vea"):
+        return "VAE"
+    return "BaseModel"
+
+
+def infer_download_model_kind(repo_id: str, requested_kind: str, fallback_kind: str = "") -> str:
+    if requested_kind:
+        return normalize_download_model_kind(requested_kind)
+    if fallback_kind:
+        return normalize_download_model_kind(fallback_kind)
+    repo_hint = str(repo_id or "").lower()
+    if "lora" in repo_hint:
+        return "Lora"
+    if "vae" in repo_hint or "vea" in repo_hint:
+        return "VAE"
+    return "BaseModel"
+
+
+def infer_download_base_model(repo_id: str, requested_base_model: str, fallback_hint: str = "") -> str:
+    raw = str(requested_base_model or "").strip()
+    if raw:
+        return raw
+    if fallback_hint:
+        return fallback_hint
+    estimated = infer_base_model_label(repo_id)
+    return estimated if estimated != "Other" else "Unknown"
+
+
+def write_videogen_model_meta(
+    model_dir: Path,
+    *,
+    source: str,
+    repo_id: str,
+    task: str,
+    base_model: str,
+    category: str,
+    extra: Optional[Dict[str, Any]] = None,
+) -> None:
+    payload: Dict[str, Any] = {
+        "source": source,
+        "repo_id": repo_id,
+        "task": task,
+        "base_model": base_model,
+        "category": category,
+        "downloaded_at": utc_now(),
+    }
+    if extra:
+        payload.update({key: value for key, value in extra.items() if value is not None})
+    (model_dir / "videogen_meta.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
 def save_hf_model_metadata(
     model_dir: Path,
     repo_id: str,
@@ -3550,6 +4772,11 @@ def download_model_worker(task_id: str, req: DownloadRequest) -> None:
     models_dir.mkdir(parents=True, exist_ok=True)
     token = settings["huggingface"].get("token") or None
     model_dir = models_dir / sanitize_repo_id(repo_id)
+    requested_task = str(req.task or "").strip().lower()
+    if requested_task not in LOCAL_TREE_API_TO_TASK:
+        requested_task = "text-to-image"
+    requested_base_model = str(req.base_model or "").strip()
+    requested_model_kind = str(req.model_kind or "").strip()
     LOGGER.info("download start task_id=%s repo=%s revision=%s target=%s", task_id, repo_id, revision or "main", str(model_dir))
     try:
         update_task(task_id, status="running", progress=0.0, message=f"Preparing download {repo_id}", downloaded_bytes=0, total_bytes=None)
@@ -3596,6 +4823,20 @@ def download_model_worker(task_id: str, req: DownloadRequest) -> None:
             }
             (model_dir / "civitai_model.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
             (model_dir / "model_meta.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
+            selected_version_base_model = str(selected_version.get("baseModel") or "").strip()
+            write_videogen_model_meta(
+                model_dir,
+                source="civitai",
+                repo_id=repo_id,
+                task=requested_task,
+                base_model=infer_download_base_model(repo_id, requested_base_model, selected_version_base_model),
+                category=infer_download_model_kind(repo_id, requested_model_kind, str(selected_file.get("type") or "")),
+                extra={
+                    "model_id": civitai_model_id,
+                    "version_id": selected_version.get("id"),
+                    "file_id": selected_file.get("id"),
+                },
+            )
             images = selected_version.get("images", []) if isinstance(selected_version.get("images"), list) else []
             preview_url = ""
             for image in images:
@@ -3667,6 +4908,15 @@ def download_model_worker(task_id: str, req: DownloadRequest) -> None:
             )
             with contextlib.suppress(Exception):
                 save_hf_model_metadata(model_dir=model_dir, repo_id=repo_id, revision=revision, token=token)
+            write_videogen_model_meta(
+                model_dir,
+                source="huggingface",
+                repo_id=repo_id,
+                task=requested_task,
+                base_model=infer_download_base_model(repo_id, requested_base_model),
+                category=infer_download_model_kind(repo_id, requested_model_kind),
+                extra={"revision": revision},
+            )
         final_downloaded_bytes = directory_size_bytes(model_dir)
         current_task = get_task(task_id) or {}
         total_bytes_value = safe_int(current_task.get("total_bytes")) or final_downloaded_bytes
@@ -3679,6 +4929,7 @@ def download_model_worker(task_id: str, req: DownloadRequest) -> None:
             total_bytes=total_bytes_value,
             result={"repo_id": repo_id, "local_path": str(model_dir.resolve()), "base_dir": str(models_dir.resolve())},
         )
+        invalidate_local_tree_cache(models_dir)
         LOGGER.info("download done task_id=%s repo=%s local_path=%s", task_id, repo_id, str(model_dir.resolve()))
     except Exception as exc:
         trace = format_exception_trace()
@@ -3892,7 +5143,7 @@ def list_local_models(dir: str = "") -> Dict[str, Any]:
                         "name": child.name,
                         "repo_hint": desanitize_repo_id(child.name),
                         "path": str(child.resolve()),
-                        "can_delete": is_deletable_model_dir(child),
+                        "can_delete": is_deletable_local_model_path(child),
                         "preview_url": preview_url,
                         "class_name": meta.class_name,
                         "base_model": meta.base_model,
@@ -3908,7 +5159,7 @@ def list_local_models(dir: str = "") -> Dict[str, Any]:
                         "name": child.name,
                         "repo_hint": child.stem,
                         "path": str(child.resolve()),
-                        "can_delete": False,
+                        "can_delete": is_deletable_local_model_path(child),
                         "preview_url": None,
                         "class_name": "SingleFileCheckpoint",
                         "base_model": single_file_base_model_label(child),
@@ -3967,26 +5218,41 @@ def reveal_local_model(req: RevealLocalModelRequest) -> Dict[str, Any]:
 def delete_local_model(req: DeleteLocalModelRequest) -> Dict[str, Any]:
     settings = settings_store.get()
     base_dir = resolve_path((req.base_dir or "").strip() or settings["paths"]["models_dir"])
-    model_name = req.model_name.strip()
-    if not model_name:
-        raise HTTPException(status_code=400, detail="model_name is required")
-    if Path(model_name).name != model_name or "/" in model_name or "\\" in model_name:
-        raise HTTPException(status_code=400, detail="Invalid model_name")
+    raw_path = str(req.path or "").strip()
+    model_name = str(req.model_name or "").strip()
+    if not raw_path and not model_name:
+        raise HTTPException(status_code=400, detail="path or model_name is required")
 
-    target = (base_dir / model_name).resolve()
+    if raw_path:
+        requested = Path(raw_path).expanduser()
+        if not requested.is_absolute():
+            target = (base_dir / requested).resolve()
+        else:
+            target = requested.resolve()
+    else:
+        if Path(model_name).name != model_name or "/" in model_name or "\\" in model_name:
+            raise HTTPException(status_code=400, detail="Invalid model_name")
+        target = (base_dir / model_name).resolve()
+        if target.parent.resolve() != base_dir.resolve():
+            raise HTTPException(status_code=400, detail="Only direct child directories can be deleted by model_name")
+
     if not safe_in_directory(target, base_dir):
         raise HTTPException(status_code=400, detail="Invalid target path")
-    if target.parent.resolve() != base_dir.resolve():
-        raise HTTPException(status_code=400, detail="Only direct child directories can be deleted")
-    if not target.exists() or not target.is_dir():
-        raise HTTPException(status_code=404, detail="Model directory not found")
-    if not is_deletable_model_dir(target):
-        raise HTTPException(status_code=400, detail="Target directory is not recognized as a downloadable model")
+    if target.resolve() == base_dir.resolve():
+        raise HTTPException(status_code=400, detail="Base directory cannot be deleted")
+    if not target.exists():
+        raise HTTPException(status_code=404, detail="Target not found")
+    if not is_deletable_local_model_path(target):
+        raise HTTPException(status_code=400, detail="Target is not recognized as a deletable local model")
 
-    shutil.rmtree(target)
+    if target.is_dir():
+        shutil.rmtree(target)
+    else:
+        target.unlink(missing_ok=True)
     invalidate_local_tree_cache(base_dir)
-    LOGGER.info("local model deleted base_dir=%s name=%s path=%s", str(base_dir), model_name, str(target))
-    return {"status": "ok", "deleted_path": str(target), "model_name": model_name}
+    deleted_name = model_name or target.name
+    LOGGER.info("local model deleted base_dir=%s name=%s path=%s", str(base_dir), deleted_name, str(target))
+    return {"status": "ok", "deleted_path": str(target), "model_name": deleted_name}
 
 
 @app.get("/api/models/preview")
@@ -4006,54 +5272,70 @@ def get_local_model_preview(rel: str, base_dir: str = "") -> FileResponse:
     return FileResponse(requested, media_type=media_type)
 
 
+def local_tree_flat_items_for_task(models_dir: Path, task: str) -> list[Dict[str, Any]]:
+    tree = get_local_model_tree_cached(models_dir)
+    task_dir = LOCAL_TREE_API_TO_TASK.get(task, "")
+    flat_items = list(tree.get("flat_items") or [])
+    filtered = [item for item in flat_items if str(item.get("task_dir") or "") == task_dir]
+    filtered.sort(
+        key=lambda item: (
+            str(item.get("base_name") or "").lower(),
+            str(item.get("category") or "").lower(),
+            str(item.get("name") or "").lower(),
+        )
+    )
+    return filtered
+
+
+def build_catalog_item_from_tree(item: Dict[str, Any], label_prefix: str = "local") -> Dict[str, Any]:
+    path_value = str(item.get("path") or "")
+    path_obj = Path(path_value) if path_value else Path(".")
+    repo_hint = str(item.get("repo_hint") or "").strip()
+    if not repo_hint:
+        repo_hint = path_obj.stem if path_obj.suffix else path_obj.name
+    model_url = str(item.get("model_url") or "").strip() or None
+    preview_url = str(item.get("preview_url") or "").strip() or None
+    size_bytes = safe_int(item.get("size_bytes"))
+    return {
+        "source": "local",
+        "label": f"[{label_prefix}] {repo_hint}",
+        "value": path_value,
+        "id": repo_hint,
+        "size_bytes": size_bytes,
+        "preview_url": preview_url,
+        "model_url": model_url,
+    }
+
+
 @app.get("/api/models/catalog")
 def model_catalog(task: Literal["text-to-image", "image-to-image", "text-to-video", "image-to-video"], limit: int = 30) -> Dict[str, Any]:
     settings = settings_store.get()
     models_dir = resolve_path(settings["paths"]["models_dir"])
     models_dir.mkdir(parents=True, exist_ok=True)
+    capped_limit = min(max(limit, 1), 1000)
+    tree = get_local_model_tree_cached(models_dir)
+    flat_items = list(tree.get("flat_items") or [])
+    task_dir = LOCAL_TREE_API_TO_TASK.get(task, "")
+    ordered_items = [item for item in flat_items if str(item.get("task_dir") or "") == task_dir]
+    ordered_items.sort(
+        key=lambda item: (
+            str(item.get("base_name") or "").lower(),
+            str(item.get("name") or "").lower(),
+        )
+    )
 
-    local_items = []
-    for child in sorted(models_dir.iterdir()):
-        if child.is_dir():
-            if not is_local_model_compatible(task, child):
-                LOGGER.info("catalog skip incompatible task=%s path=%s", task, str(child))
-                continue
-            repo_hint = desanitize_repo_id(child.name)
-            preview_rel = find_local_preview_relpath(child, models_dir)
-            preview_url = None
-            if preview_rel:
-                preview_url = f"/api/models/preview?rel={quote(preview_rel, safe='/')}"
-            local_items.append(
-                {
-                    "source": "local",
-                    "label": f"[local] {repo_hint}",
-                    "value": str(child.resolve()),
-                    "id": repo_hint,
-                    "size_bytes": None,
-                    "preview_url": preview_url,
-                    "model_url": f"https://huggingface.co/{quote(repo_hint, safe='/')}",
-                }
-            )
+    local_items: list[Dict[str, Any]] = []
+    seen_paths: set[str] = set()
+    for item in ordered_items:
+        if str(item.get("category") or "") != "BaseModel":
             continue
-        if is_single_file_model(child):
-            compatible_tasks = single_file_model_compatible_tasks(child)
-            if task not in compatible_tasks:
-                continue
-            size_bytes = None
-            with contextlib.suppress(OSError):
-                size_bytes = int(child.stat().st_size)
-            local_items.append(
-                {
-                    "source": "local",
-                    "label": f"[local] {child.stem}",
-                    "value": str(child.resolve()),
-                    "id": child.stem,
-                    "size_bytes": size_bytes,
-                    "preview_url": None,
-                    "model_url": None,
-                }
-            )
-
+        value = str(item.get("path") or "")
+        if not value or value in seen_paths:
+            continue
+        seen_paths.add(value)
+        local_items.append(build_catalog_item_from_tree(item, label_prefix="local"))
+        if len(local_items) >= capped_limit:
+            break
     default_model = get_default_model_for_task(task, settings)
     return {"items": local_items, "default_model": default_model}
 
@@ -4065,10 +5347,16 @@ def search_models(
     limit: int = 30,
     source: Literal["all", "huggingface", "civitai"] = "all",
     base_model: str = "",
+    size_min_mb: Optional[float] = None,
+    size_max_mb: Optional[float] = None,
 ) -> Dict[str, Any]:
     settings = settings_store.get()
     token = settings["huggingface"].get("token") or None
     capped_limit = min(max(limit, 1), 50)
+    try:
+        min_size_bytes, max_size_bytes = normalize_size_filter_bounds(size_min_mb, size_max_mb)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     include_hf = source in ("all", "huggingface")
     include_civitai = source in ("all", "civitai") and task in ("text-to-image", "image-to-image")
 
@@ -4103,6 +5391,7 @@ def search_models(
                 normalized_base_model,
             )
         ]
+    results = filter_models_by_size_bytes(results, min_size_bytes, max_size_bytes)
     for item in results:
         if not item.get("base_model"):
             item["base_model"] = infer_base_model_label(item.get("id"), item.get("pipeline_tag"), item.get("type"))
@@ -4121,10 +5410,16 @@ def search_models_v2(
     page: int = 1,
     cursor: str = "",
     model_kind: str = "",
+    size_min_mb: Optional[float] = None,
+    size_max_mb: Optional[float] = None,
 ) -> Dict[str, Any]:
     settings = settings_store.get()
     token = settings["huggingface"].get("token") or None
     capped_limit = min(max(limit, 1), 100)
+    try:
+        min_size_bytes, max_size_bytes = normalize_size_filter_bounds(size_min_mb, size_max_mb)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     current_page = max(int(page), 1)
     include_hf = source in ("all", "huggingface")
     include_civitai = source in ("all", "civitai") and task in ("text-to-image", "image-to-image")
@@ -4187,6 +5482,7 @@ def search_models_v2(
                 normalized_base_model,
             )
         ]
+    results = filter_models_by_size_bytes(results, min_size_bytes, max_size_bytes)
 
     models_dir = resolve_path(settings["paths"]["models_dir"])
     installed = collect_installed_model_id_set(models_dir)
@@ -4213,6 +5509,8 @@ def search_models_v2(
             "sort": sort,
             "nsfw": nsfw,
             "model_kind": normalized_model_kind(model_kind) or "checkpoint",
+            "size_min_mb": size_min_mb,
+            "size_max_mb": size_max_mb,
         },
     }
 
@@ -4252,26 +5550,43 @@ def lora_catalog(
 
     effective_model = model_ref.strip() or get_default_model_for_task(task, settings)
     capped_limit = min(max(limit, 1), 1000)
+    task_dir = LOCAL_TREE_API_TO_TASK.get(task, "")
+    tree = get_local_model_tree_cached(models_dir)
+    flat_items = list(tree.get("flat_items") or [])
+    task_items = [item for item in flat_items if str(item.get("category") or "") == "Lora" and str(item.get("task_dir") or "") == task_dir]
+    other_items = [item for item in flat_items if str(item.get("category") or "") == "Lora" and str(item.get("task_dir") or "") != task_dir]
+    ordered_items = task_items + other_items
+    ordered_items.sort(key=lambda item: str(item.get("name") or "").lower())
+
     items: list[Dict[str, Any]] = []
-    for child in sorted(models_dir.iterdir()):
-        if not child.is_dir():
+    seen_paths: set[str] = set()
+    for item in ordered_items:
+        path_value = str(item.get("path") or "")
+        if not path_value or path_value in seen_paths:
             continue
-        if not is_local_lora_dir(child):
+        child = Path(path_value)
+        if not child.exists():
             continue
-        adapter_config = parse_lora_adapter_config(child)
-        base_model_hint = str(adapter_config.get("base_model_name_or_path") or "").strip()
-        repo_hint = desanitize_repo_id(child.name)
-        if task in ("text-to-video", "image-to-video") and not base_model_hint:
-            # Video tasks are strict: when adapter metadata is missing, skip unknown LoRA
-            # to avoid incompatible adapters crashing inference (e.g. SDXL LoRA on T2V 3D UNet).
-            inferred_lora_base = infer_base_model_label(repo_hint)
-            inferred_model_base = infer_base_model_label(effective_model)
-            if inferred_lora_base != inferred_model_base:
+        seen_paths.add(path_value)
+        base_model_hint = ""
+        if child.is_dir():
+            adapter_config = parse_lora_adapter_config(child)
+            base_model_hint = str(adapter_config.get("base_model_name_or_path") or "").strip()
+        if not base_model_hint:
+            item_meta = load_local_videogen_meta(child)
+            base_model_hint = str(item_meta.get("base_model") or "").strip()
+        should_filter_by_model = task in ("text-to-image", "image-to-image")
+        if should_filter_by_model and base_model_hint and not lora_matches_model(base_model_hint, effective_model):
+            hint_lineage = infer_base_model_label(base_model_hint)
+            model_lineage = infer_base_model_label(effective_model)
+            if not (hint_lineage != "Other" and hint_lineage == model_lineage):
                 continue
-        if not lora_matches_model(base_model_hint, effective_model):
-            continue
-        preview_rel = find_local_preview_relpath(child, models_dir)
-        preview_url = f"/api/models/preview?rel={quote(preview_rel, safe='/')}" if preview_rel else None
+        repo_hint = str(item.get("repo_hint") or "").strip() or desanitize_repo_id(child.name)
+        preview_url = str(item.get("preview_url") or "").strip() or None
+        model_url = str(item.get("model_url") or "").strip() or None
+        size_bytes = safe_int(item.get("size_bytes"))
+        if size_bytes is None and child.is_dir():
+            size_bytes = local_lora_size_bytes(child)
         items.append(
             {
                 "source": "local",
@@ -4279,9 +5594,9 @@ def lora_catalog(
                 "value": str(child.resolve()),
                 "id": repo_hint,
                 "base_model": base_model_hint or None,
-                "size_bytes": local_lora_size_bytes(child),
+                "size_bytes": size_bytes,
                 "preview_url": preview_url,
-                "model_url": f"https://huggingface.co/{quote(repo_hint, safe='/')}",
+                "model_url": model_url,
             }
         )
         if len(items) >= capped_limit:
@@ -4295,24 +5610,33 @@ def vae_catalog(limit: int = 200) -> Dict[str, Any]:
     models_dir = resolve_path(settings["paths"]["models_dir"])
     models_dir.mkdir(parents=True, exist_ok=True)
     capped_limit = min(max(limit, 1), 1000)
+    tree = get_local_model_tree_cached(models_dir)
+    flat_items = list(tree.get("flat_items") or [])
+    flat_items.sort(key=lambda item: str(item.get("name") or "").lower())
     items: list[Dict[str, Any]] = []
-    for child in sorted(models_dir.iterdir()):
-        if not child.is_dir():
+    seen_paths: set[str] = set()
+    for item in flat_items:
+        if str(item.get("category") or "") != "VAE":
             continue
-        if not is_local_vae_dir(child):
+        path_value = str(item.get("path") or "")
+        if not path_value or path_value in seen_paths:
             continue
-        repo_hint = desanitize_repo_id(child.name)
-        preview_rel = find_local_preview_relpath(child, models_dir)
-        preview_url = f"/api/models/preview?rel={quote(preview_rel, safe='/')}" if preview_rel else None
+        child = Path(path_value)
+        if not child.exists():
+            continue
+        seen_paths.add(path_value)
+        repo_hint = str(item.get("repo_hint") or "").strip() or desanitize_repo_id(child.name)
+        preview_url = str(item.get("preview_url") or "").strip() or None
+        model_url = str(item.get("model_url") or "").strip() or None
         items.append(
             {
                 "source": "local",
                 "label": f"[vae] {repo_hint}",
                 "value": str(child.resolve()),
                 "id": repo_hint,
-                "size_bytes": None,
+                "size_bytes": safe_int(item.get("size_bytes")),
                 "preview_url": preview_url,
-                "model_url": f"https://huggingface.co/{quote(repo_hint, safe='/')}",
+                "model_url": model_url,
             }
         )
         if len(items) >= capped_limit:
@@ -4324,7 +5648,7 @@ def vae_catalog(limit: int = 200) -> Dict[str, Any]:
 def download_model(req: DownloadRequest) -> Dict[str, str]:
     task_id = create_task("download", "Download queued")
     LOGGER.info(
-        "download requested task_id=%s repo=%s source=%s revision=%s hf_revision=%s civitai_model_id=%s civitai_version_id=%s civitai_file_id=%s target_dir=%s",
+        "download requested task_id=%s repo=%s source=%s revision=%s hf_revision=%s civitai_model_id=%s civitai_version_id=%s civitai_file_id=%s target_dir=%s task=%s base_model=%s model_kind=%s",
         task_id,
         req.repo_id,
         req.source or "",
@@ -4334,6 +5658,9 @@ def download_model(req: DownloadRequest) -> Dict[str, str]:
         req.civitai_version_id,
         req.civitai_file_id,
         req.target_dir,
+        req.task or "",
+        req.base_model or "",
+        req.model_kind or "",
     )
     thread = threading.Thread(
         target=download_model_worker,
@@ -4473,7 +5800,7 @@ def generate_text2video(req: Text2VideoRequest) -> Dict[str, str]:
             raise HTTPException(status_code=500, detail=f"Diffusers runtime is not available: {exc}") from exc
     task_id = create_task("text2video", "Generation queued")
     LOGGER.info(
-        "text2video requested task_id=%s model=%s backend=%s requested_backend=%s loras=%s lora_scale=%s prompt_len=%s negative_len=%s steps=%s frames=%s guidance=%s fps=%s seed=%s",
+        "text2video requested task_id=%s model=%s backend=%s requested_backend=%s loras=%s lora_scale=%s prompt_len=%s negative_len=%s steps=%s duration_sec=%.3f legacy_frames=%s guidance=%s fps=%s seed=%s",
         task_id,
         req.model_id or "(default)",
         backend,
@@ -4483,6 +5810,7 @@ def generate_text2video(req: Text2VideoRequest) -> Dict[str, str]:
         len(req.prompt or ""),
         len(req.negative_prompt or ""),
         req.num_inference_steps,
+        float(req.duration_seconds),
         req.num_frames,
         req.guidance_scale,
         req.fps,
@@ -4503,7 +5831,8 @@ async def generate_image2video(
     lora_ids: list[str] = Form(default=[]),
     lora_scale: float = Form(1.0),
     num_inference_steps: int = Form(30),
-    num_frames: int = Form(16),
+    num_frames: Optional[int] = Form(None),
+    duration_seconds: float = Form(VIDEO_DURATION_SECONDS_DEFAULT),
     guidance_scale: float = Form(9.0),
     fps: int = Form(8),
     width: int = Form(512),
@@ -4532,6 +5861,7 @@ async def generate_image2video(
         "lora_scale": lora_scale,
         "num_inference_steps": num_inference_steps,
         "num_frames": num_frames,
+        "duration_seconds": duration_seconds,
         "guidance_scale": guidance_scale,
         "fps": fps,
         "width": width,
@@ -4540,13 +5870,14 @@ async def generate_image2video(
     }
     task_id = create_task("image2video", "Generation queued")
     LOGGER.info(
-        "image2video requested task_id=%s model=%s loras=%s lora_scale=%s file=%s steps=%s frames=%s guidance=%s fps=%s size=%sx%s seed=%s",
+        "image2video requested task_id=%s model=%s loras=%s lora_scale=%s file=%s steps=%s duration_sec=%.3f legacy_frames=%s guidance=%s fps=%s size=%sx%s seed=%s",
         task_id,
         model_id.strip() or "(default)",
         ",".join(lora_refs) if lora_refs else "(none)",
         lora_scale,
         image.filename,
         num_inference_steps,
+        float(duration_seconds),
         num_frames,
         guidance_scale,
         fps,
@@ -4565,6 +5896,31 @@ def task_status(task_id: str) -> Dict[str, Any]:
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
     return task
+
+
+@app.get("/api/tasks")
+def list_tasks(
+    task_type: str = "",
+    status: str = "all",
+    limit: int = 30,
+) -> Dict[str, Any]:
+    normalized_task_type = str(task_type or "").strip().lower()
+    normalized_status = str(status or "all").strip().lower()
+    capped_limit = min(max(int(limit), 1), 200)
+    allowed_status = {"all", "queued", "running", "completed", "error"}
+    if normalized_status not in allowed_status:
+        raise HTTPException(status_code=400, detail="Invalid status")
+    with TASKS_LOCK:
+        values = [copy.deepcopy(task) for task in TASKS.values()]
+    filtered: list[Dict[str, Any]] = []
+    for task in values:
+        if normalized_task_type and str(task.get("task_type") or "").strip().lower() != normalized_task_type:
+            continue
+        if normalized_status != "all" and str(task.get("status") or "").strip().lower() != normalized_status:
+            continue
+        filtered.append(task)
+    filtered.sort(key=lambda task: str(task.get("updated_at") or task.get("created_at") or ""), reverse=True)
+    return {"tasks": filtered[:capped_limit]}
 
 
 @app.get("/api/outputs")
