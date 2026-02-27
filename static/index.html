@@ -180,7 +180,10 @@
         </label>
         <div class="grid">
           <label><span data-i18n="labelSteps" class="has-help" data-help-key="helpStepsText2Video" tabindex="0">Steps</span> <input id="t2vSteps" type="number" min="1" max="120" value="30" /></label>
-          <label><span>Duration (sec)</span> <input id="t2vFrames" type="number" min="0.1" max="10800" step="0.1" value="2.0" /></label>
+          <label>
+            <span data-i18n="labelDurationSeconds" class="has-help" data-help-key="helpDurationSeconds" tabindex="0">Duration (sec)</span>
+            <input id="t2vFrames" type="number" min="0.1" max="10800" step="0.1" value="2.0" />
+          </label>
           <label><span data-i18n="labelGuidance" class="has-help" data-help-key="helpGuidanceText2Video" tabindex="0">Guidance</span> <input id="t2vGuidance" type="number" min="0" max="30" step="0.1" value="9.0" /></label>
           <label><span data-i18n="labelLoraScale" class="has-help" data-help-key="helpLoraScale" tabindex="0">LoRA Scale</span> <input id="t2vLoraScale" type="number" min="0" max="2" step="0.05" value="1.0" /></label>
           <label><span data-i18n="labelFps" class="has-help" data-help-key="helpFpsText2Video" tabindex="0">FPS</span> <input id="t2vFps" type="number" min="1" max="60" value="8" /></label>
@@ -229,7 +232,10 @@
         </label>
         <div class="grid">
           <label><span data-i18n="labelSteps" class="has-help" data-help-key="helpStepsImage2Video" tabindex="0">Steps</span> <input id="i2vSteps" type="number" min="1" max="120" value="30" /></label>
-          <label><span>Duration (sec)</span> <input id="i2vFrames" type="number" min="0.1" max="10800" step="0.1" value="2.0" /></label>
+          <label>
+            <span data-i18n="labelDurationSeconds" class="has-help" data-help-key="helpDurationSeconds" tabindex="0">Duration (sec)</span>
+            <input id="i2vFrames" type="number" min="0.1" max="10800" step="0.1" value="2.0" />
+          </label>
           <label><span data-i18n="labelGuidance" class="has-help" data-help-key="helpGuidanceImage2Video" tabindex="0">Guidance</span> <input id="i2vGuidance" type="number" min="0" max="30" step="0.1" value="9.0" /></label>
           <label><span data-i18n="labelLoraScale" class="has-help" data-help-key="helpLoraScale" tabindex="0">LoRA Scale</span> <input id="i2vLoraScale" type="number" min="0" max="2" step="0.05" value="1.0" /></label>
           <label><span data-i18n="labelFps" class="has-help" data-help-key="helpFpsImage2Video" tabindex="0">FPS</span> <input id="i2vFps" type="number" min="1" max="60" value="8" /></label>
@@ -448,6 +454,30 @@
             <span data-i18n="labelClearHfCache" class="has-help" data-help-key="helpClearHfCache" tabindex="0">Clear Hugging Face Cache</span>
             <button id="clearHfCacheBtn" type="button" data-i18n="btnClearHfCache">Clear Cache</button>
           </label>
+          <label>
+            <span data-i18n="labelCleanupNow">Cleanup Runtime Storage</span>
+            <button id="runCleanupBtn" type="button" data-i18n="btnRunCleanup">Run Cleanup</button>
+          </label>
+          <label>
+            <span data-i18n="labelCleanupIncludeCache">Include HF Cache</span>
+            <input id="cleanupIncludeCache" type="checkbox" checked />
+          </label>
+          <label>
+            <span data-i18n="labelCleanupMaxAgeDays">Cleanup Max Age (days)</span>
+            <input id="cfgCleanupMaxAgeDays" type="number" min="1" max="90" step="1" value="7" />
+          </label>
+          <label>
+            <span data-i18n="labelCleanupMaxOutputsCount">Cleanup Max Outputs</span>
+            <input id="cfgCleanupMaxOutputsCount" type="number" min="10" max="5000" step="10" value="200" />
+          </label>
+          <label>
+            <span data-i18n="labelCleanupMaxTmpCount">Cleanup Max Tmp</span>
+            <input id="cfgCleanupMaxTmpCount" type="number" min="10" max="10000" step="10" value="300" />
+          </label>
+          <label>
+            <span data-i18n="labelCleanupMaxCacheGb">Cleanup Max Cache (GB)</span>
+            <input id="cfgCleanupMaxCacheGb" type="number" min="1" max="500" step="1" value="30" />
+          </label>
         </div>
         <button type="submit" class="primary" data-i18n="btnSaveSettings">Save Settings</button>
       </form>
@@ -460,6 +490,10 @@
         <div id="taskProgressBar" class="task-progress-bar"></div>
         <div id="taskProgressLabel" class="task-progress-label">0% | ETA --:-- | ELAPSED 00:00</div>
       </div>
+      <details id="taskLogPanel" class="task-log-panel">
+        <summary data-i18n="labelTaskLog">Task Log</summary>
+        <pre id="taskLogContent"></pre>
+      </details>
       <img id="imagePreview" alt="Generated image preview" />
       <video id="preview" controls></video>
     </section>

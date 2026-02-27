@@ -4,6 +4,7 @@ const LANG_STORAGE_KEY = "videogen_lang";
 const TASK_STORAGE_KEY = "videogen_last_task_id";
 const TASK_POLL_INTERVAL_MS = 1000;
 const DOWNLOAD_TASK_POLL_INTERVAL_MS = 1500;
+const EXTERNAL_I18N_URL = "/static/i18n/messages.json";
 
 const I18N = {
   en: {
@@ -25,6 +26,7 @@ const I18N = {
     labelModelSelect: "Model Selection",
     labelSteps: "Steps",
     labelFrames: "Frames",
+    labelDurationSeconds: "Duration (sec)",
     labelGuidance: "Guidance",
     labelFps: "FPS",
     labelT2VBackend: "T2V Backend",
@@ -145,6 +147,8 @@ const I18N = {
       "Impact: Higher values usually improve quality but increase time and GPU load.\nExample: 30",
     helpFramesText2Video:
       "Impact: More frames create longer/smoother clips but raise VRAM and render time.\nExample: 16",
+    helpDurationSeconds:
+      "Impact: Video length in seconds. Longer duration increases generation time and VRAM usage.\nExample: 2.0",
     helpGuidanceText2Video:
       "Impact: Higher guidance follows prompt more strongly but may look less natural.\nExample: 9.0",
     helpFpsText2Video:
@@ -258,6 +262,13 @@ const I18N = {
     helpClearHfCache:
       "Impact: Deletes downloaded Hugging Face cache files to reclaim disk space; next model load/download may take longer.\nExample: Run this after low disk warning",
     btnSaveSettings: "Save Settings",
+    btnRunCleanup: "Run Cleanup",
+    labelCleanupNow: "Cleanup Runtime Storage",
+    labelCleanupIncludeCache: "Include HF Cache",
+    labelCleanupMaxAgeDays: "Cleanup Max Age (days)",
+    labelCleanupMaxOutputsCount: "Cleanup Max Outputs",
+    labelCleanupMaxTmpCount: "Cleanup Max Tmp",
+    labelCleanupMaxCacheGb: "Cleanup Max Cache (GB)",
     btnClearHfCache: "Clear Cache",
     btnGenerateTextImage: "Generate Text Image",
     headingPathBrowser: "Folder Browser",
@@ -395,9 +406,12 @@ const I18N = {
     statusRunning: "running",
     statusCompleted: "completed",
     statusError: "error",
+    labelTaskLog: "Task Log",
     statusCancelled: "cancelled",
     btnCancelTask: "Cancel Task",
     msgTaskCancelRequested: "Cancellation requested for task={id}",
+    msgCleanupDone: "Cleanup completed: outputs={outputs}, tmp={tmp}, cache_paths={cache}",
+    msgCleanupFailed: "Cleanup failed: {error}",
     taskLine: "task={id} | type={type} | status={status} | {progress}% | {message}",
     taskError: "error={error}",
     runtimeDevice: "device",
@@ -449,6 +463,7 @@ const I18N = {
     labelModelSelect: "モデル選択",
     labelSteps: "ステップ数",
     labelFrames: "フレーム数",
+    labelDurationSeconds: "長さ（秒）",
     labelGuidance: "ガイダンス",
     labelFps: "FPS",
     labelT2VBackend: "T2Vバックエンド",
@@ -569,6 +584,8 @@ const I18N = {
       "影響: 値を上げると品質向上が見込めますが、時間とGPU負荷が増えます。\n例: 30",
     helpFramesText2Video:
       "影響: 値を上げると動画が長く滑らかになりますが、VRAMと処理時間が増えます。\n例: 16",
+    helpDurationSeconds:
+      "生成する動画の長さ（秒）。長くすると生成時間とVRAM使用量が増えます。\n例: 2.0",
     helpGuidanceText2Video:
       "影響: 値を上げると指示への忠実度が上がりますが、不自然になる場合があります。\n例: 9.0",
     helpFpsText2Video:
@@ -682,6 +699,13 @@ const I18N = {
     helpClearHfCache:
       "影響: Hugging Face のキャッシュファイルを削除してディスク容量を回復します。次回は再ダウンロードが発生し時間がかかります。\n例: 容量不足警告が出た後に実行",
     btnSaveSettings: "設定を保存",
+    btnRunCleanup: "クリーンアップ実行",
+    labelCleanupNow: "ランタイムストレージのクリーンアップ",
+    labelCleanupIncludeCache: "HFキャッシュも対象にする",
+    labelCleanupMaxAgeDays: "クリーンアップ保持日数",
+    labelCleanupMaxOutputsCount: "クリーンアップ出力上限",
+    labelCleanupMaxTmpCount: "クリーンアップ一時ファイル上限",
+    labelCleanupMaxCacheGb: "クリーンアップキャッシュ上限(GB)",
     btnClearHfCache: "キャッシュ削除",
     btnGenerateTextImage: "テキスト画像を生成",
     headingPathBrowser: "フォルダブラウザ",
@@ -819,9 +843,12 @@ const I18N = {
     statusRunning: "実行中",
     statusCompleted: "完了",
     statusError: "エラー",
+    labelTaskLog: "タスクログ",
     statusCancelled: "キャンセル",
     btnCancelTask: "タスクをキャンセル",
     msgTaskCancelRequested: "タスクのキャンセルを要求しました: {id}",
+    msgCleanupDone: "クリーンアップ完了: outputs={outputs}, tmp={tmp}, cache_paths={cache}",
+    msgCleanupFailed: "クリーンアップ失敗: {error}",
     taskLine: "task={id} | type={type} | status={status} | {progress}% | {message}",
     taskError: "error={error}",
     runtimeDevice: "device",
@@ -1017,6 +1044,7 @@ const state = {
   currentTaskSnapshot: null,
   lastErrorPopupTaskId: null,
   generationBusy: false,
+  taskLogLines: [],
 };
 
 const SEARCH_BASE_MODEL_OPTIONS_BY_TASK = {
@@ -1402,6 +1430,21 @@ function setLanguage(languageCode) {
   loadLocalModels().catch(() => {});
 }
 
+async function loadExternalI18n() {
+  try {
+    const response = await fetch(EXTERNAL_I18N_URL, { cache: "no-store" });
+    if (!response.ok) return;
+    const payload = await response.json();
+    if (!payload || typeof payload !== "object") return;
+    Object.entries(payload).forEach(([lang, dict]) => {
+      if (!I18N[lang] || !dict || typeof dict !== "object") return;
+      I18N[lang] = { ...I18N[lang], ...dict };
+    });
+  } catch (_error) {
+    // 外部辞書がなくても既定辞書で動作可能なため、初期化を止めない。
+  }
+}
+
 async function api(path, options = {}) {
   const response = await fetch(path, options);
   if (!response.ok) {
@@ -1411,8 +1454,37 @@ async function api(path, options = {}) {
   return response.json();
 }
 
+async function withApiState(action, hooks = {}) {
+  const { onLoading, onSuccess, onError, onFinally } = hooks;
+  if (onLoading) onLoading();
+  try {
+    const result = await action();
+    if (onSuccess) onSuccess(result);
+    return result;
+  } catch (error) {
+    if (onError) onError(error);
+    throw error;
+  } finally {
+    if (onFinally) onFinally();
+  }
+}
+
 function showTaskMessage(text) {
   el("taskStatus").textContent = text;
+  appendTaskLog(text);
+}
+
+function appendTaskLog(text) {
+  const line = `[${new Date().toLocaleTimeString()}] ${String(text || "")}`;
+  state.taskLogLines.push(line);
+  if (state.taskLogLines.length > 200) {
+    state.taskLogLines = state.taskLogLines.slice(state.taskLogLines.length - 200);
+  }
+  const logNode = el("taskLogContent");
+  if (logNode) {
+    logNode.textContent = state.taskLogLines.join("\n");
+    logNode.scrollTop = logNode.scrollHeight;
+  }
 }
 
 function setGenerationBusy(isBusy) {
@@ -1739,6 +1811,19 @@ function applySettings(settings) {
   }
   if (el("cfgSoftwareVideoFallback")) {
     el("cfgSoftwareVideoFallback").checked = Boolean(serverSettings?.allow_software_video_fallback);
+  }
+  const storage = settings.storage || {};
+  if (el("cfgCleanupMaxAgeDays")) {
+    el("cfgCleanupMaxAgeDays").value = Number(storage.cleanup_max_age_days || 7);
+  }
+  if (el("cfgCleanupMaxOutputsCount")) {
+    el("cfgCleanupMaxOutputsCount").value = Number(storage.cleanup_max_outputs_count || 200);
+  }
+  if (el("cfgCleanupMaxTmpCount")) {
+    el("cfgCleanupMaxTmpCount").value = Number(storage.cleanup_max_tmp_count || 300);
+  }
+  if (el("cfgCleanupMaxCacheGb")) {
+    el("cfgCleanupMaxCacheGb").value = Number(storage.cleanup_max_cache_size_gb || 30);
   }
   if (el("cfgT2VBackend")) {
     el("cfgT2VBackend").value = defaultT2vBackend;
@@ -2079,6 +2164,13 @@ async function saveSettings(event) {
       width: Number(el("cfgWidth").value),
       height: Number(el("cfgHeight").value),
     },
+    storage: {
+      cleanup_enabled: true,
+      cleanup_max_age_days: Number(el("cfgCleanupMaxAgeDays")?.value || 7),
+      cleanup_max_outputs_count: Number(el("cfgCleanupMaxOutputsCount")?.value || 200),
+      cleanup_max_tmp_count: Number(el("cfgCleanupMaxTmpCount")?.value || 300),
+      cleanup_max_cache_size_gb: Number(el("cfgCleanupMaxCacheGb")?.value || 30),
+    },
   };
   const updated = await api("/api/settings", {
     method: "PUT",
@@ -2118,6 +2210,22 @@ async function clearHfCache() {
       removed: (result.removed_paths || []).length,
       skipped: (result.skipped || []).length,
       failed: (result.failed || []).length,
+    }),
+  );
+}
+
+async function runCleanupNow() {
+  const includeCache = Boolean(el("cleanupIncludeCache")?.checked);
+  const result = await api("/api/cleanup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ include_cache: includeCache }),
+  });
+  showTaskMessage(
+    t("msgCleanupDone", {
+      outputs: (result.removed_outputs || []).length,
+      tmp: (result.removed_tmp || []).length,
+      cache: (result.removed_cache_paths || []).length,
     }),
   );
 }
@@ -2976,7 +3084,7 @@ async function openModelDetail(item) {
       source,
       id: String(item.id || ""),
     });
-    const detail = await api(`/api/models/detail?${params.toString()}`);
+    const detail = await withApiState(async () => api(`/api/models/detail?${params.toString()}`));
     state.searchDetail = { item, detail };
     renderModelDetail(item, detail);
   } catch (error) {
@@ -3216,7 +3324,16 @@ async function searchModels(event, options = {}) {
   if (sizeMaxMb !== null && sizeMaxMb > 0) {
     params.set("size_max_mb", String(sizeMaxMb));
   }
-  const data = await api(`/api/models/search2?${params.toString()}`);
+  const data = await withApiState(
+    async () => api(`/api/models/search2?${params.toString()}`),
+    {
+      onError: (error) => {
+        if (el("searchCards")) {
+          el("searchCards").innerHTML = `<div class="downloads-empty">${escapeHtml(error.message)}</div>`;
+        }
+      },
+    },
+  );
   state.lastSearchResults = data.items || [];
   state.searchNextCursor = data.next_cursor || null;
   state.searchPrevCursor = data.prev_cursor || null;
@@ -3669,6 +3786,7 @@ function bindLanguageSelector() {
 }
 
 async function bootstrap() {
+  await loadExternalI18n();
   state.language = detectInitialLanguage();
   bindLanguageSelector();
   setLanguage(state.language);
@@ -3690,6 +3808,13 @@ async function bootstrap() {
       await clearHfCache();
     } catch (error) {
       showTaskMessage(t("msgHfCacheClearFailed", { error: error.message }));
+    }
+  });
+  bindClick("runCleanupBtn", async () => {
+    try {
+      await runCleanupNow();
+    } catch (error) {
+      showTaskMessage(t("msgCleanupFailed", { error: error.message }));
     }
   });
   el("searchForm").addEventListener("submit", async (event) => {

@@ -25,6 +25,7 @@
 - `TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL` is derived from persisted settings when absent.
 - Allocator env (`PYTORCH_ALLOC_CONF` / `PYTORCH_CUDA_ALLOC_CONF`) is normalized at startup.
 - `/api/runtime` exposes effective env + mismatch warnings to detect uvicorn direct-launch misconfiguration.
+- `/api/runtime` now also reports selected dtype/bf16 capability/device name/gpu count/concurrency policy.
 
 ### 3) Device/dtype policy unification
 
@@ -34,6 +35,7 @@
   - `server.preferred_dtype` (`float16` / `bf16`)
 - If `bf16` is requested but unsupported, runtime falls back to `float16` on GPU.
 - `/api/runtime` reports selected dtype and bf16 capability.
+- 推論本体は `torch.inference_mode()` + `torch.autocast(device_type="cuda", dtype=...)` を共通コンテキストで適用。
 
 ### 4) Task cancellation model
 
@@ -48,7 +50,16 @@
 - Opt-in setting: `server.allow_software_video_fallback`.
 - When enabled, fallback encoder is `libx264` via ffmpeg/imageio if AMF initialization fails.
 
-### 6) Network I/O hardening
+### 6) Storage lifecycle and cleanup
+
+- Added `POST /api/cleanup`.
+- Policy source is `settings.storage.*`:
+  - max age (days)
+  - max file count (outputs/tmp)
+  - max HF cache size
+- Cleanup runs on explicit user action from UI; policy is deterministic and logs removed counts.
+
+### 7) Network I/O hardening
 
 - External calls now use `httpx` with timeout/retry policy from settings:
   - `server.request_timeout_sec`
@@ -73,4 +84,3 @@
 - Added loading indicators for model search/detail/local model loading.
 - Added polling backoff (`setTimeout`) for tasks/download lists to reduce unnecessary traffic under failures.
 - Generation buttons are disabled while generation task is active.
-

@@ -178,6 +178,14 @@ VAE は `Text to Image` / `Image to Image` タブで選択できます。
     - 生成系・CivitAIストリームDLはキャンセル反映されます。
     - HF `snapshot_download` は処理開始後に即中断できない場合があります（サーバログに明示）。
 
+- `POST /api/cleanup`
+  - body:
+    - `include_cache`（任意, 既定 `true`）
+  - response:
+    - 削除件数・削除パス・キャッシュ前後サイズ
+  - 備考:
+    - `settings.storage.*` の上限/TTLポリシーを使って `outputs/tmp/HF cache` を整理します。
+
 ## 手動テスト手順（Model Search）
 
 1. `start.bat` で起動し、`Models` タブを開く
@@ -210,6 +218,16 @@ VAE は `Text to Image` / `Image to Image` タブで選択できます。
 6. `Rescan` を押下し、追加したモデルが反映されることを確認
 7. `Reveal` を押下し Explorer で対象フォルダ/ファイルが開くことを確認（Windows）
 
+## E2E スモーク手順（Windows + ROCm）
+
+1. `start.bat` で起動
+2. `GET /api/runtime` を確認し、`device` / `dtype` / `torch_hip_version` / `gpu_name` が期待通りであることを確認
+3. `Models` タブで検索し、`Detail` を開いてローディング表示が出ることを確認
+4. 任意モデルをダウンロード開始し、右上 Downloads ウィジェットで進捗表示を確認
+5. `Text to Video` または `Image to Video` を実行し、進捗バーと `Task Log` の更新を確認
+6. 実行中に `Cancel Task` を押して `cancelled` 遷移を確認
+7. `Settings` で `Run Cleanup` を押し、削除件数メッセージが表示されることを確認
+
 ## 保存先
 
 - 設定: `data/settings.json`
@@ -218,6 +236,11 @@ VAE は `Text to Image` / `Image to Image` タブで選択できます。
   - `server.gpu_max_concurrency`: 生成系の同時実行上限（既定 `1`）
   - `server.allow_software_video_fallback`: `true` の場合、AMF失敗時に `libx264` へフォールバック
   - `server.request_timeout_sec` / `server.request_retry_count` / `server.request_retry_backoff_sec`
+  - `storage.cleanup_enabled`
+  - `storage.cleanup_max_age_days`
+  - `storage.cleanup_max_outputs_count`
+  - `storage.cleanup_max_tmp_count`
+  - `storage.cleanup_max_cache_size_gb`
 - モデル: `models/`
 - 生成画像/動画: `outputs/`
 - 一時画像: `tmp/`
@@ -225,10 +248,14 @@ VAE は `Text to Image` / `Image to Image` タブで選択できます。
 
 ## 開発ツール
 
-- `ruff` / `black` を導入（`pyproject.toml`）
-- 依存:
-  - `requirements-test.txt` に `ruff`, `black` を追加
-  - `requirements.txt` に `httpx` を追加
+- `ruff` / `black` / `pytest` を必須化
+- 開発依存:
+  - `requirements-test.txt`（テスト + lint）
+  - `requirements-dev.txt`（最小開発セット）
+- 実行:
+  - `python -m black main.py videogen tests`
+  - `python -m ruff check .`
+  - `python -m pytest -q`
 - 設計判断の詳細: `docs/ARCHITECTURE.md`
 
 ## ログ確認

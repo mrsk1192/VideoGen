@@ -1,0 +1,56 @@
+{
+  "en": {
+    "labelDurationSeconds": "Duration (sec)",
+    "helpDurationSeconds": "Video length in seconds. Longer duration increases generation time and VRAM usage.",
+    "labelCleanupNow": "Cleanup Runtime Storage",
+    "labelCleanupIncludeCache": "Include HF Cache",
+    "labelCleanupMaxAgeDays": "Cleanup Max Age (days)",
+    "labelCleanupMaxOutputsCount": "Cleanup Max Outputs",
+    "labelCleanupMaxTmpCount": "Cleanup Max Tmp",
+    "labelCleanupMaxCacheGb": "Cleanup Max Cache (GB)",
+    "btnRunCleanup": "Run Cleanup",
+    "labelTaskLog": "Task Log",
+    "msgCleanupFailed": "Cleanup failed: {error}"
+  },
+  "ja": {
+    "labelDurationSeconds": "長さ（秒）",
+    "helpDurationSeconds": "生成する動画の長さ（秒）。長くすると生成時間とVRAM使用量が増えます。",
+    "labelCleanupNow": "ランタイムストレージのクリーンアップ",
+    "labelCleanupIncludeCache": "HFキャッシュも対象にする",
+    "labelCleanupMaxAgeDays": "クリーンアップ保持日数",
+    "labelCleanupMaxOutputsCount": "クリーンアップ出力上限",
+    "labelCleanupMaxTmpCount": "クリーンアップ一時ファイル上限",
+    "labelCleanupMaxCacheGb": "クリーンアップキャッシュ上限(GB)",
+    "btnRunCleanup": "クリーンアップ実行",
+    "labelTaskLog": "タスクログ",
+    "msgCleanupFailed": "クリーンアップ失敗: {error}"
+  },
+  "es": {
+    "labelDurationSeconds": "Duración (seg)",
+    "helpDurationSeconds": "Duración del video en segundos. Valores más altos incrementan tiempo y VRAM."
+  },
+  "fr": {
+    "labelDurationSeconds": "Durée (s)",
+    "helpDurationSeconds": "Durée de la vidéo en secondes. Une durée plus longue augmente le temps de génération et la VRAM."
+  },
+  "de": {
+    "labelDurationSeconds": "Dauer (Sek.)",
+    "helpDurationSeconds": "Videolänge in Sekunden. Längere Dauer erhöht Laufzeit und VRAM-Nutzung."
+  },
+  "it": {
+    "labelDurationSeconds": "Durata (sec)",
+    "helpDurationSeconds": "Durata video in secondi. Durate più lunghe aumentano tempo di generazione e uso VRAM."
+  },
+  "pt": {
+    "labelDurationSeconds": "Duração (s)",
+    "helpDurationSeconds": "Duração do vídeo em segundos. Quanto maior, maior o tempo de geração e uso de VRAM."
+  },
+  "ru": {
+    "labelDurationSeconds": "Длительность (с)",
+    "helpDurationSeconds": "Длина видео в секундах. Большее значение увеличивает время генерации и потребление VRAM."
+  },
+  "ar": {
+    "labelDurationSeconds": "المدة (ثانية)",
+    "helpDurationSeconds": "مدة الفيديو بالثواني. المدة الأطول تزيد وقت التوليد واستهلاك VRAM."
+  }
+}

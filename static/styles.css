@@ -1354,6 +1354,32 @@ button.is-busy {
   text-overflow: ellipsis;
 }
 
+.task-log-panel {
+  margin-bottom: 0.7rem;
+  border: 1px solid rgba(130, 174, 208, 0.35);
+  border-radius: 10px;
+  background: rgba(4, 8, 15, 0.65);
+}
+
+.task-log-panel summary {
+  cursor: pointer;
+  padding: 0.45rem 0.6rem;
+  font-family: "IBM Plex Mono", monospace;
+  color: #cbe6f7;
+}
+
+#taskLogContent {
+  margin: 0;
+  padding: 0.55rem 0.7rem 0.8rem;
+  max-height: 180px;
+  overflow: auto;
+  color: #9fc7dd;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.74rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 #preview {
   width: 100%;
   border-radius: 10px;
