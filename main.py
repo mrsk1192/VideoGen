@@ -1811,6 +1811,32 @@ def get_vram_full_load_threshold_gb(settings: Dict[str, Any]) -> float:
     return max(1.0, min(threshold_gb, 256.0))
 
 
+def build_loader_max_memory(settings: Dict[str, Any], hardware_profile: Any) -> Dict[Any, str]:
+    """Build conservative max_memory caps so accelerate does not spill aggressively into host RAM."""
+
+    server = settings.get("server", {}) if isinstance(settings, dict) else {}
+    try:
+        cpu_cap_gb = float(server.get("max_memory_cpu_gb", 8.0))
+    except Exception:
+        cpu_cap_gb = 8.0
+    cpu_cap_gb = max(2.0, min(cpu_cap_gb, 64.0))
+
+    total_vram_bytes = int(getattr(hardware_profile, "gpu_total_bytes", 0) or 0)
+    total_vram_gb = float(total_vram_bytes) / float(1024**3) if total_vram_bytes > 0 else 0.0
+    try:
+        gpu_cap_gb_raw = float(server.get("max_memory_gpu_gb", 90.0))
+    except Exception:
+        gpu_cap_gb_raw = 90.0
+    gpu_cap_gb = max(4.0, min(gpu_cap_gb_raw, 256.0))
+    if total_vram_gb > 0:
+        gpu_cap_gb = max(4.0, min(gpu_cap_gb, max(4.0, total_vram_gb - 2.0)))
+
+    memory_caps: Dict[Any, str] = {"cpu": f"{int(cpu_cap_gb)}GB"}
+    if bool(getattr(hardware_profile, "cuda_available", False)):
+        memory_caps[0] = f"{int(gpu_cap_gb)}GB"
+    return memory_caps
+
+
 def is_96gb_vram_profile(hardware_profile: Any, settings: Dict[str, Any], prefer_gpu_device_map: bool) -> bool:
     if not prefer_gpu_device_map:
         return False
@@ -1906,7 +1932,18 @@ def load_pipeline_from_pretrained_with_strategy(
     offload_dir = resolve_offload_dir(BASE_DIR)
     hardware_profile = detect_hardware_profile(torch_module=torch, import_error=TORCH_IMPORT_ERROR)
     cache_key_value = cache_key or f"{kind}:{source}"
-    safetensors_mode, safetensors_mode_label = resolve_safetensors_mode(settings)
+    requested_safetensors_mode, requested_safetensors_mode_label = resolve_safetensors_mode(settings)
+    # Memory-safe policy for huge models: always use safetensors + mmap path.
+    if requested_safetensors_mode is not True:
+        LOGGER.warning(
+            "forcing use_safetensors=True for memory-safe load kind=%s source=%s requested_mode=%s",
+            kind,
+            source,
+            requested_safetensors_mode_label,
+        )
+    safetensors_mode = True
+    safetensors_mode_label = "forced_safetensors_mmap"
+    max_memory_caps = build_loader_max_memory(settings, hardware_profile)
     if safetensors_mode is True:
         integrity = verify_safetensors_integrity(source, settings)
         if integrity.get("failed"):
@@ -1927,24 +1964,43 @@ def load_pipeline_from_pretrained_with_strategy(
         base_kwargs: Dict[str, Any] = {
             "torch_dtype": dtype,
             "low_cpu_mem_usage": True,
+            "device_map": "cuda",
+            "use_safetensors": True,
+            "max_memory": max_memory_caps,
+            "offload_folder": None,
+            "offload_state_dict": False,
         }
-        if safetensors_mode is not None:
-            base_kwargs["use_safetensors"] = safetensors_mode
         if status_callback is not None:
             with contextlib.suppress(Exception):
                 status_callback("model_load_gpu", "Loading pipeline (low_cpu_mem_usage=True)")
         LOGGER.info(
-            "Loading pipeline (low_cpu_mem_usage=True) kind=%s source=%s profile=%s dtype=%s safetensors_mode=%s",
+            "Loading pipeline (low_cpu_mem_usage=True) kind=%s source=%s profile=%s dtype=%s "
+            "safetensors_mode=%s device_map=%s max_memory=%s",
             kind,
             source,
             vram_profile,
             str(dtype),
             safetensors_mode_label,
+            base_kwargs.get("device_map"),
+            base_kwargs.get("max_memory"),
         )
-        log_memory_snapshot("before", kind=kind, source=source, strategy="full_vram_no_device_map")
-        strategy_name = "full_vram_no_device_map"
-        strategy_message = "VRAMにロード中 (device_map omitted)"
-        pipe = loader(source, **base_kwargs)
+        log_memory_snapshot("before", kind=kind, source=source, strategy="full_vram_device_map_cuda")
+        strategy_name = "full_vram_device_map_cuda"
+        strategy_message = "VRAMにロード中 (device_map='cuda')"
+        try:
+            pipe = loader(source, **base_kwargs)
+        except TypeError as exc:
+            fallback_keys = {"max_memory", "offload_folder", "offload_state_dict"}
+            fallback_kwargs = {key: value for key, value in base_kwargs.items() if key not in fallback_keys}
+            LOGGER.warning(
+                "pipeline loader rejected optional kwargs; retrying without %s kind=%s source=%s error=%s",
+                ",".join(sorted(fallback_keys)),
+                kind,
+                source,
+                str(exc),
+            )
+            pipe = loader(source, **fallback_kwargs)
+            base_kwargs = fallback_kwargs
 
         meta_names = pipeline_meta_tensor_names(pipe)
         if meta_names:
@@ -1965,7 +2021,7 @@ def load_pipeline_from_pretrained_with_strategy(
             setattr(pipe, "_videogen_enable_cpu_offload", False)
             setattr(pipe, "_videogen_vram_profile", vram_profile)
             setattr(pipe, "_videogen_pre_inference_cleanup_pending", True)
-            setattr(pipe, "_videogen_device_map_used", None)
+            setattr(pipe, "_videogen_device_map_used", base_kwargs.get("device_map"))
             setattr(pipe, "_videogen_safetensors_mode", safetensors_mode_label)
 
         vae_tiling_enabled = None
@@ -1986,14 +2042,15 @@ def load_pipeline_from_pretrained_with_strategy(
             "name": strategy_name,
             "task_step": "model_load_gpu",
             "task_message": strategy_message,
-            "device_map": None,
+            "device_map": base_kwargs.get("device_map"),
             "use_safetensors": safetensors_mode,
             "low_cpu_mem_usage": True,
-            "offload_state_dict": False,
-            "offload_folder": None,
+            "offload_state_dict": bool(base_kwargs.get("offload_state_dict", False)),
+            "offload_folder": base_kwargs.get("offload_folder"),
+            "max_memory": base_kwargs.get("max_memory"),
             "enable_model_cpu_offload": False,
             "vram_profile": vram_profile,
-            "device_map_used": None,
+            "device_map_used": base_kwargs.get("device_map"),
             "cpu_offload_used": False,
             "vae_tiling_enabled": vae_tiling_enabled,
             "safetensors_mode": safetensors_mode_label,
@@ -2033,19 +2090,25 @@ def load_pipeline_from_pretrained_with_strategy(
         strategy_name = policy.name
         kwargs = policy.loader_kwargs(dtype)
         kwargs["low_cpu_mem_usage"] = True
-        if safetensors_mode is not None:
-            kwargs["use_safetensors"] = safetensors_mode
+        kwargs["use_safetensors"] = True
+        kwargs["offload_folder"] = None
+        kwargs["offload_state_dict"] = False
+        if kwargs.get("device_map") in {"auto", "cuda"}:
+            kwargs["max_memory"] = max_memory_caps
         if should_disable_cpu_offload(settings) and kwargs.get("device_map") == "auto" and strategy_name == "cpu_offload_after_load":
             kwargs.pop("device_map", None)
         if status_callback is not None:
             with contextlib.suppress(Exception):
                 status_callback(policy.task_step, policy.task_message)
         LOGGER.info(
-            "Loading pipeline (low_cpu_mem_usage=True) kind=%s source=%s strategy=%s safetensors_mode=%s",
+            "Loading pipeline (low_cpu_mem_usage=True) kind=%s source=%s strategy=%s safetensors_mode=%s "
+            "device_map=%s max_memory=%s",
             kind,
             source,
             strategy_name,
             safetensors_mode_label,
+            kwargs.get("device_map"),
+            kwargs.get("max_memory"),
         )
         with contextlib.suppress(Exception):
             gc.collect()

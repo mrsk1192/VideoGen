@@ -99,6 +99,8 @@ def runtime_diagnostics(
         "preferred_dtype": str(server_settings.get("preferred_dtype", "bf16")).strip().lower(),
         "vram_gpu_direct_load_threshold_gb": float(server_settings.get("vram_gpu_direct_load_threshold_gb", 48.0) or 48.0),
         "vram_full_load_threshold_gb": float(server_settings.get("vram_full_load_threshold_gb", 80.0) or 80.0),
+        "max_memory_gpu_gb": float(server_settings.get("max_memory_gpu_gb", 90.0) or 90.0),
+        "max_memory_cpu_gb": float(server_settings.get("max_memory_cpu_gb", 8.0) or 8.0),
         "force_full_vram_load": parse_bool_setting(server_settings.get("force_full_vram_load", False), default=False),
         "disable_cpu_offload": parse_bool_setting(server_settings.get("disable_cpu_offload", False), default=False),
         "disable_vae_tiling": parse_bool_setting(server_settings.get("disable_vae_tiling", True), default=True),
