@@ -278,9 +278,14 @@ def build_load_policy_preview(
         return {
             "vram_gpu_direct_load_threshold_gb": float(server.get("vram_gpu_direct_load_threshold_gb", 48.0) or 48.0),
             "vram_full_load_threshold_gb": full_threshold_gb,
+            "force_full_vram_load": parse_bool_setting(server.get("force_full_vram_load", False), default=False),
+            "disable_cpu_offload": parse_bool_setting(server.get("disable_cpu_offload", False), default=False),
+            "disable_vae_tiling": parse_bool_setting(server.get("disable_vae_tiling", True), default=True),
+            "prefer_safetensors": parse_bool_setting(server.get("prefer_safetensors", True), default=True),
+            "force_bin_weights": parse_bool_setting(server.get("force_bin_weights", False), default=False),
+            "verify_safetensors_on_load": parse_bool_setting(server.get("verify_safetensors_on_load", True), default=True),
             "enable_device_map_auto": parse_bool_setting(server.get("enable_device_map_auto", True), default=True),
             "enable_model_cpu_offload": parse_bool_setting(server.get("enable_model_cpu_offload", True), default=True),
-            "try_device_map_dict_full_load": parse_bool_setting(server.get("try_device_map_dict_full_load", False), default=False),
             "candidates": [full_candidate],
             "selected_policy_name": full_candidate["name"],
         }
@@ -293,9 +298,14 @@ def build_load_policy_preview(
     return {
         "vram_gpu_direct_load_threshold_gb": float(server.get("vram_gpu_direct_load_threshold_gb", 48.0) or 48.0),
         "vram_full_load_threshold_gb": full_threshold_gb,
+        "force_full_vram_load": parse_bool_setting(server.get("force_full_vram_load", False), default=False),
+        "disable_cpu_offload": parse_bool_setting(server.get("disable_cpu_offload", False), default=False),
+        "disable_vae_tiling": parse_bool_setting(server.get("disable_vae_tiling", True), default=True),
+        "prefer_safetensors": parse_bool_setting(server.get("prefer_safetensors", True), default=True),
+        "force_bin_weights": parse_bool_setting(server.get("force_bin_weights", False), default=False),
+        "verify_safetensors_on_load": parse_bool_setting(server.get("verify_safetensors_on_load", True), default=True),
         "enable_device_map_auto": parse_bool_setting(server.get("enable_device_map_auto", True), default=True),
         "enable_model_cpu_offload": parse_bool_setting(server.get("enable_model_cpu_offload", True), default=True),
-        "try_device_map_dict_full_load": parse_bool_setting(server.get("try_device_map_dict_full_load", False), default=False),
         "candidates": [policy.to_dict() for policy in policies],
         "selected_policy_name": policies[0].name if policies else "",
     }

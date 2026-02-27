@@ -26,9 +26,14 @@ DEFAULT_SETTINGS: Dict[str, Any] = {
         "preferred_dtype": "bf16",
         "vram_gpu_direct_load_threshold_gb": 48.0,
         "vram_full_load_threshold_gb": 80.0,
+        "force_full_vram_load": False,
+        "disable_cpu_offload": False,
+        "disable_vae_tiling": True,
+        "prefer_safetensors": True,
+        "force_bin_weights": False,
+        "verify_safetensors_on_load": True,
         "enable_device_map_auto": True,
         "enable_model_cpu_offload": True,
-        "try_device_map_dict_full_load": False,
         "allow_software_video_fallback": False,
         "request_timeout_sec": 20,
         "request_retry_count": 2,
@@ -128,7 +133,14 @@ def sanitize_settings(payload: Dict[str, Any]) -> Dict[str, Any]:
     server["preferred_dtype"] = preferred_dtype if preferred_dtype in {"float16", "bf16"} else "bf16"
     server["enable_device_map_auto"] = parse_bool_setting(server.get("enable_device_map_auto", True), default=True)
     server["enable_model_cpu_offload"] = parse_bool_setting(server.get("enable_model_cpu_offload", True), default=True)
-    server["try_device_map_dict_full_load"] = parse_bool_setting(server.get("try_device_map_dict_full_load", False), default=False)
+    server["force_full_vram_load"] = parse_bool_setting(server.get("force_full_vram_load", False), default=False)
+    server["disable_cpu_offload"] = parse_bool_setting(server.get("disable_cpu_offload", False), default=False)
+    server["disable_vae_tiling"] = parse_bool_setting(server.get("disable_vae_tiling", True), default=True)
+    server["prefer_safetensors"] = parse_bool_setting(server.get("prefer_safetensors", True), default=True)
+    server["force_bin_weights"] = parse_bool_setting(server.get("force_bin_weights", False), default=False)
+    server["verify_safetensors_on_load"] = parse_bool_setting(server.get("verify_safetensors_on_load", True), default=True)
+    if server["force_bin_weights"]:
+        server["prefer_safetensors"] = False
     try:
         threshold_gb = float(server.get("vram_gpu_direct_load_threshold_gb", 48.0))
     except Exception:

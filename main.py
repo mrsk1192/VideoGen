@@ -4,12 +4,14 @@ import ctypes
 import dataclasses
 import gc
 import hashlib
+import importlib.metadata
 import importlib.util
 import inspect
 import json
 import logging
 import math
 import os
+import platform
 import re
 import shutil
 import subprocess
@@ -139,6 +141,7 @@ PRELOAD_STATE: Dict[str, Any] = {
 }
 LAST_LOAD_POLICY_LOCK = threading.Lock()
 LAST_LOAD_POLICY: Dict[str, Dict[str, Any]] = {}
+STARTUP_ENV_LOGGED = False
 PROCESS_LOG_TIMESTAMP = time.strftime("%Y%m%d_%H%M%S", time.localtime())
 LOG_FILE_NAME = f"{PROCESS_LOG_TIMESTAMP}_videogen_pid{os.getpid()}.log"
 LOG_FILE_MAX_BYTES = 10 * 1024 * 1024
@@ -339,6 +342,65 @@ def setup_logger(settings: Dict[str, Any]) -> None:
         CURRENT_LOG_LEVEL = level_value
         LOGGER_READY = True
     LOGGER.info("logger initialized file=%s level=%s", str(log_file), level_name)
+
+
+def package_version_or_unknown(name: str) -> str:
+    try:
+        return str(importlib.metadata.version(name))
+    except Exception:
+        return "unknown"
+
+
+def resolve_safetensors_mode(settings: Dict[str, Any]) -> tuple[Optional[bool], str]:
+    server = settings.get("server", {}) if isinstance(settings, dict) else {}
+    if parse_bool_setting(server.get("force_bin_weights", False), default=False):
+        return False, "force_bin_weights"
+    if parse_bool_setting(server.get("prefer_safetensors", True), default=True):
+        return True, "prefer_safetensors"
+    return None, "auto"
+
+
+def should_disable_cpu_offload(settings: Dict[str, Any]) -> bool:
+    server = settings.get("server", {}) if isinstance(settings, dict) else {}
+    return parse_bool_setting(server.get("disable_cpu_offload", False), default=False)
+
+
+def should_disable_vae_tiling(settings: Dict[str, Any]) -> bool:
+    server = settings.get("server", {}) if isinstance(settings, dict) else {}
+    return parse_bool_setting(server.get("disable_vae_tiling", True), default=True)
+
+
+def should_verify_safetensors_on_load(settings: Dict[str, Any]) -> bool:
+    server = settings.get("server", {}) if isinstance(settings, dict) else {}
+    return parse_bool_setting(server.get("verify_safetensors_on_load", True), default=True)
+
+
+def log_startup_environment_once(settings: Dict[str, Any]) -> None:
+    global STARTUP_ENV_LOGGED
+    if STARTUP_ENV_LOGGED:
+        return
+    runtime = detect_runtime()
+    LOGGER.info(
+        "runtime env python=%s platform=%s executable=%s torch=%s hip=%s cuda_available=%s gpu=%s total_vram_gb=%s free_vram_gb=%s "
+        "safetensors=%s diffusers=%s accelerate=%s dtype=%s load_strategy=%s safetensors_mode=%s hip_alloc_conf=%s",
+        runtime.get("python_version"),
+        runtime.get("platform"),
+        runtime.get("python_executable"),
+        runtime.get("torch_version"),
+        runtime.get("torch_hip_version"),
+        runtime.get("cuda_available"),
+        runtime.get("gpu_name"),
+        runtime.get("total_vram_gb"),
+        runtime.get("free_vram_gb"),
+        runtime.get("safetensors_version"),
+        runtime.get("diffusers_version"),
+        runtime.get("accelerate_version"),
+        runtime.get("selected_dtype"),
+        runtime.get("vram_profile"),
+        runtime.get("safetensors_mode"),
+        runtime.get("pytorch_hip_alloc_conf"),
+    )
+    STARTUP_ENV_LOGGED = True
 
 
 def format_exception_trace(limit_chars: int = TASK_TRACEBACK_MAX_CHARS) -> str:
@@ -841,6 +903,7 @@ def server_flag(name: str, default: bool) -> bool:
 
 def detect_runtime() -> Dict[str, Any]:
     settings = settings_store.get()
+    safetensors_mode, safetensors_mode_label = resolve_safetensors_mode(settings)
     configured_t2v_backend = str(settings.get("server", {}).get("t2v_backend", "auto")).strip().lower()
     if configured_t2v_backend not in SUPPORTED_T2V_BACKENDS:
         configured_t2v_backend = "auto"
@@ -910,6 +973,15 @@ def detect_runtime() -> Dict[str, Any]:
             runtime_info["tiling_enabled"] = policy_payload.get("vae_tiling_enabled")
     runtime_info["pre_torch_env"] = PRE_TORCH_ENV
     runtime_info["pytorch_hip_alloc_conf"] = str(os.environ.get("PYTORCH_HIP_ALLOC_CONF", "")).strip()
+    runtime_info["python_version"] = sys.version
+    runtime_info["python_executable"] = sys.executable
+    runtime_info["platform"] = platform.platform()
+    runtime_info["safetensors_version"] = package_version_or_unknown("safetensors")
+    runtime_info["diffusers_version"] = package_version_or_unknown("diffusers")
+    runtime_info["accelerate_version"] = package_version_or_unknown("accelerate")
+    runtime_info["transformers_version"] = package_version_or_unknown("transformers")
+    runtime_info["safetensors_mode"] = safetensors_mode_label
+    runtime_info["safetensors_mode_value"] = safetensors_mode
     runtime_info["gpu_max_concurrency_effective"] = GPU_SEMAPHORE_LIMIT
     expected_aotriton = "1" if parse_bool_setting(settings.get("server", {}).get("rocm_aotriton_experimental", True), True) else "0"
     current_aotriton = str(os.environ.get("TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL", "")).strip()
@@ -1276,7 +1348,7 @@ def infer_task_step_from_message(message: str) -> str:
         return "queued"
     if "vramにロード中" in text or "device_map='cuda'" in text or "device_map={'': 'cuda'}" in text:
         return "model_load_gpu"
-    if "loading pipeline (low_cpu_mem_usage=true)" in text:
+    if "loading pipeline (low_cpu_mem_usage=" in text:
         return "model_load"
     if "moving pipeline to vram" in text:
         return "model_load_gpu"
@@ -1744,9 +1816,80 @@ def is_96gb_vram_profile(hardware_profile: Any, settings: Dict[str, Any], prefer
         return False
     if not bool(getattr(hardware_profile, "cuda_available", False)):
         return False
+    server = settings.get("server", {}) if isinstance(settings, dict) else {}
+    if parse_bool_setting(server.get("force_full_vram_load", False), default=False):
+        return True
     threshold_gb = get_vram_full_load_threshold_gb(settings)
     threshold_bytes = int(threshold_gb * (1024**3))
     return int(getattr(hardware_profile, "gpu_total_bytes", 0) or 0) >= threshold_bytes
+
+
+def pipeline_meta_tensor_names(pipe: Any, *, limit: int = 32) -> list[str]:
+    names: list[str] = []
+    components = getattr(pipe, "components", None)
+    if not isinstance(components, dict):
+        return names
+    for component_name, component in components.items():
+        if component is None:
+            continue
+        with contextlib.suppress(Exception):
+            if hasattr(component, "named_parameters"):
+                for param_name, param in component.named_parameters(recurse=True):
+                    if str(getattr(getattr(param, "device", None), "type", "")) == "meta":
+                        names.append(f"{component_name}.{param_name}")
+                        if len(names) >= limit:
+                            return names
+        with contextlib.suppress(Exception):
+            if hasattr(component, "named_buffers"):
+                for buffer_name, buffer in component.named_buffers(recurse=True):
+                    if str(getattr(getattr(buffer, "device", None), "type", "")) == "meta":
+                        names.append(f"{component_name}.{buffer_name}")
+                        if len(names) >= limit:
+                            return names
+    return names
+
+
+def collect_local_safetensors_files(source: str) -> list[Path]:
+    source_path = Path(source).expanduser()
+    if not source_path.exists():
+        return []
+    if source_path.is_file() and source_path.suffix.lower() == ".safetensors":
+        return [source_path.resolve()]
+    if not source_path.is_dir():
+        return []
+    return sorted(source_path.rglob("*.safetensors"))
+
+
+def verify_safetensors_integrity(source: str, settings: Dict[str, Any]) -> Dict[str, Any]:
+    if not should_verify_safetensors_on_load(settings):
+        return {"enabled": False, "checked": 0, "failed": 0, "failures": []}
+    files = collect_local_safetensors_files(source)
+    if not files:
+        return {"enabled": True, "checked": 0, "failed": 0, "failures": []}
+    try:
+        from safetensors import safe_open
+    except Exception as exc:
+        return {
+            "enabled": True,
+            "checked": 0,
+            "failed": 1,
+            "failures": [{"path": "(import safetensors)", "error": str(exc)}],
+        }
+    failures: list[Dict[str, str]] = []
+    checked = 0
+    for path in files:
+        checked += 1
+        try:
+            with safe_open(str(path), framework="pt", device="cpu") as handle:
+                _ = len(list(handle.keys()))
+        except Exception as exc:
+            failures.append({"path": str(path), "error": f"{exc.__class__.__name__}: {exc}"})
+    return {
+        "enabled": True,
+        "checked": checked,
+        "failed": len(failures),
+        "failures": failures,
+    }
 
 
 def load_pipeline_from_pretrained_with_strategy(
@@ -1763,42 +1906,52 @@ def load_pipeline_from_pretrained_with_strategy(
     offload_dir = resolve_offload_dir(BASE_DIR)
     hardware_profile = detect_hardware_profile(torch_module=torch, import_error=TORCH_IMPORT_ERROR)
     cache_key_value = cache_key or f"{kind}:{source}"
+    safetensors_mode, safetensors_mode_label = resolve_safetensors_mode(settings)
+    if safetensors_mode is True:
+        integrity = verify_safetensors_integrity(source, settings)
+        if integrity.get("failed"):
+            first_failure = (integrity.get("failures") or [{}])[0]
+            raise RuntimeError(
+                "Safetensors integrity check failed before pipeline load. "
+                f"checked={integrity.get('checked')} failed={integrity.get('failed')} "
+                f"first={first_failure.get('path')} error={first_failure.get('error')}"
+            )
+        if int(integrity.get("checked") or 0) > 0:
+            LOGGER.info(
+                "safetensors integrity check passed source=%s checked_files=%s",
+                source,
+                integrity.get("checked"),
+            )
     vram_profile = "96gb_class" if is_96gb_vram_profile(hardware_profile, settings, prefer_gpu_device_map) else "low_vram_or_default"
     if vram_profile == "96gb_class":
         base_kwargs: Dict[str, Any] = {
             "torch_dtype": dtype,
             "low_cpu_mem_usage": True,
-            "offload_state_dict": True,
-            "offload_folder": str(offload_dir),
         }
+        if safetensors_mode is not None:
+            base_kwargs["use_safetensors"] = safetensors_mode
         if status_callback is not None:
             with contextlib.suppress(Exception):
                 status_callback("model_load_gpu", "Loading pipeline (low_cpu_mem_usage=True)")
-        LOGGER.info("Loading pipeline (low_cpu_mem_usage=True) kind=%s source=%s profile=%s", kind, source, vram_profile)
+        LOGGER.info(
+            "Loading pipeline (low_cpu_mem_usage=True) kind=%s source=%s profile=%s dtype=%s safetensors_mode=%s",
+            kind,
+            source,
+            vram_profile,
+            str(dtype),
+            safetensors_mode_label,
+        )
         log_memory_snapshot("before", kind=kind, source=source, strategy="full_vram_no_device_map")
-        pipe: Any = None
         strategy_name = "full_vram_no_device_map"
         strategy_message = "VRAMにロード中 (device_map omitted)"
-        server = settings.get("server", {}) if isinstance(settings, dict) else {}
-        try_device_map_dict = parse_bool_setting(server.get("try_device_map_dict_full_load", False), default=False)
-        if try_device_map_dict:
-            dict_map_kwargs = dict(base_kwargs)
-            dict_map_kwargs["device_map"] = {"": "cuda"}
-            try:
-                pipe = loader(source, **dict_map_kwargs)
-                strategy_name = "full_vram_dict_map"
-                strategy_message = "VRAMにロード中 (device_map={'': 'cuda'})"
-            except (TypeError, ValueError) as exc:
-                LOGGER.warning(
-                    "dict device_map load is unsupported; fallback to no device_map strategy kind=%s source=%s error=%s",
-                    kind,
-                    source,
-                    str(exc),
-                )
-                detach_exception_state(exc)
-                pipe = None
-        if pipe is None:
-            pipe = loader(source, **base_kwargs)
+        pipe = loader(source, **base_kwargs)
+
+        meta_names = pipeline_meta_tensor_names(pipe)
+        if meta_names:
+            raise RuntimeError(
+                "Meta tensor detected in full VRAM strategy after from_pretrained. "
+                f"samples={','.join(meta_names[:8])}"
+            )
 
         if status_callback is not None:
             with contextlib.suppress(Exception):
@@ -1813,9 +1966,10 @@ def load_pipeline_from_pretrained_with_strategy(
             setattr(pipe, "_videogen_vram_profile", vram_profile)
             setattr(pipe, "_videogen_pre_inference_cleanup_pending", True)
             setattr(pipe, "_videogen_device_map_used", None)
+            setattr(pipe, "_videogen_safetensors_mode", safetensors_mode_label)
 
-        vae_tiling_enabled = False
-        if hasattr(pipe, "vae") and getattr(pipe, "vae", None) is not None:
+        vae_tiling_enabled = None
+        if should_disable_vae_tiling(settings) and hasattr(pipe, "vae") and getattr(pipe, "vae", None) is not None:
             if status_callback is not None:
                 with contextlib.suppress(Exception):
                     status_callback("model_load_gpu", "Disabling VAE tiling (96GB profile)")
@@ -1824,23 +1978,25 @@ def load_pipeline_from_pretrained_with_strategy(
             if vae is not None and hasattr(vae, "disable_tiling"):
                 with contextlib.suppress(Exception):
                     vae.disable_tiling()
+                vae_tiling_enabled = False
             with contextlib.suppress(Exception):
-                setattr(pipe, "_videogen_vae_tiling_enabled", False)
+                setattr(pipe, "_videogen_vae_tiling_enabled", vae_tiling_enabled)
 
         policy_payload = {
             "name": strategy_name,
             "task_step": "model_load_gpu",
             "task_message": strategy_message,
             "device_map": None,
-            "use_safetensors": None,
+            "use_safetensors": safetensors_mode,
             "low_cpu_mem_usage": True,
-            "offload_state_dict": True,
-            "offload_folder": str(offload_dir),
+            "offload_state_dict": False,
+            "offload_folder": None,
             "enable_model_cpu_offload": False,
             "vram_profile": vram_profile,
             "device_map_used": None,
             "cpu_offload_used": False,
             "vae_tiling_enabled": vae_tiling_enabled,
+            "safetensors_mode": safetensors_mode_label,
         }
         with contextlib.suppress(Exception):
             setattr(pipe, "_videogen_load_policy", policy_payload)
@@ -1866,12 +2022,31 @@ def load_pipeline_from_pretrained_with_strategy(
     )
     last_error: Optional[Exception] = None
     for policy in policies:
+        if should_disable_cpu_offload(settings) and bool(policy.enable_model_cpu_offload):
+            LOGGER.info(
+                "skip cpu offload policy because disable_cpu_offload=true kind=%s source=%s strategy=%s",
+                kind,
+                source,
+                policy.name,
+            )
+            continue
         strategy_name = policy.name
         kwargs = policy.loader_kwargs(dtype)
+        kwargs["low_cpu_mem_usage"] = True
+        if safetensors_mode is not None:
+            kwargs["use_safetensors"] = safetensors_mode
+        if should_disable_cpu_offload(settings) and kwargs.get("device_map") == "auto" and strategy_name == "cpu_offload_after_load":
+            kwargs.pop("device_map", None)
         if status_callback is not None:
             with contextlib.suppress(Exception):
                 status_callback(policy.task_step, policy.task_message)
-        LOGGER.info("Loading pipeline (low_cpu_mem_usage=True) kind=%s source=%s strategy=%s", kind, source, strategy_name)
+        LOGGER.info(
+            "Loading pipeline (low_cpu_mem_usage=True) kind=%s source=%s strategy=%s safetensors_mode=%s",
+            kind,
+            source,
+            strategy_name,
+            safetensors_mode_label,
+        )
         with contextlib.suppress(Exception):
             gc.collect()
         clear_cuda_allocator_cache(reason=f"pretrained-load-before:{kind}:{strategy_name}")
@@ -1885,7 +2060,7 @@ def load_pipeline_from_pretrained_with_strategy(
                 ",".join(sorted(kwargs.keys())),
             )
             pipe = loader(source, **kwargs)
-            if policy.enable_model_cpu_offload and hasattr(pipe, "enable_model_cpu_offload"):
+            if policy.enable_model_cpu_offload and (not should_disable_cpu_offload(settings)) and hasattr(pipe, "enable_model_cpu_offload"):
                 if status_callback is not None:
                     with contextlib.suppress(Exception):
                         status_callback("model_load_cpu_offload", "CPUオフロード有効化中")
@@ -1901,6 +2076,7 @@ def load_pipeline_from_pretrained_with_strategy(
                 setattr(pipe, "_videogen_pre_inference_cleanup_pending", False)
                 setattr(pipe, "_videogen_device_map_used", kwargs.get("device_map"))
                 setattr(pipe, "_videogen_vae_tiling_enabled", None)
+                setattr(pipe, "_videogen_safetensors_mode", safetensors_mode_label)
             with contextlib.suppress(Exception):
                 setattr(pipe, "_videogen_load_policy", policy.to_dict())
             record_last_load_policy(
@@ -1915,6 +2091,7 @@ def load_pipeline_from_pretrained_with_strategy(
                         "device_map_used": kwargs.get("device_map"),
                         "cpu_offload_used": bool(policy.enable_model_cpu_offload),
                         "vae_tiling_enabled": None,
+                        "safetensors_mode": safetensors_mode_label,
                     },
                     "hardware_profile": hardware_profile.to_dict(),
                 },
@@ -5453,6 +5630,8 @@ app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 @app.on_event("startup")
 def startup_preload_default_t2i() -> None:
+    with contextlib.suppress(Exception):
+        log_startup_environment_once(settings_store.get())
     if not server_flag("preload_default_t2i_on_startup", True):
         LOGGER.info("startup preload skipped: preload_default_t2i_on_startup=false")
         return
@@ -5643,7 +5822,7 @@ def update_settings(payload: Dict[str, Any]) -> Dict[str, Any]:
             desired_aotriton,
         )
     LOGGER.info(
-        "settings updated models_dir=%s outputs_dir=%s tmp_dir=%s logs_dir=%s log_level=%s listen_port=%s rocm_aotriton_experimental=%s require_gpu=%s allow_cpu_fallback=%s preload_default_t2i_on_startup=%s t2v_backend=%s t2v_npu_runner=%s t2v_npu_model_dir=%s preferred_dtype=%s gpu_max_concurrency=%s allow_software_video_fallback=%s vram_gpu_direct_load_threshold_gb=%s vram_full_load_threshold_gb=%s enable_device_map_auto=%s enable_model_cpu_offload=%s try_device_map_dict_full_load=%s",
+        "settings updated models_dir=%s outputs_dir=%s tmp_dir=%s logs_dir=%s log_level=%s listen_port=%s rocm_aotriton_experimental=%s require_gpu=%s allow_cpu_fallback=%s preload_default_t2i_on_startup=%s t2v_backend=%s t2v_npu_runner=%s t2v_npu_model_dir=%s preferred_dtype=%s gpu_max_concurrency=%s allow_software_video_fallback=%s vram_gpu_direct_load_threshold_gb=%s vram_full_load_threshold_gb=%s force_full_vram_load=%s disable_cpu_offload=%s disable_vae_tiling=%s prefer_safetensors=%s force_bin_weights=%s verify_safetensors_on_load=%s enable_device_map_auto=%s enable_model_cpu_offload=%s",
         updated["paths"].get("models_dir"),
         updated["paths"].get("outputs_dir"),
         updated["paths"].get("tmp_dir"),
@@ -5662,9 +5841,14 @@ def update_settings(payload: Dict[str, Any]) -> Dict[str, Any]:
         updated.get("server", {}).get("allow_software_video_fallback"),
         updated.get("server", {}).get("vram_gpu_direct_load_threshold_gb"),
         updated.get("server", {}).get("vram_full_load_threshold_gb"),
+        updated.get("server", {}).get("force_full_vram_load"),
+        updated.get("server", {}).get("disable_cpu_offload"),
+        updated.get("server", {}).get("disable_vae_tiling"),
+        updated.get("server", {}).get("prefer_safetensors"),
+        updated.get("server", {}).get("force_bin_weights"),
+        updated.get("server", {}).get("verify_safetensors_on_load"),
         updated.get("server", {}).get("enable_device_map_auto"),
         updated.get("server", {}).get("enable_model_cpu_offload"),
-        updated.get("server", {}).get("try_device_map_dict_full_load"),
     )
     return updated
 
