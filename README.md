@@ -221,7 +221,7 @@ VAE は `Text to Image` / `Image to Image` タブで選択できます。
 ## E2E スモーク手順（Windows + ROCm）
 
 1. `start.bat` で起動
-2. `GET /api/runtime` を確認し、`device` / `dtype` / `torch_hip_version` / `gpu_name` が期待通りであることを確認
+2. `GET /api/runtime` を確認し、`device` / `dtype` / `torch_hip_version` / `hardware_profile` / `load_policy_preview` が期待通りであることを確認
 3. `Models` タブで検索し、`Detail` を開いてローディング表示が出ることを確認
 4. 任意モデルをダウンロード開始し、右上 Downloads ウィジェットで進捗表示を確認
 5. `Text to Video` または `Image to Video` を実行し、進捗バーと `Task Log` の更新を確認
@@ -232,7 +232,10 @@ VAE は `Text to Image` / `Image to Image` タブで選択できます。
 
 - 設定: `data/settings.json`
   - `server.rocm_aotriton_experimental`: `true/false`（`start.bat` 起動時に `TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=1/0` へ反映）
-  - `server.preferred_dtype`: `float16|bf16`
+  - `server.preferred_dtype`: `bf16|float16`（既定: `bf16`, 非対応時は `float16` に自動フォールバック）
+  - `server.vram_gpu_direct_load_threshold_gb`: VRAM直ロード判定しきい値（既定 `48`）
+  - `server.enable_device_map_auto`: 低VRAM時の `device_map=\"auto\"` を有効化（既定 `true`）
+  - `server.enable_model_cpu_offload`: 低VRAM時の CPU offload フォールバックを有効化（既定 `true`）
   - `server.gpu_max_concurrency`: 生成系の同時実行上限（既定 `1`）
   - `server.allow_software_video_fallback`: `true` の場合、AMF失敗時に `libx264` へフォールバック
   - `server.request_timeout_sec` / `server.request_retry_count` / `server.request_retry_backoff_sec`
@@ -253,6 +256,7 @@ VAE は `Text to Image` / `Image to Image` タブで選択できます。
   - `requirements-test.txt`（テスト + lint）
   - `requirements-dev.txt`（最小開発セット）
 - 実行:
+  - `python -m compileall .`
   - `python -m black main.py videogen tests`
   - `python -m ruff check .`
   - `python -m pytest -q`
