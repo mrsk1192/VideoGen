@@ -280,6 +280,172 @@ button:hover {
   gap: 0.55rem;
 }
 
+.local-tree-toolbar {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.local-tree {
+  border: 1px solid rgba(130, 174, 208, 0.35);
+  border-radius: 10px;
+  background: rgba(4, 8, 15, 0.45);
+  padding: 0.55rem;
+  margin-bottom: 0.55rem;
+}
+
+.local-tree-empty {
+  color: var(--sub);
+  font-size: 0.86rem;
+}
+
+.local-tree details {
+  margin: 0.2rem 0;
+}
+
+.local-tree summary {
+  list-style: none;
+}
+
+.local-tree summary::-webkit-details-marker {
+  display: none;
+}
+
+.local-tree-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border: 1px solid rgba(130, 174, 208, 0.25);
+  border-radius: 8px;
+  padding: 0.38rem 0.5rem;
+  cursor: pointer;
+  background: rgba(4, 8, 15, 0.5);
+}
+
+.local-tree-label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.local-tree-title {
+  color: #d8eeff;
+  font-size: 0.87rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.local-tree-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  padding: 0.08rem 0.35rem;
+  border-radius: 999px;
+  border: 1px solid rgba(130, 174, 208, 0.45);
+  color: #cbe8fa;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.74rem;
+}
+
+.local-tree-children {
+  margin-left: 0.8rem;
+  margin-top: 0.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.local-tree-item {
+  border: 1px solid rgba(130, 174, 208, 0.28);
+  border-radius: 8px;
+  padding: 0.42rem 0.5rem;
+  background: rgba(3, 7, 14, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.local-tree-item.selected {
+  border-color: rgba(20, 197, 175, 0.8);
+  box-shadow: 0 0 0 1px rgba(20, 197, 175, 0.35) inset;
+}
+
+.local-tree-item-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+  min-width: 0;
+}
+
+.local-tree-item-name {
+  color: #d7efff;
+  font-size: 0.86rem;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.local-tree-item-meta {
+  color: var(--sub);
+  font-size: 0.77rem;
+  font-family: "IBM Plex Mono", monospace;
+  word-break: break-all;
+}
+
+.local-tree-item-actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.local-selection {
+  border: 1px solid rgba(130, 174, 208, 0.35);
+  border-radius: 10px;
+  background: rgba(4, 8, 15, 0.45);
+  padding: 0.55rem;
+  margin-bottom: 0.55rem;
+}
+
+.local-selection-empty {
+  color: var(--sub);
+  font-size: 0.84rem;
+}
+
+.local-selection-name {
+  color: #d6efff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.local-selection-meta {
+  color: var(--sub);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.78rem;
+  margin-bottom: 0.45rem;
+}
+
+.local-selection-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+#panel-local-models[data-view="tree"] #localModels {
+  display: none;
+}
+
+#panel-local-models[data-view="flat"] #localModelsTree,
+#panel-local-models[data-view="flat"] #localModelSelection {
+  display: none;
+}
+
 .model-search-topbar {
   margin-bottom: 0.7rem;
 }
@@ -364,11 +530,17 @@ button:hover {
   position: relative;
   width: 100%;
   height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
   border-bottom: 1px solid rgba(130, 174, 208, 0.35);
   background: rgba(4, 8, 15, 0.9);
 }
 
 .model-card-cover {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -385,8 +557,9 @@ button:hover {
   padding: 0.6rem;
   color: var(--sub);
   font-size: 0.82rem;
+  line-height: 1.4;
   font-family: "IBM Plex Mono", monospace;
-  border-top: 1px dashed rgba(130, 174, 208, 0.35);
+  border-top: none;
 }
 
 .model-card.list-mode .model-card-cover-wrap {
@@ -560,8 +733,9 @@ button:hover {
 }
 
 .model-detail-gallery-empty {
+  grid-column: 1 / -1;
   width: 100%;
-  min-height: 70px;
+  height: 70px;
   border: 1px dashed rgba(130, 174, 208, 0.35);
   border-radius: 7px;
   display: flex;

@@ -1,4 +1,5 @@
 import json
+import os
 import time
 from pathlib import Path
 
@@ -251,6 +252,68 @@ def test_models_search_merges_hf_and_civitai(client: TestClient, monkeypatch: py
     assert "civitai/1" in ids
 
 
+def test_models_search2_returns_page_info_and_installed(client: TestClient, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    models_dir = tmp_path / "models_search2"
+    (models_dir / "hf--a").mkdir(parents=True)
+    settings = client.get("/api/settings").json()
+    settings["paths"]["models_dir"] = str(models_dir.resolve())
+    put_resp = client.put("/api/settings", json=settings)
+    assert put_resp.status_code == 200
+
+    monkeypatch.setattr(
+        main,
+        "search_hf_models_v2",
+        lambda **_kwargs: {
+            "items": [
+                {
+                    "id": "hf/a",
+                    "title": "hf/a",
+                    "pipeline_tag": "text-to-image",
+                    "downloads": 1,
+                    "likes": 2,
+                    "size_bytes": 3,
+                    "source": "huggingface",
+                    "download_supported": True,
+                    "base_model": "StableDiffusion XL",
+                }
+            ],
+            "has_next": True,
+        },
+    )
+    monkeypatch.setattr(main, "search_civitai_models_v2", lambda **_kwargs: {"items": [], "has_next": False})
+
+    resp = client.get(
+        "/api/models/search2",
+        params={"task": "text-to-image", "query": "", "limit": 30, "source": "huggingface", "page": 1},
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["page_info"]["page"] == 1
+    assert body["next_cursor"] == "2"
+    assert body["items"][0]["installed"] is True
+
+
+def test_models_detail_endpoints(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        main,
+        "get_hf_model_detail",
+        lambda repo_id, token: {"source": "huggingface", "id": repo_id, "title": repo_id, "versions": [], "previews": [], "tags": []},
+    )
+    monkeypatch.setattr(
+        main,
+        "get_civitai_model_detail",
+        lambda model_id: {"source": "civitai", "id": f"civitai/{model_id}", "title": "x", "versions": [], "previews": [], "tags": []},
+    )
+
+    hf = client.get("/api/models/detail", params={"source": "huggingface", "id": "foo/bar"})
+    assert hf.status_code == 200
+    assert hf.json()["id"] == "foo/bar"
+
+    civitai = client.get("/api/models/detail", params={"source": "civitai", "id": "civitai/123"})
+    assert civitai.status_code == 200
+    assert civitai.json()["id"] == "civitai/123"
+
+
 def test_models_search_source_filter(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
     called = {"hf": 0, "civitai": 0}
 
@@ -328,6 +391,94 @@ def test_models_search_civitai_live_parser_path(client: TestClient, monkeypatch:
     assert civitai["download_supported"] is True
     assert civitai["preview_url"] == "https://example.invalid/preview.jpg"
     assert civitai["size_bytes"] == 2048 * 1024
+
+
+def test_download_task_lifecycle_civitai_with_selected_file(client: TestClient, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    class FakeResponse:
+        def __init__(self, payload: bytes, content_length: int | None = None) -> None:
+            self._payload = payload
+            self._offset = 0
+            self.headers = {"Content-Length": str(content_length)} if content_length is not None else {}
+
+        def read(self, size: int = -1) -> bytes:
+            if size is None or size < 0:
+                data = self._payload[self._offset :]
+                self._offset = len(self._payload)
+                return data
+            if self._offset >= len(self._payload):
+                return b""
+            end = min(self._offset + size, len(self._payload))
+            data = self._payload[self._offset : end]
+            self._offset = end
+            return data
+
+        def close(self) -> None:
+            return None
+
+    model_payload = {
+        "id": 123,
+        "name": "Civit Model",
+        "modelVersions": [
+            {
+                "id": 456,
+                "name": "v1",
+                "images": [{"url": "https://example.invalid/preview.jpg"}],
+                "files": [
+                    {"id": 789, "name": "file_a.safetensors", "type": "Model", "downloadUrl": "https://example.invalid/file_a"}
+                ],
+            },
+            {
+                "id": 999,
+                "name": "v2",
+                "files": [
+                    {"id": 555, "name": "file_b.safetensors", "type": "Model", "downloadUrl": "https://example.invalid/file_b"}
+                ],
+            },
+        ],
+    }
+
+    def fake_urlopen(request_obj, timeout: int = 20):
+        url = request_obj.full_url
+        if "/api/v1/models/123" in url:
+            return FakeResponse(json.dumps(model_payload).encode("utf-8"))
+        if "example.invalid/file_b" in url:
+            payload = b"selected"
+            return FakeResponse(payload, content_length=len(payload))
+        if "example.invalid/preview.jpg" in url:
+            payload = b"img"
+            return FakeResponse(payload, content_length=len(payload))
+        raise AssertionError(f"unexpected url: {url}")
+
+    monkeypatch.setattr(main, "urlopen", fake_urlopen)
+    target_dir = tmp_path / "download-target-civitai-selected"
+    post = client.post(
+        "/api/models/download",
+        json={
+            "repo_id": "civitai/123",
+            "source": "civitai",
+            "civitai_model_id": 123,
+            "civitai_version_id": 999,
+            "civitai_file_id": 555,
+            "target_dir": str(target_dir),
+        },
+    )
+    assert post.status_code == 200
+    task_id = post.json()["task_id"]
+
+    deadline = time.time() + 5
+    last = None
+    while time.time() < deadline:
+        status = client.get(f"/api/tasks/{task_id}")
+        assert status.status_code == 200
+        last = status.json()
+        if last["status"] in ("completed", "error"):
+            break
+        time.sleep(0.1)
+
+    assert last is not None
+    assert last["status"] == "completed"
+    model_dir = Path(last["result"]["local_path"])
+    assert (model_dir / "file_b.safetensors").read_bytes() == b"selected"
 
 
 def test_model_catalog_filters_incompatible_local_models(client: TestClient, tmp_path: Path) -> None:
@@ -413,6 +564,83 @@ def test_local_models_include_preview_and_meta(client: TestClient, tmp_path: Pat
     lora_item = next(item for item in items if item["name"] == "org--style-lora")
     assert lora_item["is_lora"] is True
     assert lora_item["base_model"] == "runwayml/stable-diffusion-v1-5"
+
+
+def test_local_models_tree_structure_and_vea_alias(client: TestClient, tmp_path: Path) -> None:
+    models_dir = tmp_path / "models_tree"
+    t2i_base = models_dir / "T2I" / "SDXL1.0"
+    (t2i_base / "BaseModel").mkdir(parents=True)
+    (t2i_base / "BaseModel" / "realvisxl.safetensors").write_bytes(b"abc")
+    (t2i_base / "VEA").mkdir(parents=True)
+    (t2i_base / "VEA" / "sdxl_vae.safetensors").write_bytes(b"123")
+    i2v_model = models_dir / "I2V" / "Wan2.2" / "BaseModel" / "wan-model"
+    i2v_model.mkdir(parents=True)
+    (i2v_model / "model_index.json").write_text(json.dumps({"_class_name": "WanImageToVideoPipeline"}), encoding="utf-8")
+
+    resp = client.get("/api/models/local/tree", params={"dir": str(models_dir)})
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["model_root"] == str(models_dir.resolve())
+    tasks = {task["task"]: task for task in body["tasks"]}
+    assert "T2I" in tasks
+    assert "V2V" in tasks
+
+    t2i_categories = tasks["T2I"]["bases"][0]["categories"]
+    category_names = [category["category"] for category in t2i_categories]
+    assert "VAE" in category_names
+    assert "VEA" not in category_names
+    base_category = next(category for category in t2i_categories if category["category"] == "BaseModel")
+    base_item = next(item for item in base_category["items"] if item["name"] == "realvisxl.safetensors")
+    assert base_item["task_api"] == "text-to-image"
+    assert base_item["apply_supported"] is True
+
+    v2v_category = tasks["V2V"]["bases"][0]["categories"][0]
+    v2v_item = v2v_category["items"][0]
+    assert v2v_item["task_api"] == "image-to-video"
+
+
+def test_local_models_tree_rescan_reflects_new_item(client: TestClient, tmp_path: Path) -> None:
+    models_dir = tmp_path / "models_tree_rescan"
+    base_dir = models_dir / "T2I" / "SD1" / "BaseModel"
+    base_dir.mkdir(parents=True)
+    (base_dir / "initial.safetensors").write_bytes(b"old")
+
+    first = client.get("/api/models/local/tree", params={"dir": str(models_dir)})
+    assert first.status_code == 200
+    first_names = {item["name"] for item in first.json()["flat_items"]}
+    assert "initial.safetensors" in first_names
+    assert "added.safetensors" not in first_names
+
+    (base_dir / "added.safetensors").write_bytes(b"new")
+    rescan = client.post("/api/models/local/rescan", json={"dir": str(models_dir)})
+    assert rescan.status_code == 200
+    names_after_rescan = {item["name"] for item in rescan.json()["flat_items"]}
+    assert "added.safetensors" in names_after_rescan
+
+
+def test_local_models_reveal_endpoint(client: TestClient, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    models_dir = tmp_path / "models_reveal"
+    model_dir = models_dir / "T2I" / "SDXL1.0" / "BaseModel" / "demo-model"
+    model_dir.mkdir(parents=True)
+    (model_dir / "model_index.json").write_text(json.dumps({"_class_name": "StableDiffusionXLPipeline"}), encoding="utf-8")
+
+    if os.name == "nt":
+        calls: list[list[str]] = []
+
+        def fake_popen(args, shell=False):  # type: ignore[override]
+            calls.append(list(args))
+            return object()
+
+        monkeypatch.setattr(main.subprocess, "Popen", fake_popen)
+        resp = client.post("/api/models/local/reveal", json={"path": str(model_dir), "base_dir": str(models_dir)})
+        assert resp.status_code == 200
+        assert resp.json()["status"] == "ok"
+        assert calls
+        assert calls[0][0].lower() == "explorer"
+    else:
+        resp = client.post("/api/models/local/reveal", json={"path": str(model_dir), "base_dir": str(models_dir)})
+        assert resp.status_code == 200
+        assert resp.json()["status"] == "not_supported"
 
 
 def test_text2image_task_lifecycle_and_image_endpoint(client: TestClient, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

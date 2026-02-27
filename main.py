@@ -1,6 +1,7 @@
 import copy
 import contextlib
 import dataclasses
+import hashlib
 import importlib.util
 import logging
 import inspect
@@ -17,7 +18,7 @@ import uuid
 from collections import deque
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from typing import Any, Dict, Literal, Optional
+from typing import Any, Callable, Dict, Literal, Optional
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode
 from urllib.request import Request as UrlRequest, urlopen
@@ -25,7 +26,7 @@ from urllib.request import Request as UrlRequest, urlopen
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from huggingface_hub import HfApi, snapshot_download
+from huggingface_hub import HfApi, hf_hub_download, snapshot_download
 from pydantic import BaseModel, Field
 
 TORCH_IMPORT_ERROR: Optional[str] = None
@@ -94,6 +95,12 @@ VAES_LOCK = threading.Lock()
 MODEL_SIZE_CACHE: Dict[str, Dict[str, Any]] = {}
 MODEL_SIZE_CACHE_LOCK = threading.Lock()
 MODEL_SIZE_CACHE_TTL_SEC = 60 * 60
+SEARCH_API_CACHE: Dict[str, Dict[str, Any]] = {}
+SEARCH_API_CACHE_LOCK = threading.Lock()
+SEARCH_API_CACHE_TTL_SEC = 60 * 5
+LOCAL_TREE_CACHE: Dict[str, Dict[str, Any]] = {}
+LOCAL_TREE_CACHE_LOCK = threading.Lock()
+LOCAL_TREE_CACHE_TTL_SEC = 30
 LOGGER = logging.getLogger("videogen")
 LOGGER_LOCK = threading.Lock()
 LOGGER_READY = False
@@ -120,8 +127,13 @@ HIGH_VALUE_ENDPOINTS = {
     "/api/generate/text2video",
     "/api/generate/image2video",
     "/api/models/loras/catalog",
+    "/api/models/search2",
+    "/api/models/detail",
     "/api/models/download",
     "/api/models/local/delete",
+    "/api/models/local/tree",
+    "/api/models/local/rescan",
+    "/api/models/local/reveal",
     "/api/outputs/delete",
     "/api/settings",
     "/api/cache/hf/clear",
@@ -171,6 +183,30 @@ OUTPUT_IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
 OUTPUT_VIDEO_EXTENSIONS = {".mp4", ".mov", ".webm", ".mkv"}
 SINGLE_FILE_MODEL_EXTENSIONS = {".safetensors", ".ckpt"}
 SUPPORTED_T2V_BACKENDS = {"auto", "cuda", "npu"}
+LOCAL_MODEL_FILE_EXTENSIONS = {".safetensors", ".ckpt", ".pt", ".pth", ".bin"}
+LOCAL_TREE_TASK_ORDER = ["T2I", "I2I", "T2V", "V2V"]
+LOCAL_TREE_TASK_TO_API = {
+    "T2I": "text-to-image",
+    "I2I": "image-to-image",
+    "T2V": "text-to-video",
+    "V2V": "image-to-video",
+}
+LOCAL_TREE_TASK_ALIASES = {
+    "T2I": "T2I",
+    "TEXT2IMAGE": "T2I",
+    "TEXT_TO_IMAGE": "T2I",
+    "I2I": "I2I",
+    "IMAGE2IMAGE": "I2I",
+    "IMAGE_TO_IMAGE": "I2I",
+    "T2V": "T2V",
+    "TEXT2VIDEO": "T2V",
+    "TEXT_TO_VIDEO": "T2V",
+    "V2V": "V2V",
+    "I2V": "V2V",
+    "IMAGE2VIDEO": "V2V",
+    "IMAGE_TO_VIDEO": "V2V",
+}
+LOCAL_TREE_CATEGORY_ORDER = ["BaseModel", "Lora", "VAE"]
 
 
 @dataclasses.dataclass
@@ -1806,123 +1842,124 @@ def matches_base_model_filter(candidate: str, selected: str) -> bool:
     return candidate_label.lower() == normalized_selected.lower() or infer_base_model_label(candidate_label) == normalized_selected
 
 
-def search_hf_models(
-    task: Literal["text-to-image", "image-to-image", "text-to-video", "image-to-video"],
-    query: str,
-    limit: int,
-    token: Optional[str],
-) -> list[Dict[str, Any]]:
-    api = HfApi(token=token)
-    capped_limit = min(max(limit, 1), 50)
-    normalized_query = query.strip()
-    if normalized_query:
-        found = api.list_models(
-            search=normalized_query,
-            sort="downloads",
-            direction=-1,
-            limit=capped_limit * 6,
-            full=True,
-            cardData=True,
-        )
-    else:
-        found = api.list_models(
-            filter=task,
-            sort="downloads",
-            direction=-1,
-            limit=capped_limit * 3,
-            full=True,
-            cardData=True,
-        )
-    results: list[Dict[str, Any]] = []
-    for model in found:
-        pipeline_tag = getattr(model, "pipeline_tag", None)
-        tags = getattr(model, "tags", []) or []
-        matches_task = pipeline_tag == task or task in tags
-        if not matches_task:
-            continue
-        model_id = getattr(model, "id", "")
-        if not model_id:
-            continue
-        card_data = getattr(model, "cardData", None)
-        card_hints: list[str] = []
-        if isinstance(card_data, dict):
-            for key in ("base_model", "baseModel", "base_models", "baseModels", "model_type", "modelType"):
-                value = card_data.get(key)
-                if isinstance(value, list):
-                    card_hints.extend(str(v) for v in value)
-                elif value:
-                    card_hints.append(str(value))
-        base_model = infer_base_model_label(model_id, pipeline_tag, " ".join(str(tag) for tag in tags), " ".join(card_hints))
-        size_bytes = get_remote_model_size_bytes(api, model, model_id)
-        results.append(
-            {
-                "id": model_id,
-                "pipeline_tag": pipeline_tag,
-                "downloads": getattr(model, "downloads", None),
-                "likes": getattr(model, "likes", None),
-                "private": getattr(model, "private", False),
-                "size_bytes": size_bytes,
-                "model_url": f"https://huggingface.co/{quote(model_id, safe='/')}",
-                "preview_url": resolve_preview_url(model),
-                "base_model": base_model,
-                "source": "huggingface",
-                "download_supported": True,
-            }
-        )
-        if len(results) >= capped_limit:
-            break
-
-    if not results and not normalized_query:
-        fallback = api.list_models(
-            search=task,
-            sort="downloads",
-            direction=-1,
-            limit=capped_limit * 4,
-            full=True,
-            cardData=True,
-        )
-        for model in fallback:
-            pipeline_tag = getattr(model, "pipeline_tag", None)
-            tags = getattr(model, "tags", []) or []
-            matches_task = pipeline_tag == task or task in tags
-            if not matches_task:
-                continue
-            model_id = getattr(model, "id", "")
-            if not model_id:
-                continue
-            card_data = getattr(model, "cardData", None)
-            card_hints: list[str] = []
-            if isinstance(card_data, dict):
-                for key in ("base_model", "baseModel", "base_models", "baseModels", "model_type", "modelType"):
-                    value = card_data.get(key)
-                    if isinstance(value, list):
-                        card_hints.extend(str(v) for v in value)
-                    elif value:
-                        card_hints.append(str(value))
-            base_model = infer_base_model_label(model_id, pipeline_tag, " ".join(str(tag) for tag in tags), " ".join(card_hints))
-            size_bytes = get_remote_model_size_bytes(api, model, model_id)
-            results.append(
-                {
-                    "id": model_id,
-                    "pipeline_tag": pipeline_tag,
-                    "downloads": getattr(model, "downloads", None),
-                    "likes": getattr(model, "likes", None),
-                    "private": getattr(model, "private", False),
-                    "size_bytes": size_bytes,
-                    "model_url": f"https://huggingface.co/{quote(model_id, safe='/')}",
-                    "preview_url": resolve_preview_url(model),
-                    "base_model": base_model,
-                    "source": "huggingface",
-                    "download_supported": True,
-                }
-            )
-            if len(results) >= capped_limit:
-                break
-
-    return results
+def normalized_task(task: str) -> str:
+    raw = str(task or "").strip().lower()
+    if raw in ("text-to-image", "image-to-image", "text-to-video", "image-to-video"):
+        return raw
+    return "text-to-image"
 
 
-def civitai_task_model_types(task: str) -> list[str]:
+def normalized_source(source: str) -> str:
+    raw = str(source or "").strip().lower()
+    if raw in ("all", "huggingface", "civitai"):
+        return raw
+    return "all"
+
+
+def normalized_sort(sort: str) -> str:
+    raw = str(sort or "").strip().lower()
+    if raw in ("popularity", "downloads", "likes", "updated", "created"):
+        return raw
+    return "downloads"
+
+
+def normalized_nsfw(nsfw: str) -> str:
+    raw = str(nsfw or "").strip().lower()
+    if raw in ("include", "exclude"):
+        return raw
+    return "exclude"
+
+
+def normalized_model_kind(model_kind: str) -> str:
+    raw = str(model_kind or "").strip().lower()
+    if raw in ("checkpoint", "lora", "vae", "controlnet", "embedding", "upscaler"):
+        return raw
+    return ""
+
+
+def cache_key(prefix: str, payload: Dict[str, Any]) -> str:
+    body = json.dumps(payload, ensure_ascii=True, sort_keys=True, separators=(",", ":"))
+    digest = hashlib.sha256(body.encode("utf-8")).hexdigest()
+    return f"{prefix}:{digest}"
+
+
+def cache_get_or_set(prefix: str, payload: Dict[str, Any], loader: Callable[[], Dict[str, Any]]) -> Dict[str, Any]:
+    key = cache_key(prefix, payload)
+    now = time.time()
+    with SEARCH_API_CACHE_LOCK:
+        cached = SEARCH_API_CACHE.get(key)
+        if cached and (now - float(cached.get("ts") or 0.0)) < SEARCH_API_CACHE_TTL_SEC:
+            value = cached.get("value")
+            if isinstance(value, dict):
+                return copy.deepcopy(value)
+    loaded = loader()
+    with SEARCH_API_CACHE_LOCK:
+        SEARCH_API_CACHE[key] = {"ts": now, "value": copy.deepcopy(loaded)}
+    return loaded
+
+
+def normalize_model_lookup_key(value: str) -> str:
+    return str(value or "").strip().lower().replace("\\", "/")
+
+
+def collect_installed_model_id_set(models_dir: Path) -> set[str]:
+    installed: set[str] = set()
+    if not models_dir.exists():
+        return installed
+    for child in models_dir.iterdir():
+        if child.is_dir():
+            repo_hint = desanitize_repo_id(child.name)
+            installed.add(normalize_model_lookup_key(repo_hint))
+            installed.add(normalize_model_lookup_key(child.name))
+            civitai_meta = child / "civitai_model.json"
+            if civitai_meta.exists():
+                with contextlib.suppress(Exception):
+                    payload = json.loads(civitai_meta.read_text(encoding="utf-8"))
+                    model_id = safe_int(payload.get("model_id"))
+                    if model_id:
+                        installed.add(normalize_model_lookup_key(f"civitai/{model_id}"))
+        elif is_single_file_model(child):
+            installed.add(normalize_model_lookup_key(child.stem))
+    return installed
+
+
+def hf_sort_to_api(sort: str) -> str:
+    normalized = normalized_sort(sort)
+    if normalized in ("popularity", "downloads"):
+        return "downloads"
+    if normalized == "likes":
+        return "likes"
+    if normalized == "updated":
+        return "lastModified"
+    if normalized == "created":
+        return "createdAt"
+    return "downloads"
+
+
+def hf_model_matches_kind(model: Any, model_kind: str) -> bool:
+    normalized_kind = normalized_model_kind(model_kind)
+    if not normalized_kind:
+        return True
+    tags = [str(tag).lower() for tag in (getattr(model, "tags", None) or [])]
+    model_id = str(getattr(model, "id", "")).lower()
+    joined = " ".join(tags + [model_id])
+    if normalized_kind == "checkpoint":
+        return not any(token in joined for token in ("lora", "vae", "controlnet", "embedding", "upscaler"))
+    return normalized_kind in joined
+
+
+def civitai_task_model_types(task: str, model_kind: str = "") -> list[str]:
+    normalized_kind = normalized_model_kind(model_kind)
+    kind_map = {
+        "checkpoint": ["Checkpoint"],
+        "lora": ["LORA"],
+        "vae": ["VAE"],
+        "controlnet": ["Controlnet"],
+        "embedding": ["TextualInversion"],
+        "upscaler": ["Upscaler"],
+    }
+    if normalized_kind:
+        return kind_map.get(normalized_kind, [])
     if task in ("text-to-image", "image-to-image"):
         return ["Checkpoint"]
     return []
@@ -1948,6 +1985,289 @@ def directory_size_bytes(root: Path) -> int:
         except OSError:
             continue
     return total
+
+
+def directory_size_bytes_limited(root: Path, max_entries: int = 2000) -> Optional[int]:
+    if not root.exists():
+        return 0
+    total = 0
+    seen = 0
+    for entry in root.rglob("*"):
+        if not entry.is_file():
+            continue
+        seen += 1
+        if seen > max_entries:
+            return None
+        try:
+            total += int(entry.stat().st_size)
+        except OSError:
+            continue
+    return total
+
+
+def normalize_local_tree_task_dir(name: str) -> Optional[str]:
+    key = re.sub(r"[^A-Za-z0-9_]+", "", str(name or "").upper())
+    return LOCAL_TREE_TASK_ALIASES.get(key)
+
+
+def normalize_local_tree_category(name: str) -> Optional[str]:
+    key = re.sub(r"[^A-Za-z0-9_]+", "", str(name or "").upper())
+    if key in {"BASEMODEL", "BASE", "MODEL", "CHECKPOINT"}:
+        return "BaseModel"
+    if key in {"LORA", "LORAS"}:
+        return "Lora"
+    if key in {"VAE", "VEA"}:
+        return "VAE"
+    return None
+
+
+def is_local_tree_model_file(path: Path) -> bool:
+    return path.is_file() and path.suffix.lower() in LOCAL_MODEL_FILE_EXTENSIONS
+
+
+def is_diffusers_model_directory(path: Path) -> bool:
+    if not path.is_dir():
+        return False
+    if (path / "model_index.json").exists():
+        return True
+    if (path / "config.json").exists():
+        return True
+    return False
+
+
+def is_local_tree_item_directory(path: Path, category: str) -> bool:
+    if not path.is_dir():
+        return False
+    if category == "Lora":
+        return is_local_lora_dir(path)
+    if category == "VAE":
+        return is_local_vae_dir(path) or is_diffusers_model_directory(path)
+    if is_diffusers_model_directory(path):
+        return True
+    # Accept directories that store a single-file checkpoint directly under BaseModel.
+    with contextlib.suppress(OSError):
+        for child in path.iterdir():
+            if is_local_tree_model_file(child):
+                return True
+    return False
+
+
+def detect_model_provider_from_path(path: Path) -> Optional[str]:
+    candidates: list[Path] = []
+    if path.is_dir():
+        candidates.extend([path / "model_meta.json", path / "civitai_model.json"])
+    else:
+        candidates.extend([path.parent / "model_meta.json", path.parent / "civitai_model.json"])
+    for candidate in candidates:
+        if not candidate.exists():
+            continue
+        try:
+            payload = json.loads(candidate.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        source = str(payload.get("source") or "").strip().lower()
+        if source in ("huggingface", "civitai"):
+            return source
+    return None
+
+
+def model_item_preview_url(path: Path, model_root: Path) -> Optional[str]:
+    if path.is_dir():
+        preview_rel = find_local_preview_relpath(path, model_root)
+        if preview_rel:
+            return f"/api/models/preview?rel={quote(preview_rel, safe='/')}&base_dir={quote(str(model_root), safe='/:\\\\')}"
+    else:
+        stem = path.stem.lower()
+        for suffix in (".png", ".jpg", ".jpeg", ".webp"):
+            candidate = path.with_suffix(suffix)
+            if candidate.exists() and candidate.is_file():
+                rel = candidate.resolve().relative_to(model_root.resolve())
+                return f"/api/models/preview?rel={quote(str(rel).replace('\\', '/'), safe='/')}&base_dir={quote(str(model_root), safe='/:\\\\')}"
+            alt = path.parent / f"{stem}.preview{suffix}"
+            if alt.exists() and alt.is_file():
+                rel = alt.resolve().relative_to(model_root.resolve())
+                return f"/api/models/preview?rel={quote(str(rel).replace('\\', '/'), safe='/')}&base_dir={quote(str(model_root), safe='/:\\\\')}"
+    return None
+
+
+def build_local_tree_item(
+    item_path: Path,
+    model_root: Path,
+    task_dir: str,
+    base_name: str,
+    category: str,
+) -> Dict[str, Any]:
+    is_dir = item_path.is_dir()
+    size_bytes: Optional[int] = None
+    if is_dir:
+        size_bytes = directory_size_bytes_limited(item_path)
+    else:
+        with contextlib.suppress(OSError):
+            size_bytes = int(item_path.stat().st_size)
+    provider = detect_model_provider_from_path(item_path)
+    task_api = LOCAL_TREE_TASK_TO_API.get(task_dir, "")
+    class_name = ""
+    model_id = item_path.stem if item_path.is_file() else desanitize_repo_id(item_path.name)
+    if is_dir:
+        meta = detect_local_model_meta(item_path)
+        class_name = meta.class_name
+    else:
+        class_name = "SingleFileModel" if item_path.suffix.lower() in SINGLE_FILE_MODEL_EXTENSIONS else "ModelFile"
+    model_url = None
+    if provider == "huggingface":
+        model_url = f"https://huggingface.co/{quote(model_id, safe='/')}"
+    elif provider == "civitai":
+        civitai_id = parse_civitai_model_id(model_id)
+        if civitai_id:
+            model_url = f"https://civitai.com/models/{civitai_id}"
+    return {
+        "name": item_path.name,
+        "display_name": item_path.stem if item_path.is_file() else item_path.name,
+        "path": str(item_path.resolve()),
+        "is_dir": is_dir,
+        "size_bytes": size_bytes,
+        "provider": provider,
+        "base_name": base_name,
+        "category": category,
+        "task_dir": task_dir,
+        "task_api": task_api,
+        "apply_supported": bool(task_api and category == "BaseModel"),
+        "model_id": model_id,
+        "preview_url": model_item_preview_url(item_path, model_root),
+        "model_url": model_url,
+        "compatible_tasks": [task_api] if task_api and category == "BaseModel" else [],
+        "is_lora": category == "Lora",
+        "is_vae": category == "VAE",
+        "class_name": class_name,
+        "repo_hint": model_id,
+        "can_delete": False,
+    }
+
+
+def build_local_model_tree(model_root: Path) -> Dict[str, Any]:
+    tasks_out: list[Dict[str, Any]] = []
+    flat_items: list[Dict[str, Any]] = []
+    if not model_root.exists():
+        return {
+            "model_root": str(model_root),
+            "generated_at": utc_now(),
+            "tasks": tasks_out,
+            "flat_items": flat_items,
+        }
+    task_dirs: list[Path] = [entry for entry in model_root.iterdir() if entry.is_dir()]
+    normalized_task_dirs: list[tuple[str, Path]] = []
+    for task_dir in task_dirs:
+        canonical = normalize_local_tree_task_dir(task_dir.name)
+        if not canonical:
+            continue
+        normalized_task_dirs.append((canonical, task_dir))
+    normalized_task_dirs.sort(key=lambda pair: (LOCAL_TREE_TASK_ORDER.index(pair[0]) if pair[0] in LOCAL_TREE_TASK_ORDER else 999, pair[1].name.lower()))
+    for canonical_task, task_path in normalized_task_dirs:
+        bases_out: list[Dict[str, Any]] = []
+        task_item_count = 0
+        base_dirs = [entry for entry in task_path.iterdir() if entry.is_dir()]
+        base_dirs.sort(key=lambda path: path.name.lower())
+        for base_dir in base_dirs:
+            categories_out: list[Dict[str, Any]] = []
+            base_item_count = 0
+            category_dirs = [entry for entry in base_dir.iterdir() if entry.is_dir()]
+            grouped_categories: Dict[str, list[Path]] = {}
+            for category_dir in category_dirs:
+                normalized_category = normalize_local_tree_category(category_dir.name)
+                if not normalized_category:
+                    continue
+                grouped_categories.setdefault(normalized_category, []).append(category_dir)
+            normalized_category_names = sorted(
+                grouped_categories.keys(),
+                key=lambda name: (
+                    LOCAL_TREE_CATEGORY_ORDER.index(name) if name in LOCAL_TREE_CATEGORY_ORDER else 999,
+                    name.lower(),
+                ),
+            )
+            for category_name in normalized_category_names:
+                items: list[Dict[str, Any]] = []
+                category_paths = sorted(grouped_categories.get(category_name, []), key=lambda path: path.name.lower())
+                for category_path in category_paths:
+                    children = sorted(category_path.iterdir(), key=lambda path: (path.is_file(), path.name.lower()))
+                    for child in children:
+                        if child.is_file() and not is_local_tree_model_file(child):
+                            continue
+                        if child.is_dir() and not is_local_tree_item_directory(child, category_name):
+                            continue
+                        item = build_local_tree_item(
+                            item_path=child,
+                            model_root=model_root,
+                            task_dir=canonical_task,
+                            base_name=base_dir.name,
+                            category=category_name,
+                        )
+                        items.append(item)
+                        flat_items.append(item)
+                if not items:
+                    continue
+                item_count = len(items)
+                base_item_count += item_count
+                categories_out.append(
+                    {
+                        "category": category_name,
+                        "path": str(category_paths[0].resolve()),
+                        "source_paths": [str(path.resolve()) for path in category_paths],
+                        "item_count": item_count,
+                        "items": items,
+                    }
+                )
+            if not categories_out:
+                continue
+            task_item_count += base_item_count
+            bases_out.append(
+                {
+                    "base_name": base_dir.name,
+                    "path": str(base_dir.resolve()),
+                    "item_count": base_item_count,
+                    "categories": categories_out,
+                }
+            )
+        if not bases_out:
+            continue
+        tasks_out.append(
+            {
+                "task": canonical_task,
+                "path": str(task_path.resolve()),
+                "item_count": task_item_count,
+                "bases": bases_out,
+            }
+        )
+    return {
+        "model_root": str(model_root),
+        "generated_at": utc_now(),
+        "tasks": tasks_out,
+        "flat_items": flat_items,
+    }
+
+
+def get_local_model_tree_cached(model_root: Path, force_rescan: bool = False) -> Dict[str, Any]:
+    key = str(model_root.resolve()).lower()
+    now = time.time()
+    if not force_rescan:
+        with LOCAL_TREE_CACHE_LOCK:
+            cached = LOCAL_TREE_CACHE.get(key)
+            if cached and (now - float(cached.get("ts") or 0.0)) < LOCAL_TREE_CACHE_TTL_SEC:
+                value = cached.get("value")
+                if isinstance(value, dict):
+                    return copy.deepcopy(value)
+    built = build_local_model_tree(model_root)
+    with LOCAL_TREE_CACHE_LOCK:
+        LOCAL_TREE_CACHE[key] = {"ts": now, "value": copy.deepcopy(built)}
+    return built
+
+
+def invalidate_local_tree_cache(model_root: Optional[Path] = None) -> None:
+    with LOCAL_TREE_CACHE_LOCK:
+        if model_root is None:
+            LOCAL_TREE_CACHE.clear()
+            return
+        key = str(model_root.resolve()).lower()
+        LOCAL_TREE_CACHE.pop(key, None)
 
 
 def civitai_request_json(path: str, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
@@ -2015,92 +2335,452 @@ def extract_civitai_primary_file(model_payload: Dict[str, Any]) -> Optional[Dict
     return None
 
 
-def search_civitai_models(task: Literal["text-to-image", "image-to-image", "text-to-video", "image-to-video"], query: str, limit: int) -> list[Dict[str, Any]]:
-    model_types = civitai_task_model_types(task)
-    if not model_types:
-        return []
-
-    capped_limit = min(max(limit, 1), 50)
-    params: Dict[str, Any] = {
-        "limit": capped_limit,
-        "nsfw": "false",
-        "sort": "Most Downloaded",
-        "period": "AllTime",
-    }
-    if query.strip():
-        params["query"] = query.strip()
-    for model_type in model_types:
-        params.setdefault("types", [])
-        params["types"].append(model_type)
-    try:
-        payload = civitai_request_json("models", params)
-    except (HTTPError, URLError, TimeoutError, json.JSONDecodeError, UnicodeDecodeError):
-        LOGGER.warning("civitai search failed task=%s query=%s", task, query, exc_info=True)
-        return []
-
-    items = payload.get("items", []) if isinstance(payload, dict) else []
-    results: list[Dict[str, Any]] = []
-    for item in items:
-        if not isinstance(item, dict):
-            continue
-        model_id = safe_int(item.get("id"))
-        if not model_id:
-            continue
-        model_name = str(item.get("name") or f"model-{model_id}")
-        model_type = str(item.get("type") or "")
-        stats = item.get("stats", {}) if isinstance(item.get("stats"), dict) else {}
-        downloads = safe_int(stats.get("downloadCount"))
-        likes = safe_int(stats.get("favoriteCount")) or safe_int(stats.get("thumbsUpCount"))
-        preview_url = None
-        size_bytes = None
-        has_download_file = False
-        base_model_raw = ""
-        model_versions = item.get("modelVersions", [])
-        if isinstance(model_versions, list) and model_versions:
-            first_version = model_versions[0] if isinstance(model_versions[0], dict) else {}
-            base_model_raw = str(first_version.get("baseModel") or "").strip()
-            images = first_version.get("images", [])
-            if isinstance(images, list):
-                for image in images:
-                    if isinstance(image, dict):
-                        image_url = str(image.get("url") or "").strip()
-                        if image_url:
-                            preview_url = image_url
-                            break
-            files = first_version.get("files", [])
-            if isinstance(files, list) and files:
-                first_file = files[0] if isinstance(files[0], dict) else {}
-                for candidate_file in files:
-                    if isinstance(candidate_file, dict) and str(candidate_file.get("downloadUrl") or "").strip():
-                        has_download_file = True
+def parse_civitai_item(item: Dict[str, Any], task: str) -> Optional[Dict[str, Any]]:
+    model_id = safe_int(item.get("id"))
+    if not model_id:
+        return None
+    model_name = str(item.get("name") or f"model-{model_id}")
+    model_type = str(item.get("type") or "")
+    stats = item.get("stats", {}) if isinstance(item.get("stats"), dict) else {}
+    downloads = safe_int(stats.get("downloadCount"))
+    likes = safe_int(stats.get("favoriteCount")) or safe_int(stats.get("thumbsUpCount"))
+    preview_url = None
+    size_bytes = None
+    has_download_file = False
+    base_model_raw = ""
+    model_versions = item.get("modelVersions", [])
+    if isinstance(model_versions, list) and model_versions:
+        first_version = model_versions[0] if isinstance(model_versions[0], dict) else {}
+        base_model_raw = str(first_version.get("baseModel") or "").strip()
+        images = first_version.get("images", [])
+        if isinstance(images, list):
+            for image in images:
+                if isinstance(image, dict):
+                    image_url = str(image.get("url") or "").strip()
+                    if image_url:
+                        preview_url = image_url
                         break
-                size_kb = first_file.get("sizeKB")
+        files = first_version.get("files", [])
+        if isinstance(files, list):
+            for candidate_file in files:
+                if not isinstance(candidate_file, dict):
+                    continue
+                if str(candidate_file.get("downloadUrl") or "").strip():
+                    has_download_file = True
+                    size_kb = candidate_file.get("sizeKB")
+                    if isinstance(size_kb, (int, float)) and size_kb > 0:
+                        size_bytes = int(float(size_kb) * 1024)
+                    break
+    if not base_model_raw:
+        base_model_raw = str(item.get("baseModel") or "").strip()
+    base_model = infer_base_model_label(base_model_raw, model_name, model_type, task)
+    result_id = f"civitai/{model_id}"
+    return {
+        "id": result_id,
+        "name": model_name,
+        "title": model_name,
+        "pipeline_tag": task,
+        "downloads": downloads,
+        "likes": likes,
+        "private": False,
+        "size_bytes": size_bytes,
+        "model_url": f"https://civitai.com/models/{model_id}",
+        "preview_url": preview_url,
+        "source": "civitai",
+        "download_supported": has_download_file,
+        "label": f"[civitai] {model_name}",
+        "type": model_type,
+        "base_model": base_model,
+        "civitai_model_id": model_id,
+    }
+
+
+def search_hf_models_v2(
+    task: Literal["text-to-image", "image-to-image", "text-to-video", "image-to-video"],
+    query: str,
+    limit: int,
+    token: Optional[str],
+    page: int = 1,
+    sort: str = "downloads",
+    model_kind: str = "",
+) -> Dict[str, Any]:
+    capped_limit = min(max(limit, 1), 50)
+    current_page = max(int(page), 1)
+    normalized_query = query.strip()
+    normalized_kind = normalized_model_kind(model_kind)
+    normalized_sort_value = normalized_sort(sort)
+    cache_payload = {
+        "task": task,
+        "query": normalized_query,
+        "limit": capped_limit,
+        "page": current_page,
+        "sort": normalized_sort_value,
+        "model_kind": normalized_kind,
+    }
+
+    def loader() -> Dict[str, Any]:
+        api = HfApi(token=token)
+        fetch_limit = min(300, max(capped_limit * current_page * 3, capped_limit * 3))
+        list_kwargs: Dict[str, Any] = {
+            "sort": hf_sort_to_api(normalized_sort_value),
+            "direction": -1,
+            "limit": fetch_limit,
+            "full": True,
+            "cardData": True,
+        }
+        if normalized_query:
+            list_kwargs["search"] = normalized_query
+        else:
+            list_kwargs["filter"] = task
+
+        try:
+            found = list(api.list_models(**list_kwargs))
+        except Exception:
+            LOGGER.warning("hf search2 list_models failed with sort=%s. fallback=downloads", list_kwargs.get("sort"), exc_info=True)
+            list_kwargs["sort"] = "downloads"
+            found = list(api.list_models(**list_kwargs))
+        filtered: list[Dict[str, Any]] = []
+        for model in found:
+            pipeline_tag = getattr(model, "pipeline_tag", None)
+            tags = getattr(model, "tags", []) or []
+            matches_task = pipeline_tag == task or task in tags
+            if not matches_task:
+                continue
+            if not hf_model_matches_kind(model, normalized_kind):
+                continue
+            model_id = getattr(model, "id", "")
+            if not model_id:
+                continue
+            card_data = getattr(model, "cardData", None)
+            card_hints: list[str] = []
+            if isinstance(card_data, dict):
+                for key in ("base_model", "baseModel", "base_models", "baseModels", "model_type", "modelType"):
+                    value = card_data.get(key)
+                    if isinstance(value, list):
+                        card_hints.extend(str(v) for v in value)
+                    elif value:
+                        card_hints.append(str(value))
+            base_model = infer_base_model_label(model_id, pipeline_tag, " ".join(str(tag) for tag in tags), " ".join(card_hints))
+            size_bytes = get_remote_model_size_bytes(api, model, model_id)
+            filtered.append(
+                {
+                    "id": model_id,
+                    "name": model_id,
+                    "title": model_id,
+                    "pipeline_tag": pipeline_tag,
+                    "downloads": getattr(model, "downloads", None),
+                    "likes": getattr(model, "likes", None),
+                    "private": getattr(model, "private", False),
+                    "size_bytes": size_bytes,
+                    "model_url": f"https://huggingface.co/{quote(model_id, safe='/')}",
+                    "preview_url": resolve_preview_url(model),
+                    "base_model": base_model,
+                    "source": "huggingface",
+                    "download_supported": True,
+                    "type": str(pipeline_tag or ""),
+                }
+            )
+        start = (current_page - 1) * capped_limit
+        page_items = filtered[start : start + capped_limit]
+        has_next = len(filtered) > start + capped_limit
+        return {"items": page_items, "has_next": has_next, "total_known": len(filtered)}
+
+    return cache_get_or_set("hf-search2", cache_payload, loader)
+
+
+def civitai_sort_to_api(sort: str) -> str:
+    normalized = normalized_sort(sort)
+    if normalized in ("popularity", "downloads"):
+        return "Most Downloaded"
+    if normalized == "likes":
+        return "Most Liked"
+    if normalized in ("updated", "created"):
+        return "Newest"
+    return "Most Downloaded"
+
+
+def search_civitai_models_v2(
+    task: Literal["text-to-image", "image-to-image", "text-to-video", "image-to-video"],
+    query: str,
+    limit: int,
+    page: int = 1,
+    sort: str = "downloads",
+    nsfw: str = "exclude",
+    model_kind: str = "",
+) -> Dict[str, Any]:
+    model_types = civitai_task_model_types(task, model_kind=model_kind)
+    if not model_types:
+        return {"items": [], "has_next": False}
+    capped_limit = min(max(limit, 1), 100)
+    current_page = max(int(page), 1)
+    normalized_query = query.strip()
+    normalized_sort_value = normalized_sort(sort)
+    normalized_nsfw_value = normalized_nsfw(nsfw)
+    normalized_kind = normalized_model_kind(model_kind)
+    cache_payload = {
+        "task": task,
+        "query": normalized_query,
+        "limit": capped_limit,
+        "page": current_page,
+        "sort": normalized_sort_value,
+        "nsfw": normalized_nsfw_value,
+        "model_kind": normalized_kind,
+    }
+
+    def loader() -> Dict[str, Any]:
+        params: Dict[str, Any] = {
+            "limit": capped_limit,
+            "page": current_page,
+            "nsfw": "true" if normalized_nsfw_value == "include" else "false",
+            "sort": civitai_sort_to_api(normalized_sort_value),
+            "period": "AllTime",
+        }
+        if normalized_query:
+            params["query"] = normalized_query
+        for model_type in model_types:
+            params.setdefault("types", [])
+            params["types"].append(model_type)
+        try:
+            payload = civitai_request_json("models", params)
+        except (HTTPError, URLError, TimeoutError, json.JSONDecodeError, UnicodeDecodeError):
+            LOGGER.warning("civitai search2 failed task=%s query=%s page=%s", task, query, page, exc_info=True)
+            return {"items": [], "has_next": False}
+        items = payload.get("items", []) if isinstance(payload, dict) else []
+        results: list[Dict[str, Any]] = []
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            parsed = parse_civitai_item(item, task)
+            if parsed:
+                results.append(parsed)
+        metadata = payload.get("metadata", {}) if isinstance(payload, dict) and isinstance(payload.get("metadata"), dict) else {}
+        has_next = bool(metadata.get("nextPage"))
+        return {"items": results[:capped_limit], "has_next": has_next}
+
+    return cache_get_or_set("civitai-search2", cache_payload, loader)
+
+
+def search_hf_models(
+    task: Literal["text-to-image", "image-to-image", "text-to-video", "image-to-video"],
+    query: str,
+    limit: int,
+    token: Optional[str],
+) -> list[Dict[str, Any]]:
+    result = search_hf_models_v2(task=task, query=query, limit=limit, token=token, page=1, sort="downloads", model_kind="")
+    return list(result.get("items") or [])
+
+
+def search_civitai_models(task: Literal["text-to-image", "image-to-image", "text-to-video", "image-to-video"], query: str, limit: int) -> list[Dict[str, Any]]:
+    result = search_civitai_models_v2(task=task, query=query, limit=limit, page=1, sort="downloads", nsfw="exclude", model_kind="")
+    return list(result.get("items") or [])
+
+
+def collect_hf_preview_urls(repo_id: str, siblings: Any) -> list[str]:
+    urls: list[str] = []
+    for sibling in siblings or []:
+        name = str(getattr(sibling, "rfilename", "") or "")
+        if not name:
+            continue
+        lowered = name.lower()
+        if lowered.endswith((".png", ".jpg", ".jpeg", ".webp")) and ("preview" in lowered or "thumb" in lowered):
+            urls.append(f"https://huggingface.co/{quote(repo_id, safe='/')}/resolve/main/{quote(name, safe='/')}")
+    if not urls:
+        for sibling in siblings or []:
+            name = str(getattr(sibling, "rfilename", "") or "")
+            lowered = name.lower()
+            if lowered.endswith((".png", ".jpg", ".jpeg", ".webp")):
+                urls.append(f"https://huggingface.co/{quote(repo_id, safe='/')}/resolve/main/{quote(name, safe='/')}")
+                if len(urls) >= 8:
+                    break
+    unique: list[str] = []
+    seen: set[str] = set()
+    for url in urls:
+        if url in seen:
+            continue
+        seen.add(url)
+        unique.append(url)
+    return unique[:8]
+
+
+def hf_repo_ref_versions(api: HfApi, repo_id: str, files: list[Dict[str, Any]]) -> list[Dict[str, Any]]:
+    versions: list[Dict[str, Any]] = [{"id": "main", "name": "main", "createdAt": None, "files": files}]
+    try:
+        refs = api.list_repo_refs(repo_id=repo_id, repo_type="model")
+    except Exception:
+        return versions
+
+    def version_files(revision: str) -> list[Dict[str, Any]]:
+        output: list[Dict[str, Any]] = []
+        for item in files:
+            file_name = str(item.get("name") or "")
+            output.append(
+                {
+                    "id": f"{revision}:{file_name}",
+                    "name": file_name,
+                    "size": item.get("size"),
+                    "downloadUrl": f"https://huggingface.co/{quote(repo_id, safe='/')}/resolve/{quote(revision, safe='/')}/{quote(file_name, safe='/')}",
+                    "metadata": item.get("metadata") or {},
+                }
+            )
+        return output
+
+    for branch in getattr(refs, "branches", []) or []:
+        name = str(getattr(branch, "name", "") or "").strip()
+        if not name or name == "main":
+            continue
+        versions.append({"id": name, "name": name, "createdAt": None, "files": version_files(name)})
+    for tag in getattr(refs, "tags", []) or []:
+        name = str(getattr(tag, "name", "") or "").strip()
+        if not name:
+            continue
+        versions.append({"id": name, "name": name, "createdAt": None, "files": version_files(name)})
+    return versions
+
+
+def get_hf_model_detail(repo_id: str, token: Optional[str]) -> Dict[str, Any]:
+    normalized_repo = str(repo_id or "").strip()
+    cache_payload = {"source": "huggingface", "id": normalized_repo}
+
+    def loader() -> Dict[str, Any]:
+        api = HfApi(token=token)
+        info = api.model_info(repo_id=normalized_repo, files_metadata=True)
+        siblings = list(getattr(info, "siblings", None) or [])
+        files: list[Dict[str, Any]] = []
+        for sibling in siblings:
+            file_name = str(getattr(sibling, "rfilename", "") or "")
+            if not file_name:
+                continue
+            size_value = getattr(sibling, "size", None)
+            if not isinstance(size_value, int):
+                lfs = getattr(sibling, "lfs", None)
+                if isinstance(lfs, dict):
+                    size_value = lfs.get("size")
+            files.append(
+                {
+                    "id": file_name,
+                    "name": file_name,
+                    "size": size_value if isinstance(size_value, int) and size_value > 0 else None,
+                    "downloadUrl": f"https://huggingface.co/{quote(normalized_repo, safe='/')}/resolve/main/{quote(file_name, safe='/')}",
+                    "metadata": {
+                        "sha": getattr(sibling, "blob_id", None),
+                        "lfs": getattr(sibling, "lfs", None),
+                    },
+                }
+            )
+        files = files[:200]
+        readme_text = ""
+        with contextlib.suppress(Exception):
+            readme_path = hf_hub_download(
+                repo_id=normalized_repo,
+                filename="README.md",
+                repo_type="model",
+                token=token,
+            )
+            readme_text = Path(readme_path).read_text(encoding="utf-8", errors="replace")
+        if not readme_text:
+            card_data = getattr(info, "cardData", None)
+            if isinstance(card_data, dict):
+                readme_text = str(card_data.get("description") or "")
+        preview_urls = collect_hf_preview_urls(normalized_repo, siblings)
+        if not preview_urls:
+            primary_preview = resolve_preview_url(info)
+            if primary_preview:
+                preview_urls = [primary_preview]
+        tags = [str(tag) for tag in (getattr(info, "tags", None) or []) if str(tag or "").strip()]
+        versions = hf_repo_ref_versions(api, normalized_repo, files)
+        return {
+            "source": "huggingface",
+            "id": normalized_repo,
+            "name": normalized_repo,
+            "title": normalized_repo,
+            "description": readme_text,
+            "description_markdown": True,
+            "tags": tags[:60],
+            "previews": preview_urls[:12],
+            "versions": versions[:20],
+            "default_version_id": "main",
+        }
+
+    return cache_get_or_set("hf-detail", cache_payload, loader)
+
+
+def get_civitai_model_detail(model_id: int) -> Dict[str, Any]:
+    cache_payload = {"source": "civitai", "id": int(model_id)}
+
+    def loader() -> Dict[str, Any]:
+        payload = civitai_request_json(f"models/{int(model_id)}")
+        name = str(payload.get("name") or f"civitai/{int(model_id)}")
+        description = str(payload.get("description") or "")
+        tags = [str(tag) for tag in (payload.get("tags") or []) if str(tag or "").strip()]
+        versions_payload = payload.get("modelVersions", []) if isinstance(payload.get("modelVersions"), list) else []
+        versions: list[Dict[str, Any]] = []
+        previews: list[str] = []
+        for version in versions_payload:
+            if not isinstance(version, dict):
+                continue
+            version_id = safe_int(version.get("id"))
+            version_name = str(version.get("name") or (version_id if version_id is not None else "version"))
+            files_payload = version.get("files", []) if isinstance(version.get("files"), list) else []
+            files: list[Dict[str, Any]] = []
+            for file_entry in files_payload:
+                if not isinstance(file_entry, dict):
+                    continue
+                file_id = safe_int(file_entry.get("id"))
+                file_name = str(file_entry.get("name") or (file_id if file_id is not None else "file"))
+                size_bytes = None
+                size_kb = file_entry.get("sizeKB")
                 if isinstance(size_kb, (int, float)) and size_kb > 0:
                     size_bytes = int(float(size_kb) * 1024)
-        if not base_model_raw:
-            base_model_raw = str(item.get("baseModel") or "").strip()
-        base_model = infer_base_model_label(base_model_raw, model_name, model_type, task)
-        result_id = f"civitai/{model_id}"
-        results.append(
-            {
-                "id": result_id,
-                "pipeline_tag": task,
-                "downloads": downloads,
-                "likes": likes,
-                "private": False,
-                "size_bytes": size_bytes,
-                "model_url": f"https://civitai.com/models/{model_id}",
-                "preview_url": preview_url,
-                "source": "civitai",
-                "download_supported": has_download_file,
-                "label": f"[civitai] {model_name}",
-                "type": model_type,
-                "base_model": base_model,
-            }
-        )
-        if len(results) >= capped_limit:
-            break
-    return results
+                files.append(
+                    {
+                        "id": file_id if file_id is not None else file_name,
+                        "name": file_name,
+                        "size": size_bytes,
+                        "downloadUrl": str(file_entry.get("downloadUrl") or ""),
+                        "metadata": {
+                            "type": file_entry.get("type"),
+                            "format": file_entry.get("metadata", {}).get("format") if isinstance(file_entry.get("metadata"), dict) else None,
+                            "fp": file_entry.get("metadata", {}).get("fp") if isinstance(file_entry.get("metadata"), dict) else None,
+                        },
+                    }
+                )
+            images_payload = version.get("images", []) if isinstance(version.get("images"), list) else []
+            for image in images_payload:
+                if not isinstance(image, dict):
+                    continue
+                image_url = str(image.get("url") or "").strip()
+                if image_url:
+                    previews.append(image_url)
+            versions.append(
+                {
+                    "id": version_id if version_id is not None else version_name,
+                    "name": version_name,
+                    "createdAt": version.get("createdAt"),
+                    "files": files[:80],
+                }
+            )
+        unique_previews: list[str] = []
+        seen: set[str] = set()
+        for url in previews:
+            if url in seen:
+                continue
+            seen.add(url)
+            unique_previews.append(url)
+        return {
+            "source": "civitai",
+            "id": f"civitai/{int(model_id)}",
+            "name": name,
+            "title": name,
+            "description": description,
+            "description_markdown": False,
+            "tags": tags[:60],
+            "previews": unique_previews[:12],
+            "versions": versions[:30],
+            "default_version_id": versions[0]["id"] if versions else None,
+            "model_url": f"https://civitai.com/models/{int(model_id)}",
+        }
+
+    return cache_get_or_set("civitai-detail", cache_payload, loader)
 
 
 def stream_http_download(
@@ -2203,6 +2883,11 @@ class DownloadRequest(BaseModel):
     repo_id: str = Field(min_length=3)
     revision: Optional[str] = None
     target_dir: Optional[str] = None
+    source: Optional[Literal["huggingface", "civitai"]] = None
+    hf_revision: Optional[str] = None
+    civitai_model_id: Optional[int] = Field(default=None, ge=1)
+    civitai_version_id: Optional[int] = Field(default=None, ge=1)
+    civitai_file_id: Optional[int] = Field(default=None, ge=1)
 
 
 class DeleteLocalModelRequest(BaseModel):
@@ -2216,6 +2901,15 @@ class DeleteOutputRequest(BaseModel):
 
 class ClearHfCacheRequest(BaseModel):
     dry_run: bool = False
+
+
+class RescanLocalModelsRequest(BaseModel):
+    dir: Optional[str] = None
+
+
+class RevealLocalModelRequest(BaseModel):
+    path: str = Field(min_length=1)
+    base_dir: Optional[str] = None
 
 
 def text2image_worker(task_id: str, payload: Text2ImageRequest) -> None:
@@ -2750,10 +3444,107 @@ def image2image_worker(task_id: str, payload: Dict[str, Any]) -> None:
             image_path.unlink(missing_ok=True)
 
 
-def download_model_worker(task_id: str, repo_id: str, revision: Optional[str], target_dir: Optional[str]) -> None:
+def select_civitai_download_file(
+    model_payload: Dict[str, Any],
+    version_id: Optional[int],
+    file_id: Optional[int],
+) -> tuple[Dict[str, Any], Dict[str, Any]]:
+    versions = model_payload.get("modelVersions", [])
+    if not isinstance(versions, list) or not versions:
+        raise RuntimeError("No modelVersions found on CivitAI model")
+    selected_version: Optional[Dict[str, Any]] = None
+    if version_id:
+        for version in versions:
+            if not isinstance(version, dict):
+                continue
+            if safe_int(version.get("id")) == int(version_id):
+                selected_version = version
+                break
+        if selected_version is None:
+            raise RuntimeError(f"CivitAI model version not found: {version_id}")
+    else:
+        for version in versions:
+            if isinstance(version, dict):
+                selected_version = version
+                break
+    if selected_version is None:
+        raise RuntimeError("No valid model version found")
+
+    files = selected_version.get("files", [])
+    if not isinstance(files, list) or not files:
+        raise RuntimeError("No downloadable files found in selected CivitAI version")
+    selected_file: Optional[Dict[str, Any]] = None
+    if file_id:
+        for file_entry in files:
+            if not isinstance(file_entry, dict):
+                continue
+            if safe_int(file_entry.get("id")) == int(file_id):
+                selected_file = file_entry
+                break
+        if selected_file is None:
+            raise RuntimeError(f"CivitAI file not found in selected version: {file_id}")
+    else:
+        model_candidates: list[Dict[str, Any]] = []
+        fallback_candidates: list[Dict[str, Any]] = []
+        for file_entry in files:
+            if not isinstance(file_entry, dict):
+                continue
+            if not str(file_entry.get("downloadUrl") or "").strip():
+                continue
+            kind = str(file_entry.get("type") or "").strip().lower()
+            if kind in ("model", "checkpoint"):
+                model_candidates.append(file_entry)
+            else:
+                fallback_candidates.append(file_entry)
+        if model_candidates:
+            selected_file = model_candidates[0]
+        elif fallback_candidates:
+            selected_file = fallback_candidates[0]
+    if selected_file is None:
+        raise RuntimeError("No downloadable CivitAI file with valid URL was found")
+    return selected_version, selected_file
+
+
+def download_preview_image(preview_url: str, destination: Path) -> None:
+    req = UrlRequest(preview_url, headers={"User-Agent": "ROCm-VideoGen/1.0"})
+    with contextlib.closing(urlopen(req, timeout=20)) as resp, destination.open("wb") as out_file:
+        while True:
+            chunk = resp.read(1024 * 256)
+            if not chunk:
+                break
+            out_file.write(chunk)
+
+
+def save_hf_model_metadata(
+    model_dir: Path,
+    repo_id: str,
+    revision: str,
+    token: Optional[str],
+) -> None:
+    api = HfApi(token=token)
+    info = api.model_info(repo_id=repo_id, revision=revision, files_metadata=True)
+    metadata = {
+        "source": "huggingface",
+        "repo_id": repo_id,
+        "revision": revision,
+        "model_url": f"https://huggingface.co/{quote(repo_id, safe='/')}",
+        "downloads": getattr(info, "downloads", None),
+        "likes": getattr(info, "likes", None),
+    }
+    (model_dir / "model_meta.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
+    preview_url = resolve_preview_url(info)
+    if preview_url:
+        preview_path = model_dir / "thumbnail.jpg"
+        with contextlib.suppress(Exception):
+            download_preview_image(preview_url, preview_path)
+
+
+def download_model_worker(task_id: str, req: DownloadRequest) -> None:
     settings = settings_store.get()
     ensure_runtime_dirs(settings)
-    clean_target_dir = (target_dir or "").strip()
+    repo_id = req.repo_id
+    revision = (req.hf_revision or req.revision or "").strip() or "main"
+    clean_target_dir = (req.target_dir or "").strip()
     base_dir_raw = clean_target_dir or settings["paths"]["models_dir"]
     models_dir = resolve_path(base_dir_raw)
     models_dir.mkdir(parents=True, exist_ok=True)
@@ -2763,21 +3554,25 @@ def download_model_worker(task_id: str, repo_id: str, revision: Optional[str], t
     try:
         update_task(task_id, status="running", progress=0.0, message=f"Preparing download {repo_id}", downloaded_bytes=0, total_bytes=None)
 
-        civitai_model_id = parse_civitai_model_id(repo_id)
+        explicit_source = str(req.source or "").strip().lower()
+        civitai_model_id = req.civitai_model_id or parse_civitai_model_id(repo_id)
+        is_civitai = explicit_source == "civitai" or civitai_model_id is not None
         if civitai_model_id is not None:
-            payload = civitai_request_json(f"models/{civitai_model_id}")
-            primary_file = extract_civitai_primary_file(payload)
-            if not primary_file:
-                raise RuntimeError(f"No downloadable file found on CivitAI model {civitai_model_id}")
-            download_url = str(primary_file.get("downloadUrl") or "").strip()
+            payload = civitai_request_json(f"models/{int(civitai_model_id)}")
+            selected_version, selected_file = select_civitai_download_file(
+                payload,
+                version_id=req.civitai_version_id,
+                file_id=req.civitai_file_id,
+            )
+            download_url = str(selected_file.get("downloadUrl") or "").strip()
             if not download_url:
                 raise RuntimeError(f"Missing download URL on CivitAI model {civitai_model_id}")
             model_name = str(payload.get("name") or f"civitai-{civitai_model_id}")
-            file_name = sanitize_download_filename(str(primary_file.get("name") or ""), f"civitai-{civitai_model_id}.safetensors")
+            file_name = sanitize_download_filename(str(selected_file.get("name") or ""), f"civitai-{civitai_model_id}.safetensors")
             model_dir.mkdir(parents=True, exist_ok=True)
             file_path = model_dir / file_name
             total_bytes_hint: Optional[int] = None
-            size_kb_raw = primary_file.get("sizeKB")
+            size_kb_raw = selected_file.get("sizeKB")
             if isinstance(size_kb_raw, (int, float)):
                 total_bytes_hint = int(float(size_kb_raw) * 1024)
             downloaded_bytes = stream_http_download(
@@ -2793,14 +3588,27 @@ def download_model_worker(task_id: str, repo_id: str, revision: Optional[str], t
                 "model_id": civitai_model_id,
                 "model_name": model_name,
                 "model_url": f"https://civitai.com/models/{civitai_model_id}",
-                "version_id": primary_file.get("version_id"),
-                "version_name": primary_file.get("version_name"),
-                "file_id": primary_file.get("id"),
+                "version_id": selected_version.get("id"),
+                "version_name": selected_version.get("name"),
+                "file_id": selected_file.get("id"),
                 "file_name": file_name,
                 "bytes": downloaded_bytes,
             }
             (model_dir / "civitai_model.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
+            (model_dir / "model_meta.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
+            images = selected_version.get("images", []) if isinstance(selected_version.get("images"), list) else []
+            preview_url = ""
+            for image in images:
+                if isinstance(image, dict):
+                    preview_url = str(image.get("url") or "").strip()
+                    if preview_url:
+                        break
+            if preview_url:
+                with contextlib.suppress(Exception):
+                    download_preview_image(preview_url, model_dir / "thumbnail.jpg")
         else:
+            if is_civitai:
+                raise RuntimeError("CivitAI download requires civitai_model_id or repo_id like civitai/<id>")
             model_dir.mkdir(parents=True, exist_ok=True)
             api = HfApi(token=token)
             expected_total_bytes = get_remote_model_size_bytes(api, None, repo_id)
@@ -2857,6 +3665,8 @@ def download_model_worker(task_id: str, repo_id: str, revision: Optional[str], t
                 downloaded_bytes=downloaded_final,
                 total_bytes=expected_total_bytes or downloaded_final,
             )
+            with contextlib.suppress(Exception):
+                save_hf_model_metadata(model_dir=model_dir, repo_id=repo_id, revision=revision, token=token)
         final_downloaded_bytes = directory_size_bytes(model_dir)
         current_task = get_task(task_id) or {}
         total_bytes_value = safe_int(current_task.get("total_bytes")) or final_downloaded_bytes
@@ -3110,6 +3920,49 @@ def list_local_models(dir: str = "") -> Dict[str, Any]:
     return {"items": items, "base_dir": str(models_dir)}
 
 
+@app.get("/api/models/local/tree")
+def list_local_models_tree(dir: str = "") -> Dict[str, Any]:
+    settings = settings_store.get()
+    model_root = resolve_path(dir.strip() or settings["paths"]["models_dir"])
+    tree = get_local_model_tree_cached(model_root, force_rescan=False)
+    return tree
+
+
+@app.post("/api/models/local/rescan")
+def rescan_local_models(req: RescanLocalModelsRequest) -> Dict[str, Any]:
+    settings = settings_store.get()
+    model_root = resolve_path((req.dir or "").strip() or settings["paths"]["models_dir"])
+    invalidate_local_tree_cache(model_root)
+    tree = get_local_model_tree_cached(model_root, force_rescan=True)
+    return tree
+
+
+@app.post("/api/models/local/reveal")
+def reveal_local_model(req: RevealLocalModelRequest) -> Dict[str, Any]:
+    settings = settings_store.get()
+    base_dir = resolve_path((req.base_dir or "").strip() or settings["paths"]["models_dir"])
+    requested = Path(req.path).expanduser()
+    if not requested.is_absolute():
+        requested = (base_dir / requested).resolve()
+    else:
+        requested = requested.resolve()
+    if not safe_in_directory(requested, base_dir):
+        raise HTTPException(status_code=400, detail="Invalid target path")
+    if not requested.exists():
+        raise HTTPException(status_code=404, detail="Target not found")
+    if os.name != "nt":
+        return {"status": "not_supported", "reason": "reveal is only supported on Windows"}
+    try:
+        if requested.is_file():
+            subprocess.Popen(["explorer", "/select,", str(requested)], shell=False)
+        else:
+            subprocess.Popen(["explorer", str(requested)], shell=False)
+    except Exception as exc:
+        LOGGER.warning("reveal local model failed path=%s", str(requested), exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Reveal failed: {exc}") from exc
+    return {"status": "ok", "path": str(requested)}
+
+
 @app.post("/api/models/local/delete")
 def delete_local_model(req: DeleteLocalModelRequest) -> Dict[str, Any]:
     settings = settings_store.get()
@@ -3131,6 +3984,7 @@ def delete_local_model(req: DeleteLocalModelRequest) -> Dict[str, Any]:
         raise HTTPException(status_code=400, detail="Target directory is not recognized as a downloadable model")
 
     shutil.rmtree(target)
+    invalidate_local_tree_cache(base_dir)
     LOGGER.info("local model deleted base_dir=%s name=%s path=%s", str(base_dir), model_name, str(target))
     return {"status": "ok", "deleted_path": str(target), "model_name": model_name}
 
@@ -3255,6 +4109,137 @@ def search_models(
     return {"items": results}
 
 
+@app.get("/api/models/search2")
+def search_models_v2(
+    task: Literal["text-to-image", "image-to-image", "text-to-video", "image-to-video"],
+    query: str = "",
+    limit: int = 30,
+    source: Literal["all", "huggingface", "civitai"] = "all",
+    base_model: str = "",
+    sort: Literal["popularity", "downloads", "likes", "updated", "created"] = "downloads",
+    nsfw: Literal["include", "exclude"] = "exclude",
+    page: int = 1,
+    cursor: str = "",
+    model_kind: str = "",
+) -> Dict[str, Any]:
+    settings = settings_store.get()
+    token = settings["huggingface"].get("token") or None
+    capped_limit = min(max(limit, 1), 100)
+    current_page = max(int(page), 1)
+    include_hf = source in ("all", "huggingface")
+    include_civitai = source in ("all", "civitai") and task in ("text-to-image", "image-to-image")
+    if cursor.strip():
+        with contextlib.suppress(Exception):
+            current_page = max(int(cursor.strip()), 1)
+
+    hf_limit = 0
+    civitai_limit = 0
+    if include_hf and include_civitai:
+        civitai_limit = max(1, capped_limit // 2)
+        hf_limit = max(1, capped_limit - civitai_limit)
+    elif include_hf:
+        hf_limit = capped_limit
+    elif include_civitai:
+        civitai_limit = capped_limit
+
+    hf_data = {"items": [], "has_next": False}
+    civitai_data = {"items": [], "has_next": False}
+    if hf_limit > 0:
+        hf_data = search_hf_models_v2(
+            task=task,
+            query=query,
+            limit=hf_limit,
+            token=token,
+            page=current_page,
+            sort=sort,
+            model_kind=model_kind,
+        )
+    if civitai_limit > 0:
+        civitai_data = search_civitai_models_v2(
+            task=task,
+            query=query,
+            limit=civitai_limit,
+            page=current_page,
+            sort=sort,
+            nsfw=nsfw,
+            model_kind=model_kind,
+        )
+
+    hf_items = list(hf_data.get("items") or [])
+    civitai_items = list(civitai_data.get("items") or [])
+    results: list[Dict[str, Any]] = []
+    max_len = max(len(hf_items), len(civitai_items))
+    for index in range(max_len):
+        if index < len(hf_items):
+            results.append(hf_items[index])
+        if index < len(civitai_items):
+            results.append(civitai_items[index])
+        if len(results) >= capped_limit:
+            break
+
+    normalized_base_model = normalize_base_model_filter(base_model)
+    if normalized_base_model:
+        results = [
+            item
+            for item in results
+            if matches_base_model_filter(
+                str(item.get("base_model") or infer_base_model_label(item.get("id"), item.get("pipeline_tag"), item.get("type"))),
+                normalized_base_model,
+            )
+        ]
+
+    models_dir = resolve_path(settings["paths"]["models_dir"])
+    installed = collect_installed_model_id_set(models_dir)
+    for item in results:
+        if not item.get("base_model"):
+            item["base_model"] = infer_base_model_label(item.get("id"), item.get("pipeline_tag"), item.get("type"))
+        model_id = normalize_model_lookup_key(str(item.get("id") or ""))
+        item["installed"] = model_id in installed
+
+    has_next = bool(hf_data.get("has_next")) or bool(civitai_data.get("has_next"))
+    next_cursor = str(current_page + 1) if has_next else None
+    prev_cursor = str(current_page - 1) if current_page > 1 else None
+    return {
+        "items": results,
+        "next_cursor": next_cursor,
+        "prev_cursor": prev_cursor,
+        "page_info": {
+            "page": current_page,
+            "limit": capped_limit,
+            "has_next": has_next,
+            "has_prev": current_page > 1,
+            "source": source,
+            "task": task,
+            "sort": sort,
+            "nsfw": nsfw,
+            "model_kind": normalized_model_kind(model_kind) or "checkpoint",
+        },
+    }
+
+
+@app.get("/api/models/detail")
+def model_detail(source: Literal["huggingface", "civitai"], id: str) -> Dict[str, Any]:
+    settings = settings_store.get()
+    token = settings["huggingface"].get("token") or None
+    if source == "huggingface":
+        repo_id = str(id or "").strip()
+        if not repo_id:
+            raise HTTPException(status_code=400, detail="id is required")
+        try:
+            return get_hf_model_detail(repo_id=repo_id, token=token)
+        except Exception as exc:
+            LOGGER.warning("hf detail failed id=%s", repo_id, exc_info=True)
+            raise HTTPException(status_code=502, detail=f"Failed to fetch Hugging Face detail: {exc}") from exc
+    model_id = parse_civitai_model_id(id) if str(id).lower().startswith("civitai/") else safe_int(id)
+    if not model_id:
+        raise HTTPException(status_code=400, detail="Invalid CivitAI id")
+    try:
+        return get_civitai_model_detail(model_id=int(model_id))
+    except Exception as exc:
+        LOGGER.warning("civitai detail failed id=%s", model_id, exc_info=True)
+        raise HTTPException(status_code=502, detail=f"Failed to fetch CivitAI detail: {exc}") from exc
+
+
 @app.get("/api/models/loras/catalog")
 def lora_catalog(
     task: Literal["text-to-image", "image-to-image", "text-to-video", "image-to-video"],
@@ -3338,10 +4323,21 @@ def vae_catalog(limit: int = 200) -> Dict[str, Any]:
 @app.post("/api/models/download")
 def download_model(req: DownloadRequest) -> Dict[str, str]:
     task_id = create_task("download", "Download queued")
-    LOGGER.info("download requested task_id=%s repo=%s revision=%s target_dir=%s", task_id, req.repo_id, req.revision, req.target_dir)
+    LOGGER.info(
+        "download requested task_id=%s repo=%s source=%s revision=%s hf_revision=%s civitai_model_id=%s civitai_version_id=%s civitai_file_id=%s target_dir=%s",
+        task_id,
+        req.repo_id,
+        req.source or "",
+        req.revision or "",
+        req.hf_revision or "",
+        req.civitai_model_id,
+        req.civitai_version_id,
+        req.civitai_file_id,
+        req.target_dir,
+    )
     thread = threading.Thread(
         target=download_model_worker,
-        args=(task_id, req.repo_id, req.revision, req.target_dir),
+        args=(task_id, req),
         daemon=True,
     )
     thread.start()

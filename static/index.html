@@ -229,12 +229,16 @@
     </section>
 
     <section class="panel" id="panel-models">
-      <form id="searchForm" class="form compact">
+      <form id="searchForm" class="form compact model-search-topbar">
         <label>
           <span data-i18n="labelDownloadSavePathOptional" class="has-help" data-help-key="helpDownloadSavePath" tabindex="0">Download Save Path (optional)</span>
           <input id="downloadTargetDir" data-i18n-placeholder="placeholderDownloadSavePath" placeholder="empty = use Models Directory from Settings" />
         </label>
-        <div class="grid">
+        <div class="model-search-query-row">
+          <input id="searchQuery" data-i18n-placeholder="placeholderSearchQuery" placeholder="i2vgen, text-to-video..." />
+          <button type="submit" data-i18n="btnSearchModels">Search Models</button>
+        </div>
+        <div class="model-search-control-grid">
           <label>
             <span data-i18n="labelTask" class="has-help" data-help-key="helpTask" tabindex="0">Task</span>
             <select id="searchTask">
@@ -256,12 +260,66 @@
             <span data-i18n="labelSearchBaseModel" class="has-help" data-help-key="helpSearchBaseModel" tabindex="0">Base Model</span>
             <select id="searchBaseModel"></select>
           </label>
-          <label><span data-i18n="labelQuery" class="has-help" data-help-key="helpQuery" tabindex="0">Query</span> <input id="searchQuery" data-i18n-placeholder="placeholderSearchQuery" placeholder="i2vgen, text-to-video..." /></label>
-          <label><span data-i18n="labelLimit" class="has-help" data-help-key="helpLimit" tabindex="0">Limit</span> <input id="searchLimit" type="number" min="1" max="50" value="30" /></label>
+          <label>
+            <span data-i18n="labelSearchSort" class="has-help" data-help-key="helpSearchSort" tabindex="0">Sort</span>
+            <select id="searchSort">
+              <option value="downloads">downloads</option>
+              <option value="likes">likes</option>
+              <option value="updated">updated</option>
+              <option value="created">created</option>
+              <option value="popularity">popularity</option>
+            </select>
+          </label>
+          <label>
+            <span data-i18n="labelSearchNsfw" class="has-help" data-help-key="helpSearchNsfw" tabindex="0">NSFW</span>
+            <select id="searchNsfw">
+              <option value="exclude">exclude</option>
+              <option value="include">include</option>
+            </select>
+          </label>
+          <label>
+            <span data-i18n="labelLimit" class="has-help" data-help-key="helpLimit" tabindex="0">Limit</span>
+            <input id="searchLimit" type="number" min="1" max="100" value="30" />
+          </label>
         </div>
-        <button type="submit" data-i18n="btnSearchModels">Search Models</button>
       </form>
-      <div id="searchResults" class="list"></div>
+      <div id="searchResults" class="model-browser">
+        <aside id="searchFilters" class="model-filter-pane">
+          <h4 data-i18n="labelSearchModelKind">Model Kind</h4>
+          <label>
+            <span data-i18n="labelSearchModelKind" class="has-help" data-help-key="helpSearchModelKind" tabindex="0">Model Kind</span>
+            <select id="searchModelKind">
+              <option value="">auto</option>
+              <option value="checkpoint">checkpoint</option>
+              <option value="lora">lora</option>
+              <option value="vae">vae</option>
+              <option value="controlnet">controlnet</option>
+              <option value="embedding">embedding</option>
+              <option value="upscaler">upscaler</option>
+            </select>
+          </label>
+          <label>
+            <span data-i18n="labelSearchViewMode" class="has-help" data-help-key="helpSearchViewMode" tabindex="0">View</span>
+            <select id="searchViewMode">
+              <option value="grid">grid</option>
+              <option value="list">list</option>
+            </select>
+          </label>
+          <div class="model-filter-note" id="searchFilterNote"></div>
+        </aside>
+        <section class="model-results-pane">
+          <div id="searchCards" class="model-card-grid"></div>
+          <div class="model-pagination">
+            <button id="searchPrevBtn" type="button">Prev</button>
+            <span id="searchPageInfo">page 1</span>
+            <button id="searchNextBtn" type="button">Next</button>
+          </div>
+        </section>
+        <aside id="modelDetailPane" class="model-detail-pane">
+          <div id="modelDetailEmpty" class="model-detail-empty" data-i18n="msgModelDetailEmpty">Select a model to view detail.</div>
+          <div id="modelDetailContent" class="model-detail-content"></div>
+        </aside>
+      </div>
     </section>
 
     <section class="panel" id="panel-local-models">
@@ -270,11 +328,29 @@
         <span data-i18n="labelLocalModelsPath" class="has-help" data-help-key="helpLocalModelsPath" tabindex="0">Local Models Path</span>
         <input id="localModelsDir" data-i18n-placeholder="placeholderLocalModelsPath" placeholder="empty = use Models Directory from Settings" />
       </label>
-      <label>
-        <span data-i18n="labelLocalLineage" class="has-help" data-help-key="helpLocalLineage" tabindex="0">Lineage</span>
-        <select id="localLineageFilter"></select>
-      </label>
-      <button id="refreshLocalModels" type="button" data-i18n="btnRefreshLocalList">Refresh Local List</button>
+      <div class="grid">
+        <label>
+          <span data-i18n="labelLocalViewMode" class="has-help" data-help-key="helpLocalViewMode" tabindex="0">View Mode</span>
+          <select id="localViewMode">
+            <option value="tree" data-i18n="localViewTree">Tree</option>
+            <option value="flat" data-i18n="localViewFlat">Flat</option>
+          </select>
+        </label>
+        <label>
+          <span data-i18n="labelLocalTreeSearch" class="has-help" data-help-key="helpLocalTreeSearch" tabindex="0">Tree Search</span>
+          <input id="localTreeSearch" data-i18n-placeholder="placeholderLocalTreeSearch" placeholder="filter model name..." />
+        </label>
+        <label>
+          <span data-i18n="labelLocalLineage" class="has-help" data-help-key="helpLocalLineage" tabindex="0">Lineage</span>
+          <select id="localLineageFilter"></select>
+        </label>
+      </div>
+      <div class="local-tree-toolbar">
+        <button id="refreshLocalModels" type="button" data-i18n="btnRefreshLocalList">Refresh Local List</button>
+        <button id="rescanLocalModels" type="button" data-i18n="btnRescanLocalModels">Rescan</button>
+      </div>
+      <div id="localModelsTree" class="local-tree"></div>
+      <div id="localModelSelection" class="local-selection"></div>
       <div id="localModels" class="list"></div>
     </section>
 

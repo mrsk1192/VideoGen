@@ -56,8 +56,13 @@ const I18N = {
     headingLocalModels: "Local Models",
     headingOutputs: "Outputs",
     btnRefreshLocalList: "Refresh Local List",
+    btnRescanLocalModels: "Rescan",
     btnRefreshOutputs: "Refresh Outputs",
     labelLocalModelsPath: "Local Models Path",
+    labelLocalViewMode: "View Mode",
+    labelLocalTreeSearch: "Tree Search",
+    localViewTree: "Tree",
+    localViewFlat: "Flat",
     labelLocalLineage: "Lineage",
     labelModelsDirectory: "Models Directory",
     labelListenPort: "Listen Port",
@@ -188,6 +193,10 @@ const I18N = {
       "Impact: Changes only the card layout (grid/list), not search results.\nExample: grid",
     helpLocalModelsPath:
       "Impact: Changes which folder is scanned and shown in the Local Models screen.\nExample: D:\\ModelStore\\VideoGen",
+    helpLocalViewMode:
+      "Impact: Switches local model presentation between hierarchical tree and flat list.\nExample: Tree",
+    helpLocalTreeSearch:
+      "Impact: Filters model items in the tree by partial name match.\nExample: sdxl",
     helpLocalLineage:
       "Impact: Filters local model list by model family lineage.\nExample: StableDiffusion XL",
     helpModelsDirectory:
@@ -261,6 +270,7 @@ const I18N = {
     placeholderDownloadSavePath: "empty = use Models Directory from Settings",
     placeholderSearchQuery: "i2vgen, text-to-video...",
     placeholderLocalModelsPath: "empty = use Models Directory from Settings",
+    placeholderLocalTreeSearch: "filter model name...",
     placeholderOptional: "optional",
     searchSourceAll: "All",
     searchSourceHf: "Hugging Face",
@@ -269,6 +279,16 @@ const I18N = {
     localLineageAll: "All lineages",
     msgSettingsSaved: "Settings saved.",
     msgNoLocalModels: "No local models in: {path}",
+    msgNoLocalTreeModels: "No tree items in: {path}",
+    msgSelectLocalTreeItem: "Select a tree model item.",
+    msgTreeFilterHint: "Filter: {query}",
+    msgTreeFilterClearHint: "Filter: (none)",
+    msgApplyUnsupportedCategory: "Apply is available only for BaseModel items.",
+    msgReveal: "Reveal",
+    msgLocalModelRevealed: "Opened in Explorer: {path}",
+    msgLocalModelRevealFailed: "Reveal failed: {error}",
+    msgLocalRescanned: "Local model tree rescanned.",
+    msgLocalRescanFailed: "Local model tree rescan failed: {error}",
     msgNoOutputs: "No outputs in: {path}",
     msgPortChangeSaved: "Listen port saved. Restart `start.bat` to apply new port.",
     msgServerSettingRestartRequired: "Server setting saved. Restart `start.bat` to apply changes.",
@@ -442,8 +462,13 @@ const I18N = {
     headingLocalModels: "ローカルモデル",
     headingOutputs: "成果物",
     btnRefreshLocalList: "ローカル一覧を更新",
+    btnRescanLocalModels: "再走査",
     btnRefreshOutputs: "成果物一覧を更新",
     labelLocalModelsPath: "ローカルモデル表示パス",
+    labelLocalViewMode: "表示モード",
+    labelLocalTreeSearch: "ツリー検索",
+    localViewTree: "ツリー",
+    localViewFlat: "フラット",
     labelLocalLineage: "系譜",
     labelModelsDirectory: "モデル保存ディレクトリ",
     labelListenPort: "リッスンポート",
@@ -574,6 +599,10 @@ const I18N = {
       "影響: 結果の表示レイアウトのみを切り替えます（検索結果自体は変わりません）。\n例: grid",
     helpLocalModelsPath:
       "影響: ローカルモデル画面で一覧表示するフォルダを切り替えます。\n例: D:\\ModelStore\\VideoGen",
+    helpLocalViewMode:
+      "影響: ローカルモデル表示を階層ツリー/フラット一覧で切り替えます。\n例: ツリー",
+    helpLocalTreeSearch:
+      "影響: ツリー内のモデル名を部分一致で絞り込みます。\n例: sdxl",
     helpLocalLineage:
       "影響: ローカルモデル一覧をモデル系譜で絞り込みます。\n例: StableDiffusion XL",
     helpModelsDirectory:
@@ -647,6 +676,7 @@ const I18N = {
     placeholderDownloadSavePath: "空欄 = 設定のモデル保存先を使用",
     placeholderSearchQuery: "i2vgen, text-to-video...",
     placeholderLocalModelsPath: "空欄 = 設定のモデル保存先を使用",
+    placeholderLocalTreeSearch: "モデル名でフィルタ...",
     placeholderOptional: "任意",
     searchSourceAll: "すべて",
     searchSourceHf: "Hugging Face",
@@ -655,6 +685,16 @@ const I18N = {
     localLineageAll: "すべての系譜",
     msgSettingsSaved: "設定を保存しました。",
     msgNoLocalModels: "ローカルモデルがありません: {path}",
+    msgNoLocalTreeModels: "ツリー表示できるモデルがありません: {path}",
+    msgSelectLocalTreeItem: "ツリーのモデル項目を選択してください。",
+    msgTreeFilterHint: "フィルタ: {query}",
+    msgTreeFilterClearHint: "フィルタ: (なし)",
+    msgApplyUnsupportedCategory: "適用は BaseModel カテゴリのみ対応しています。",
+    msgReveal: "場所を開く",
+    msgLocalModelRevealed: "Explorerで開きました: {path}",
+    msgLocalModelRevealFailed: "場所を開く処理に失敗: {error}",
+    msgLocalRescanned: "ローカルモデルツリーを再走査しました。",
+    msgLocalRescanFailed: "ローカルモデルツリーの再走査に失敗: {error}",
     msgNoOutputs: "成果物がありません: {path}",
     msgPortChangeSaved: "リッスンポートを保存しました。反映には `start.bat` の再起動が必要です。",
     msgServerSettingRestartRequired: "サーバー設定を保存しました。反映には `start.bat` の再起動が必要です。",
@@ -890,6 +930,10 @@ const state = {
   settings: null,
   localModels: [],
   localModelsBaseDir: "",
+  localTreeData: null,
+  localTreeFilter: "",
+  localTreeSelected: null,
+  localViewMode: "tree",
   settingsLocalModels: [],
   lastSearchResults: [],
   language: DEFAULT_LANG,
@@ -1106,8 +1150,17 @@ function applyI18n() {
   renderVaeSelect("text-to-image");
   renderVaeSelect("image-to-image");
   renderSettingsDefaultModelSelects();
+  if (el("localViewMode")) {
+    el("localViewMode").value = state.localViewMode === "flat" ? "flat" : "tree";
+  }
+  if (el("localTreeSearch")) {
+    el("localTreeSearch").value = state.localTreeFilter || "";
+  }
   renderLocalLineageOptions(state.localModels || []);
+  renderLocalViewMode();
   renderLocalModels(state.localModels || [], state.localModelsBaseDir || "");
+  renderLocalModelTree(state.localTreeData);
+  renderLocalTreeSelection();
   renderOutputs(state.outputs || [], state.outputsBaseDir || "");
   const detailEmpty = el("modelDetailEmpty");
   if (detailEmpty && !state.searchDetail) {
@@ -1265,7 +1318,7 @@ function renderSearchBaseModelOptions() {
 }
 
 function inferLocalLineage(item) {
-  const text = `${item?.base_model || ""} ${item?.repo_hint || ""} ${item?.class_name || ""}`.toLowerCase();
+  const text = `${item?.base_model || ""} ${item?.base_name || ""} ${item?.repo_hint || ""} ${item?.class_name || ""}`.toLowerCase();
   if (text.includes("stable-diffusion-xl") || text.includes("sdxl") || /\bxl\b/.test(text)) return "StableDiffusion XL";
   if (text.includes("stable-diffusion-2-1") || text.includes("v2-1") || text.includes("2.1")) return "StableDiffusion 2.1";
   if (text.includes("stable-diffusion-2") || /\bsd2\b/.test(text) || /\b2\.0\b/.test(text)) return "StableDiffusion 2.x";
@@ -1810,6 +1863,297 @@ async function deleteLocalModel(item, baseDir = "") {
   showTaskMessage(t("msgModelDeleted", { model: name }));
 }
 
+async function applyLocalModelToTask(task, item) {
+  const modelDom = getModelDom(task);
+  const select = el(modelDom.selectId);
+  if (!select) return;
+  const catalog = state.modelCatalog[task] || [];
+  const repoHint = String(item?.repo_hint || item?.model_id || item?.display_name || item?.name || "").trim();
+  if (!catalog.some((entry) => entry.value === item.path)) {
+    catalog.push({
+      source: "local",
+      label: `[local] ${repoHint || item.path}`,
+      value: item.path,
+      id: repoHint || item.path,
+      size_bytes: item.size_bytes || null,
+      preview_url: item.preview_url || null,
+      model_url: item.model_url || null,
+    });
+  }
+  state.modelCatalog[task] = catalog;
+  renderModelSelect(task, item.path);
+  try {
+    await loadLoraCatalog(task, false);
+    if (task === "text-to-image" || task === "image-to-image") {
+      await loadVaeCatalog(task, false);
+    }
+  } catch (error) {
+    showTaskMessage(t("msgSearchFailed", { error: error.message }));
+  }
+  showTaskMessage(t("msgLocalModelApplied", { task: taskShortName(task), model: repoHint || item.path }));
+}
+
+function renderLocalViewMode() {
+  const panel = el("panel-local-models");
+  if (!panel) return;
+  panel.dataset.view = state.localViewMode === "flat" ? "flat" : "tree";
+}
+
+function findLocalTreeItemByPath(treeData, targetPath) {
+  const normalized = String(targetPath || "").trim().toLowerCase();
+  if (!normalized) return null;
+  const tasks = Array.isArray(treeData?.tasks) ? treeData.tasks : [];
+  for (const task of tasks) {
+    const bases = Array.isArray(task?.bases) ? task.bases : [];
+    for (const base of bases) {
+      const categories = Array.isArray(base?.categories) ? base.categories : [];
+      for (const category of categories) {
+        const items = Array.isArray(category?.items) ? category.items : [];
+        for (const item of items) {
+          if (String(item?.path || "").trim().toLowerCase() === normalized) {
+            return item;
+          }
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function buildFilteredLocalTree(treeData, rawQuery) {
+  const query = String(rawQuery || "").trim().toLowerCase();
+  const tasks = Array.isArray(treeData?.tasks) ? treeData.tasks : [];
+  if (!query) return tasks;
+  const filteredTasks = [];
+  for (const task of tasks) {
+    const bases = Array.isArray(task?.bases) ? task.bases : [];
+    const filteredBases = [];
+    for (const base of bases) {
+      const categories = Array.isArray(base?.categories) ? base.categories : [];
+      const filteredCategories = [];
+      for (const category of categories) {
+        const items = Array.isArray(category?.items) ? category.items : [];
+        const matchedItems = items.filter((item) => {
+          const target = `${item?.display_name || ""} ${item?.name || ""} ${item?.path || ""}`.toLowerCase();
+          return target.includes(query);
+        });
+        if (matchedItems.length > 0) {
+          filteredCategories.push({
+            ...category,
+            item_count: matchedItems.length,
+            items: matchedItems,
+          });
+        }
+      }
+      if (filteredCategories.length > 0) {
+        const baseCount = filteredCategories.reduce((sum, cat) => sum + Number(cat.item_count || 0), 0);
+        filteredBases.push({
+          ...base,
+          item_count: baseCount,
+          categories: filteredCategories,
+        });
+      }
+    }
+    if (filteredBases.length > 0) {
+      const taskCount = filteredBases.reduce((sum, base) => sum + Number(base.item_count || 0), 0);
+      filteredTasks.push({
+        ...task,
+        item_count: taskCount,
+        bases: filteredBases,
+      });
+    }
+  }
+  return filteredTasks;
+}
+
+function renderLocalTreeSelection() {
+  const container = el("localModelSelection");
+  if (!container) return;
+  const selected = state.localTreeSelected;
+  if (!selected) {
+    container.innerHTML = `<div class="local-selection-empty">${escapeHtml(t("msgSelectLocalTreeItem"))}</div>`;
+    return;
+  }
+  const sizeText = formatModelSize(selected.size_bytes);
+  container.innerHTML = `
+    <div class="local-selection-name">${escapeHtml(selected.display_name || selected.name || selected.path)}</div>
+    <div class="local-selection-meta">${escapeHtml(t("modelKind"))}=${escapeHtml(selected.category || "n/a")} | ${escapeHtml(t("modelBase"))}=${escapeHtml(
+      selected.base_name || "n/a",
+    )} | ${escapeHtml(t("modelSource"))}=${escapeHtml(selected.provider || "local")} | ${escapeHtml(t("modelSize"))}=${escapeHtml(
+      sizeText,
+    )} | ${escapeHtml(t("labelTask"))}=${escapeHtml(selected.task_dir || "n/a")}</div>
+    <div class="local-selection-actions">
+      <button type="button" id="localSelectionApplyBtn" ${selected.apply_supported ? "" : "disabled"}>${escapeHtml(t("msgApply"))}</button>
+      <button type="button" id="localSelectionRevealBtn">${escapeHtml(t("msgReveal"))}</button>
+    </div>
+  `;
+  bindClick("localSelectionApplyBtn", async () => {
+    if (!selected.apply_supported) {
+      showTaskMessage(t("msgApplyUnsupportedCategory"));
+      return;
+    }
+    await applyLocalModelToTask(selected.task_api, selected);
+  });
+  bindClick("localSelectionRevealBtn", async () => {
+    try {
+      await api("/api/models/local/reveal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          path: selected.path,
+          base_dir: state.localModelsBaseDir || null,
+        }),
+      });
+      showTaskMessage(t("msgLocalModelRevealed", { path: selected.path }));
+    } catch (error) {
+      showTaskMessage(t("msgLocalModelRevealFailed", { error: error.message }));
+    }
+  });
+}
+
+function renderLocalModelTree(treeData) {
+  const container = el("localModelsTree");
+  if (!container) return;
+  const query = String(state.localTreeFilter || "").trim();
+  const tasks = buildFilteredLocalTree(treeData, query);
+  if (!tasks.length) {
+    container.innerHTML = `<div class="local-tree-empty">${escapeHtml(t("msgNoLocalTreeModels", { path: state.localModelsBaseDir || t("msgUnknownPath") }))}</div>`;
+    renderLocalTreeSelection();
+    return;
+  }
+  const refs = [];
+  const taskHtml = tasks
+    .map((task, taskIdx) => {
+      const bases = Array.isArray(task.bases) ? task.bases : [];
+      const baseHtml = bases
+        .map((base) => {
+          const categoryHtml = (base.categories || [])
+            .map((category) => {
+              const itemHtml = (category.items || [])
+                .map((item) => {
+                  refs.push(item);
+                  const idx = refs.length - 1;
+                  const selected = state.localTreeSelected && state.localTreeSelected.path === item.path;
+                  return `
+                    <div class="local-tree-item ${selected ? "selected" : ""}">
+                      <div class="local-tree-item-main">
+                        <div class="local-tree-item-name">${escapeHtml(item.display_name || item.name || item.path)}</div>
+                        <div class="local-tree-item-meta">${escapeHtml(t("modelKind"))}=${escapeHtml(item.category || "n/a")} | ${escapeHtml(
+                          t("modelBase"),
+                        )}=${escapeHtml(item.base_name || "n/a")} | ${escapeHtml(t("modelSource"))}=${escapeHtml(
+                          item.provider || "local",
+                        )} | ${escapeHtml(t("modelSize"))}=${escapeHtml(formatModelSize(item.size_bytes))}</div>
+                      </div>
+                      <div class="local-tree-item-actions">
+                        <button type="button" class="local-tree-select-btn" data-index="${idx}">${escapeHtml(t("msgDetail"))}</button>
+                        <button type="button" class="local-tree-apply-btn" data-index="${idx}" ${item.apply_supported ? "" : "disabled"}>${escapeHtml(
+                          t("msgApply"),
+                        )}</button>
+                        <button type="button" class="local-tree-reveal-btn" data-index="${idx}">${escapeHtml(t("msgReveal"))}</button>
+                      </div>
+                    </div>
+                  `;
+                })
+                .join("");
+              return `
+                <details ${query ? "open" : ""}>
+                  <summary class="local-tree-summary">
+                    <div class="local-tree-label">
+                      <span class="local-tree-title">${escapeHtml(category.category)}</span>
+                    </div>
+                    <span class="local-tree-badge">${escapeHtml(category.item_count)}</span>
+                  </summary>
+                  <div class="local-tree-children">${itemHtml}</div>
+                </details>
+              `;
+            })
+            .join("");
+          return `
+            <details ${query ? "open" : ""}>
+              <summary class="local-tree-summary">
+                <div class="local-tree-label">
+                  <span class="local-tree-title">${escapeHtml(base.base_name)}</span>
+                </div>
+                <span class="local-tree-badge">${escapeHtml(base.item_count)}</span>
+              </summary>
+              <div class="local-tree-children">${categoryHtml}</div>
+            </details>
+          `;
+        })
+        .join("");
+      return `
+        <details ${query || taskIdx === 0 ? "open" : ""}>
+          <summary class="local-tree-summary">
+            <div class="local-tree-label">
+              <span class="local-tree-title">${escapeHtml(task.task)}</span>
+            </div>
+            <span class="local-tree-badge">${escapeHtml(task.item_count)}</span>
+          </summary>
+          <div class="local-tree-children">${baseHtml}</div>
+        </details>
+      `;
+    })
+    .join("");
+  container.innerHTML = taskHtml;
+  container.querySelectorAll(".local-tree-select-btn").forEach((button) => {
+    button.addEventListener("click", () => {
+      const idx = Number(button.dataset.index || "-1");
+      if (!Number.isInteger(idx) || idx < 0 || idx >= refs.length) return;
+      state.localTreeSelected = refs[idx];
+      renderLocalModelTree(treeData);
+      renderLocalTreeSelection();
+    });
+  });
+  container.querySelectorAll(".local-tree-apply-btn").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const idx = Number(button.dataset.index || "-1");
+      if (!Number.isInteger(idx) || idx < 0 || idx >= refs.length) return;
+      const item = refs[idx];
+      if (!item.apply_supported) {
+        showTaskMessage(t("msgApplyUnsupportedCategory"));
+        return;
+      }
+      await applyLocalModelToTask(item.task_api, item);
+    });
+  });
+  container.querySelectorAll(".local-tree-reveal-btn").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const idx = Number(button.dataset.index || "-1");
+      if (!Number.isInteger(idx) || idx < 0 || idx >= refs.length) return;
+      const item = refs[idx];
+      try {
+        await api("/api/models/local/reveal", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            path: item.path,
+            base_dir: state.localModelsBaseDir || null,
+          }),
+        });
+        showTaskMessage(t("msgLocalModelRevealed", { path: item.path }));
+      } catch (error) {
+        showTaskMessage(t("msgLocalModelRevealFailed", { error: error.message }));
+      }
+    });
+  });
+  renderLocalTreeSelection();
+}
+
+function applyLocalTreePayload(data, dir = "") {
+  const selectedPath = state.localTreeSelected?.path || "";
+  state.localTreeData = data || null;
+  state.localModels = data?.flat_items || [];
+  state.localModelsBaseDir = data?.model_root || dir || "";
+  state.localTreeSelected = findLocalTreeItemByPath(state.localTreeData, selectedPath);
+  renderLocalLineageOptions(state.localModels);
+  renderLocalViewMode();
+  renderLocalModels(state.localModels, state.localModelsBaseDir);
+  renderLocalModelTree(state.localTreeData);
+  if ((state.lastSearchResults || []).length) {
+    renderSearchResults(state.lastSearchResults);
+  }
+}
+
 function renderLocalModels(items, baseDir = "") {
   const container = el("localModels");
   const activeLineage = state.localLineageFilter || "all";
@@ -1861,32 +2205,7 @@ function renderLocalModels(items, baseDir = "") {
       const task = button.dataset.task || "";
       if (!Number.isInteger(index) || index < 0 || index >= filteredItems.length) return;
       const item = filteredItems[index];
-      const modelDom = getModelDom(task);
-      const select = el(modelDom.selectId);
-      if (!select) return;
-      const catalog = state.modelCatalog[task] || [];
-      if (!catalog.some((entry) => entry.value === item.path)) {
-        catalog.push({
-          source: "local",
-          label: `[local] ${item.repo_hint}`,
-          value: item.path,
-          id: item.repo_hint,
-          size_bytes: null,
-          preview_url: item.preview_url || null,
-          model_url: item.repo_hint ? `https://huggingface.co/${encodeURIComponent(item.repo_hint).replaceAll("%2F", "/")}` : null,
-        });
-      }
-      state.modelCatalog[task] = catalog;
-      renderModelSelect(task, item.path);
-      try {
-        await loadLoraCatalog(task, false);
-        if (task === "text-to-image" || task === "image-to-image") {
-          await loadVaeCatalog(task, false);
-        }
-      } catch (error) {
-        showTaskMessage(t("msgSearchFailed", { error: error.message }));
-      }
-      showTaskMessage(t("msgLocalModelApplied", { task, model: item.repo_hint }));
+      await applyLocalModelToTask(task, item);
     });
   });
   container.querySelectorAll(".local-delete-btn").forEach((button) => {
@@ -1902,19 +2221,55 @@ function renderLocalModels(items, baseDir = "") {
   });
 }
 
-async function loadLocalModels() {
+async function loadLocalModels(options = {}) {
+  const forceRescan = Boolean(options?.forceRescan);
   const dir = el("localModelsDir")?.value?.trim() || "";
   const params = new URLSearchParams();
   if (dir) params.set("dir", dir);
-  const url = params.toString() ? `/api/models/local?${params.toString()}` : "/api/models/local";
-  const data = await api(url);
-  state.localModels = data.items || [];
-  state.localModelsBaseDir = data.base_dir || dir || "";
-  renderLocalLineageOptions(state.localModels);
-  renderLocalModels(state.localModels, state.localModelsBaseDir);
+  try {
+    if (forceRescan) {
+      const tree = await api("/api/models/local/rescan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dir: dir || null }),
+      });
+      applyLocalTreePayload(tree, dir);
+      return;
+    }
+    const treeUrl = params.toString() ? `/api/models/local/tree?${params.toString()}` : "/api/models/local/tree";
+    const tree = await api(treeUrl);
+    let mergedTree = tree;
+    if (!Array.isArray(tree?.flat_items) || tree.flat_items.length === 0) {
+      const flatUrl = params.toString() ? `/api/models/local?${params.toString()}` : "/api/models/local";
+      const legacy = await api(flatUrl);
+      mergedTree = {
+        ...(tree || {}),
+        model_root: tree?.model_root || legacy.base_dir || dir || "",
+        flat_items: legacy.items || [],
+      };
+    }
+    applyLocalTreePayload(mergedTree, dir);
+  } catch (treeError) {
+    const flatUrl = params.toString() ? `/api/models/local?${params.toString()}` : "/api/models/local";
+    const data = await api(flatUrl);
+    state.localModels = data.items || [];
+    state.localModelsBaseDir = data.base_dir || dir || "";
+    state.localTreeData = null;
+    state.localTreeSelected = null;
+    renderLocalLineageOptions(state.localModels);
+    renderLocalViewMode();
+    renderLocalModels(state.localModels, state.localModelsBaseDir);
+    renderLocalModelTree(state.localTreeData);
+    renderLocalTreeSelection();
+  }
   if ((state.lastSearchResults || []).length) {
     renderSearchResults(state.lastSearchResults);
   }
+}
+
+async function rescanLocalModels() {
+  await loadLocalModels({ forceRescan: true });
+  showTaskMessage(t("msgLocalRescanned"));
 }
 
 function renderOutputs(items, baseDir = "") {
@@ -2700,6 +3055,9 @@ async function bootstrap() {
   setLanguage(state.language);
   setTabs();
   bindModelSelectors();
+  state.localViewMode = el("localViewMode")?.value === "flat" ? "flat" : "tree";
+  state.localTreeFilter = el("localTreeSearch")?.value || "";
+  renderLocalViewMode();
 
   el("settingsForm").addEventListener("submit", async (event) => {
     try {
@@ -2819,6 +3177,21 @@ async function bootstrap() {
     } catch (error) {
       showTaskMessage(t("msgLocalModelRefreshFailed", { error: error.message }));
     }
+  });
+  el("rescanLocalModels").addEventListener("click", async () => {
+    try {
+      await rescanLocalModels();
+    } catch (error) {
+      showTaskMessage(t("msgLocalRescanFailed", { error: error.message }));
+    }
+  });
+  el("localViewMode").addEventListener("change", () => {
+    state.localViewMode = el("localViewMode").value === "flat" ? "flat" : "tree";
+    renderLocalViewMode();
+  });
+  el("localTreeSearch").addEventListener("input", () => {
+    state.localTreeFilter = el("localTreeSearch").value || "";
+    renderLocalModelTree(state.localTreeData);
   });
   el("refreshOutputs").addEventListener("click", async () => {
     try {

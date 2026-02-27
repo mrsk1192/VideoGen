@@ -49,3 +49,32 @@ def test_is_local_lora_dir_ignores_base_pipeline_with_lora_named_file(tmp_path: 
     )
     (model_dir / "sd_xl_offset_example-lora_1.0.safetensors").write_bytes(b"abc")
     assert main.is_local_lora_dir(model_dir) is False
+
+
+def test_cache_get_or_set_uses_cached_value(monkeypatch: pytest.MonkeyPatch) -> None:
+    main.SEARCH_API_CACHE.clear()
+    counter = {"calls": 0}
+
+    def loader() -> dict:
+        counter["calls"] += 1
+        return {"value": counter["calls"]}
+
+    first = main.cache_get_or_set("test", {"a": 1}, loader)
+    second = main.cache_get_or_set("test", {"a": 1}, loader)
+    assert first["value"] == 1
+    assert second["value"] == 1
+    assert counter["calls"] == 1
+
+
+def test_normalize_local_tree_category_alias() -> None:
+    assert main.normalize_local_tree_category("VAE") == "VAE"
+    assert main.normalize_local_tree_category("VEA") == "VAE"
+    assert main.normalize_local_tree_category("lora") == "Lora"
+    assert main.normalize_local_tree_category("base-model") == "BaseModel"
+
+
+def test_is_local_tree_item_directory_accepts_single_file_checkpoint(tmp_path: Path) -> None:
+    base_model_dir = tmp_path / "single-file-base"
+    base_model_dir.mkdir(parents=True)
+    (base_model_dir / "model.safetensors").write_bytes(b"abc")
+    assert main.is_local_tree_item_directory(base_model_dir, "BaseModel") is True
