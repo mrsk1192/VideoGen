@@ -1266,6 +1266,34 @@ button:hover {
   display: none;
 }
 
+.model-support-note {
+  margin-top: 0.2rem;
+  font-size: 0.74rem;
+  font-family: "IBM Plex Mono", monospace;
+  color: #c3d8e8;
+}
+
+.model-support-note small {
+  display: block;
+  margin-top: 0.15rem;
+  color: #9eb8cb;
+  white-space: normal;
+  line-height: 1.35;
+}
+
+.model-support-note.support-ready {
+  color: #9af7be;
+}
+
+.model-support-note.support-limited {
+  color: #ffd48e;
+}
+
+.model-support-note.support-requires-patch,
+.model-support-note.support-not-supported {
+  color: #ff9da2;
+}
+
 .ghost-btn {
   border: 1px solid rgba(130, 174, 208, 0.45);
   background: rgba(10, 16, 28, 0.75);

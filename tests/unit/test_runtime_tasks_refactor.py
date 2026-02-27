@@ -23,4 +23,3 @@ def test_task_manager_cancel_flow() -> None:
     task = main.get_task(task_id)
     assert task is not None
     assert task["status"] == "cancelled"
-

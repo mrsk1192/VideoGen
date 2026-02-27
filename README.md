@@ -181,6 +181,14 @@ VAE は `Text to Image` / `Image to Image` タブで選択できます。
   - ROCm/CUDA 利用可否、dtype 方針、AOTriton/allocator env、GPUメモリ情報を返します。
   - `GET /api/system/info` は後方互換で維持されています。
 
+- `GET /api/video/runtime`
+  - 動画生成向けの `hardware_profile` と `load_policy` を返します。
+
+- `GET /api/video/models`
+  - 動画モデルレジストリ（TextToVideoSD/Wan/CogVideoX/LTX/Hunyuan/Sana/AnimateDiff）と
+    実行環境での `effective_support_level` を返します。
+  - `task_support` で `text-to-video` / `image-to-video` の実行可否を返します。
+
 - `POST /api/tasks/cancel`
   - body:
     - `task_id`（必須）

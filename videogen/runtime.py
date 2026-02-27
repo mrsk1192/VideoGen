@@ -5,6 +5,7 @@ from typing import Any, Dict, Optional
 from .config import load_raw_settings_file, parse_bool_setting
 
 DEFAULT_ALLOC_CONF = "max_split_size_mb:128,garbage_collection_threshold:0.8,expandable_segments:True"
+DEFAULT_HIP_VISIBLE_DEVICES = "0"
 
 
 def apply_pre_torch_env(base_dir: Path) -> Dict[str, Any]:
@@ -26,6 +27,8 @@ def apply_pre_torch_env(base_dir: Path) -> Dict[str, Any]:
     has_env = bool(str(os.environ.get("TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL", "")).strip())
     if not has_env:
         os.environ["TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL"] = "1" if rocm_flag else "0"
+    if not str(os.environ.get("HIP_VISIBLE_DEVICES", "")).strip():
+        os.environ["HIP_VISIBLE_DEVICES"] = DEFAULT_HIP_VISIBLE_DEVICES
     return {
         "settings_file": str(settings_path),
         "aotriton_from_settings": rocm_flag,
@@ -33,6 +36,7 @@ def apply_pre_torch_env(base_dir: Path) -> Dict[str, Any]:
         "aotriton_env_effective": os.environ.get("TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL", ""),
         "pytorch_alloc_conf": os.environ.get("PYTORCH_ALLOC_CONF", ""),
         "pytorch_hip_alloc_conf": os.environ.get("PYTORCH_HIP_ALLOC_CONF", ""),
+        "hip_visible_devices": os.environ.get("HIP_VISIBLE_DEVICES", ""),
     }
 
 
@@ -100,7 +104,7 @@ def runtime_diagnostics(
         "vram_gpu_direct_load_threshold_gb": float(server_settings.get("vram_gpu_direct_load_threshold_gb", 48.0) or 48.0),
         "vram_full_load_threshold_gb": float(server_settings.get("vram_full_load_threshold_gb", 80.0) or 80.0),
         "max_memory_gpu_gb": float(server_settings.get("max_memory_gpu_gb", 90.0) or 90.0),
-        "max_memory_cpu_gb": float(server_settings.get("max_memory_cpu_gb", 8.0) or 8.0),
+        "max_memory_cpu_gb": float(server_settings.get("max_memory_cpu_gb", 4.0) or 4.0),
         "force_full_vram_load": parse_bool_setting(server_settings.get("force_full_vram_load", False), default=False),
         "disable_cpu_offload": parse_bool_setting(server_settings.get("disable_cpu_offload", False), default=False),
         "disable_vae_tiling": parse_bool_setting(server_settings.get("disable_vae_tiling", True), default=True),
@@ -112,6 +116,7 @@ def runtime_diagnostics(
         "allow_software_video_fallback": parse_bool_setting(server_settings.get("allow_software_video_fallback", False), default=False),
         "gpu_max_concurrency": int(server_settings.get("gpu_max_concurrency", 1) or 1),
         "pytorch_hip_alloc_conf": os.environ.get("PYTORCH_HIP_ALLOC_CONF", ""),
+        "hip_visible_devices": os.environ.get("HIP_VISIBLE_DEVICES", ""),
     }
     if import_error:
         output["import_error"] = import_error

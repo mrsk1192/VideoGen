@@ -1,53 +1,31 @@
 # Breaking Changes
 
-## 概要
+## Summary
 
-この更新では、ROCm前提の自動ロード最適化（VRAM判定）とタスク可視化を優先し、
-設定項目・タスクJSON・runtime診断項目を拡張しています。
+Video stack was reworked around a unified model registry + adapter layer.
+This is a functional redesign, not a cosmetic refactor.
 
-## API
+## API changes
 
-1. `GET /api/runtime` のレスポンスを拡張しました。  
-   主な追加:
-   - `hardware_profile`（GPU名/総VRAM/空きVRAM/RAM）
-   - `load_policy_preview`（候補ロード戦略と選択ポリシー）
-   - `last_load_policy`（直近で実際に適用されたポリシー）
-2. `GET /api/tasks*` のタスクJSONに `step` を追加しました。  
-   UI/クライアント側で `step` を未考慮の場合、表示ロジックの追加が必要です。
-3. `POST /api/cleanup` を追加済み（前回追加）。  
-   今回の storage/settings 拡張と連動します。
+1. Added `GET /api/video/runtime`
+   - exposes video-oriented hardware profile and effective load policy
+2. Added `GET /api/video/models`
+   - exposes model spec registry and runtime-derived support levels
+3. Runtime surface now distinguishes base runtime diagnostics vs video-runtime diagnostics.
 
-## 設定ファイル
+## Behavior changes
 
-`data/settings.json` に以下を追加:
+1. T2V/I2V pipeline selection is now model-family based (Wan/CogVideoX/TextToVideoSD/etc).
+2. Non-Diffusers local video directories are auto-resolved to `*-Diffusers` repository candidates.
+3. Video workers now use adapter-based input preparation; unsupported families fail early with explicit messages.
 
-- `server.preferred_dtype`
-- `server.vram_gpu_direct_load_threshold_gb`
-- `server.enable_device_map_auto`
-- `server.enable_model_cpu_offload`
-- `server.gpu_max_concurrency`
-- `server.allow_software_video_fallback`
-- `server.request_timeout_sec`
-- `server.request_retry_count`
-- `server.request_retry_backoff_sec`
-- `storage.cleanup_enabled`
-- `storage.cleanup_max_age_days`
-- `storage.cleanup_max_outputs_count`
-- `storage.cleanup_max_tmp_count`
-- `storage.cleanup_max_cache_size_gb`
+## Settings defaults impacting runtime
 
-`server.preferred_dtype` の実運用既定は `bf16` 優先に変更されました  
-（未対応GPUでは `float16` に自動フォールバック）。
+1. CPU memory cap for video load is reduced to safe-side default (`4GB` cap path).
+2. ROCm pre-import environment for video stability is enforced before `torch` import.
 
-## UI
+## UI impact
 
-1. Settingsにロード戦略制御項目を追加:
-   - `VRAM Direct Load Threshold (GB)`
-   - `Enable device_map='auto'`
-   - `Enable CPU Offload Fallback`
-2. ステータス欄に `step + spinner` 表示を追加しました。
-3. ロード中メッセージが詳細化されました:
-   - `VRAMにロード中`
-   - `自動device_mapでロード中`
-   - `CPUオフロード有効化中`
-4. `Task Log` は `step/message` 更新をより細かく反映します。
+1. Video generation now validates model support against `/api/video/models` prior to submit.
+2. Unsupported model/task pairs fail fast in client with explanatory error message.
+3. Model preview cards now display runtime support badge (`ready/limited/requires_patch/not_supported`).

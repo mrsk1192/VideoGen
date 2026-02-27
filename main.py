@@ -78,14 +78,22 @@ from videogen.tasks import (
 from videogen.tasks import (
     task_progress_heartbeat as task_progress_heartbeat_ctx,
 )
+from videogen.video.adapters import resolve_adapter_for_pipeline
+from videogen.video.foundation import (
+    choose_video_load_policy,
+    derive_video_hardware_profile,
+)
+from videogen.video.registry import VIDEO_MODEL_REGISTRY, model_specs_for_task
 
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
 DATA_DIR = BASE_DIR / "data"
-FORCED_HIP_ALLOC_CONF = "expandable_segments:True,max_split_size_mb:512"
+FORCED_HIP_ALLOC_CONF = "expandable_segments:True"
+FORCED_HIP_VISIBLE_DEVICES = "0"
 # ROCm allocator policy must be fixed before importing torch. This is the final
 # fallback for direct uvicorn launches that do not pass through start scripts.
 os.environ["PYTORCH_HIP_ALLOC_CONF"] = FORCED_HIP_ALLOC_CONF
+os.environ["HIP_VISIBLE_DEVICES"] = FORCED_HIP_VISIBLE_DEVICES
 PRE_TORCH_ENV = apply_pre_torch_env(BASE_DIR)
 
 TORCH_IMPORT_ERROR: Optional[str] = None
@@ -182,7 +190,15 @@ SUPPORTED_LOCAL_PIPELINE_CLASSES: Dict[str, set[str]] = {
         "LatentConsistencyModelPipeline",
         "AuraFlowPipeline",
     },
-    "text-to-video": {"TextToVideoSDPipeline", "WanPipeline"},
+    "text-to-video": {
+        "TextToVideoSDPipeline",
+        "WanPipeline",
+        "CogVideoXPipeline",
+        "LTXVideoPipeline",
+        "HunyuanVideoPipeline",
+        "SanaVideoPipeline",
+        "AnimateDiffPipeline",
+    },
     "image-to-image": {
         "StableDiffusionImg2ImgPipeline",
         "StableDiffusionXLImg2ImgPipeline",
@@ -195,7 +211,14 @@ SUPPORTED_LOCAL_PIPELINE_CLASSES: Dict[str, set[str]] = {
         "StableDiffusionXLPipeline",
         "FluxPipeline",
     },
-    "image-to-video": {"I2VGenXLPipeline", "WanImageToVideoPipeline"},
+    "image-to-video": {
+        "I2VGenXLPipeline",
+        "StableVideoDiffusionPipeline",
+        "WanImageToVideoPipeline",
+        "CogVideoXImageToVideoPipeline",
+        "LTXImageToVideoPipeline",
+        "HunyuanVideoImageToVideoPipeline",
+    },
 }
 SUPPORTED_VAE_CLASSES = {"AutoencoderKL", "AsymmetricAutoencoderKL", "AutoencoderTiny", "ConsistencyDecoderVAE"}
 LORA_WEIGHT_CANDIDATES = (
@@ -994,6 +1017,89 @@ def detect_runtime() -> Dict[str, Any]:
     return runtime_info
 
 
+def detect_video_runtime() -> Dict[str, Any]:
+    runtime = detect_runtime()
+    profile = derive_video_hardware_profile(runtime=runtime)
+    policy = choose_video_load_policy(runtime=runtime)
+    return {
+        "hardware_profile": profile.to_dict(),
+        "load_policy": policy.to_dict(),
+        "runtime": runtime,
+    }
+
+
+def detect_video_model_statuses() -> list[Dict[str, Any]]:
+    statuses: list[Dict[str, Any]] = []
+    runtime = detect_runtime()
+    cuda_available = bool(runtime.get("cuda_available"))
+    rocm_available = bool(runtime.get("rocm_available"))
+    components: Dict[str, Any] = {}
+    with contextlib.suppress(Exception):
+        components = load_diffusers_components()
+    component_flags: Dict[str, Dict[str, bool]] = {
+        "wan": {
+            "text-to-video": bool(components.get("WanPipeline")),
+            "image-to-video": bool(components.get("WanImageToVideoPipeline")),
+        },
+        "cogvideox": {
+            "text-to-video": bool(components.get("CogVideoXPipeline")),
+            "image-to-video": bool(components.get("CogVideoXImageToVideoPipeline")),
+        },
+        "ltxvideo": {
+            "text-to-video": bool(components.get("LTXVideoPipeline")),
+            "image-to-video": bool(components.get("LTXImageToVideoPipeline")),
+        },
+        "hunyuanvideo": {
+            "text-to-video": bool(components.get("HunyuanVideoPipeline")),
+            "image-to-video": bool(components.get("HunyuanVideoImageToVideoPipeline")),
+        },
+        "sanavideo": {
+            "text-to-video": bool(components.get("SanaVideoPipeline")),
+            "image-to-video": False,
+        },
+        "animatediff": {
+            "text-to-video": bool(components.get("AnimateDiffPipeline")),
+            "image-to-video": False,
+        },
+        "text2videosd": {
+            "text-to-video": bool(components.get("TextToVideoSDPipeline")),
+            "image-to-video": False,
+        },
+        "stablevideodiffusion": {
+            "text-to-video": False,
+            "image-to-video": bool(components.get("StableVideoDiffusionPipeline")),
+        },
+    }
+    for spec in VIDEO_MODEL_REGISTRY.values():
+        support = spec.support_level
+        reason = ""
+        task_support: Dict[str, bool] = {}
+        component_map = component_flags.get(spec.key, {})
+        missing_tasks: list[str] = []
+        for task_name in spec.tasks:
+            supported_for_task = bool(component_map.get(task_name, False))
+            task_support[str(task_name)] = supported_for_task
+            if not supported_for_task:
+                missing_tasks.append(str(task_name))
+        if not cuda_available:
+            support = "not_supported"
+            reason = "GPU is unavailable"
+        elif not rocm_available:
+            reason = "Running without ROCm; behavior may differ from target environment."
+        if missing_tasks:
+            if len(missing_tasks) == len(spec.tasks):
+                support = "requires_patch" if support != "not_supported" else support
+            elif support == "ready":
+                support = "limited"
+            reason = "Missing pipeline class support for: " + ", ".join(missing_tasks)
+        payload = spec.to_dict()
+        payload["effective_support_level"] = support
+        payload["status_reason"] = reason
+        payload["task_support"] = task_support
+        statuses.append(payload)
+    return statuses
+
+
 def resolve_text2video_backend(requested_backend: str, settings: Dict[str, Any]) -> Literal["cuda", "npu"]:
     requested = str(requested_backend or "").strip().lower()
     if requested not in SUPPORTED_T2V_BACKENDS:
@@ -1282,40 +1388,64 @@ def load_diffusers_components() -> Dict[str, Any]:
     if TORCH_IMPORT_ERROR:
         raise RuntimeError(f"Runtime is not available: {TORCH_IMPORT_ERROR}")
     try:
-        from diffusers import (
-            AutoencoderKL,
-            AutoPipelineForImage2Image,
-            AutoPipelineForText2Image,
-            DiffusionPipeline,
-            DPMSolverMultistepScheduler,
-            I2VGenXLPipeline,
-            StableDiffusionImg2ImgPipeline,
-            StableDiffusionPipeline,
-            StableDiffusionXLImg2ImgPipeline,
-            StableDiffusionXLPipeline,
-            TextToVideoSDPipeline,
-            WanImageToVideoPipeline,
-        )
+        import diffusers
         from diffusers.utils import export_to_video
     except Exception as exc:
         DIFFUSERS_IMPORT_ERROR = str(exc)
         raise RuntimeError(f"Diffusers import failed: {exc}") from exc
 
+    required_names = (
+        "AutoencoderKL",
+        "AutoPipelineForImage2Image",
+        "AutoPipelineForText2Image",
+        "DiffusionPipeline",
+        "DPMSolverMultistepScheduler",
+        "I2VGenXLPipeline",
+        "StableDiffusionImg2ImgPipeline",
+        "StableDiffusionPipeline",
+        "StableDiffusionXLImg2ImgPipeline",
+        "StableDiffusionXLPipeline",
+        "TextToVideoSDPipeline",
+        "WanImageToVideoPipeline",
+    )
+    required: Dict[str, Any] = {}
+    for name in required_names:
+        value = getattr(diffusers, name, None)
+        if value is None:
+            DIFFUSERS_IMPORT_ERROR = f"missing diffusers component: {name}"
+            raise RuntimeError(f"Diffusers import failed: missing {name}")
+        required[name] = value
+
+    optional_names = (
+        "WanPipeline",
+        "StableVideoDiffusionPipeline",
+        "CogVideoXPipeline",
+        "CogVideoXImageToVideoPipeline",
+        "LTXVideoPipeline",
+        "LTXImageToVideoPipeline",
+        "HunyuanVideoPipeline",
+        "HunyuanVideoImageToVideoPipeline",
+        "SanaVideoPipeline",
+        "AnimateDiffPipeline",
+    )
+    optional: Dict[str, Any] = {name: getattr(diffusers, name, None) for name in optional_names}
+
     DIFFUSERS_COMPONENTS.update(
         {
-            "AutoPipelineForImage2Image": AutoPipelineForImage2Image,
-            "AutoPipelineForText2Image": AutoPipelineForText2Image,
-            "AutoencoderKL": AutoencoderKL,
-            "DPMSolverMultistepScheduler": DPMSolverMultistepScheduler,
-            "DiffusionPipeline": DiffusionPipeline,
-            "I2VGenXLPipeline": I2VGenXLPipeline,
-            "StableDiffusionImg2ImgPipeline": StableDiffusionImg2ImgPipeline,
-            "StableDiffusionPipeline": StableDiffusionPipeline,
-            "StableDiffusionXLImg2ImgPipeline": StableDiffusionXLImg2ImgPipeline,
-            "StableDiffusionXLPipeline": StableDiffusionXLPipeline,
-            "TextToVideoSDPipeline": TextToVideoSDPipeline,
-            "WanImageToVideoPipeline": WanImageToVideoPipeline,
+            "AutoPipelineForImage2Image": required["AutoPipelineForImage2Image"],
+            "AutoPipelineForText2Image": required["AutoPipelineForText2Image"],
+            "AutoencoderKL": required["AutoencoderKL"],
+            "DPMSolverMultistepScheduler": required["DPMSolverMultistepScheduler"],
+            "DiffusionPipeline": required["DiffusionPipeline"],
+            "I2VGenXLPipeline": required["I2VGenXLPipeline"],
+            "StableDiffusionImg2ImgPipeline": required["StableDiffusionImg2ImgPipeline"],
+            "StableDiffusionPipeline": required["StableDiffusionPipeline"],
+            "StableDiffusionXLImg2ImgPipeline": required["StableDiffusionXLImg2ImgPipeline"],
+            "StableDiffusionXLPipeline": required["StableDiffusionXLPipeline"],
+            "TextToVideoSDPipeline": required["TextToVideoSDPipeline"],
+            "WanImageToVideoPipeline": required["WanImageToVideoPipeline"],
             "export_to_video": export_to_video,
+            **optional,
         }
     )
     DIFFUSERS_IMPORT_ERROR = None
@@ -1346,7 +1476,7 @@ def infer_task_step_from_message(message: str) -> str:
     text = str(message or "").strip().lower()
     if not text:
         return "queued"
-    if "vramにロード中" in text or "device_map='cuda'" in text or "device_map={'': 'cuda'}" in text:
+    if "vramにロード中" in text or "device_map='cuda'" in text or "device_map={'': 'cuda'}" in text or "device_map={'': 'cuda:0'}" in text:
         return "model_load_gpu"
     if "loading pipeline (low_cpu_mem_usage=" in text:
         return "model_load"
@@ -1503,6 +1633,191 @@ def resolve_lora_source(lora_ref: str, settings: Dict[str, Any]) -> str:
     if local_dir.exists():
         return str(local_dir.resolve())
     return lora_ref
+
+
+def extract_repo_id_from_local_model_dir(model_dir: Path) -> str:
+    if not model_dir.exists() or not model_dir.is_dir():
+        return ""
+    for file_name in ("model_meta.json", "videogen_meta.json"):
+        candidate = model_dir / file_name
+        if not candidate.exists() or not candidate.is_file():
+            continue
+        try:
+            payload = json.loads(candidate.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if not isinstance(payload, dict):
+            continue
+        repo_id = str(payload.get("repo_id") or "").strip()
+        if repo_id:
+            return repo_id
+    return ""
+
+
+def build_diffusers_repo_candidates(repo_id_or_hint: str) -> list[str]:
+    raw = str(repo_id_or_hint or "").strip()
+    if not raw:
+        return []
+    candidates: list[str] = []
+    if raw.lower().endswith("-diffusers"):
+        candidates.append(raw)
+    else:
+        candidates.append(f"{raw}-Diffusers")
+        candidates.append(f"{raw}-diffusers")
+    unique: list[str] = []
+    seen: set[str] = set()
+    for item in candidates:
+        key = item.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(item)
+    return unique
+
+
+def resolve_missing_model_index_video_source(
+    kind: Literal["text-to-image", "image-to-image", "text-to-video", "image-to-video"],
+    source: str,
+    model_ref: str,
+    settings: Dict[str, Any],
+) -> str:
+    if kind not in ("text-to-video", "image-to-video"):
+        return source
+    source_path = Path(source)
+    if not source_path.exists() or not source_path.is_dir():
+        return source
+    if (source_path / "model_index.json").exists():
+        return source
+
+    repo_candidates_raw: list[str] = []
+    metadata_repo_id = extract_repo_id_from_local_model_dir(source_path)
+    if metadata_repo_id:
+        repo_candidates_raw.append(metadata_repo_id)
+    name_hint = desanitize_repo_id(source_path.name)
+    if name_hint:
+        repo_candidates_raw.append(name_hint)
+    model_ref_hint = str(model_ref or "").strip()
+    if model_ref_hint and ("/" in model_ref_hint):
+        repo_candidates_raw.append(model_ref_hint)
+
+    diffusers_repo_candidates: list[str] = []
+    for hint in repo_candidates_raw:
+        for candidate in build_diffusers_repo_candidates(hint):
+            if candidate not in diffusers_repo_candidates:
+                diffusers_repo_candidates.append(candidate)
+
+    if not diffusers_repo_candidates:
+        return source
+
+    models_dir = resolve_path(settings["paths"]["models_dir"])
+    for repo_id in diffusers_repo_candidates:
+        local_diffusers_dir = models_dir / sanitize_repo_id(repo_id)
+        if local_diffusers_dir.exists() and (local_diffusers_dir / "model_index.json").exists():
+            LOGGER.warning(
+                "local model missing model_index.json; switching to local Diffusers repo kind=%s source=%s fallback=%s",
+                kind,
+                source,
+                str(local_diffusers_dir),
+            )
+            return str(local_diffusers_dir.resolve())
+
+    fallback_repo = diffusers_repo_candidates[0]
+    LOGGER.warning(
+        "local model missing model_index.json; switching to remote Diffusers repo kind=%s source=%s fallback_repo=%s",
+        kind,
+        source,
+        fallback_repo,
+    )
+    return fallback_repo
+
+
+def ensure_local_pipeline_dir_compatible(
+    kind: Literal["text-to-image", "image-to-image", "text-to-video", "image-to-video"],
+    source_path: Path,
+    model_ref: str,
+) -> None:
+    if not source_path.exists() or not source_path.is_dir():
+        return
+    if (source_path / "model_index.json").exists():
+        return
+    if kind in ("text-to-video", "image-to-video"):
+        repo_hint = desanitize_repo_id(source_path.name)
+        raise RuntimeError(
+            "Selected local model is not a Diffusers pipeline directory "
+            f"(model_index.json missing): {source_path}. "
+            f"Model '{repo_hint or model_ref}' appears to be non-Diffusers format. "
+            "Please select/download a '*-Diffusers' model repository."
+        )
+
+
+def infer_video_model_family(
+    *,
+    model_ref: str,
+    source: str,
+    class_name: str = "",
+    kind: Literal["text-to-video", "image-to-video"],
+) -> str:
+    class_text = str(class_name or "").strip().lower()
+    ref_text = f"{model_ref} {source}".lower()
+    if "wan" in class_text or "wan" in ref_text:
+        return "wan"
+    if "cogvideox" in class_text or "cogvideo" in ref_text:
+        return "cogvideox"
+    if "ltx" in class_text or "ltx" in ref_text:
+        return "ltxvideo"
+    if "hunyuan" in class_text or "hunyuan" in ref_text:
+        return "hunyuanvideo"
+    if "sana" in class_text or "sana" in ref_text:
+        return "sanavideo"
+    if "animatediff" in class_text or "animatediff" in ref_text:
+        return "animatediff"
+    if "stablevideodiffusion" in class_text or "stable-video-diffusion" in ref_text or "img2vid" in ref_text:
+        return "stablevideodiffusion"
+    if "texttovideosd" in class_text or "text-to-video-ms" in ref_text or "text-to-video" in ref_text:
+        return "text2videosd"
+    return "text2videosd" if kind == "text-to-video" else "wan"
+
+
+def resolve_video_pipeline_loader(
+    *,
+    components: Dict[str, Any],
+    kind: Literal["text-to-video", "image-to-video"],
+    family: str,
+    class_name: str = "",
+) -> Any:
+    if kind == "text-to-video":
+        if family == "stablevideodiffusion":
+            raise RuntimeError("StableVideoDiffusion is an Image-to-Video model and cannot be used for Text-to-Video.")
+        if family == "wan" and components.get("WanPipeline") is not None:
+            return components["WanPipeline"]
+        if family == "cogvideox" and components.get("CogVideoXPipeline") is not None:
+            return components["CogVideoXPipeline"]
+        if family == "hunyuanvideo" and components.get("HunyuanVideoPipeline") is not None:
+            return components["HunyuanVideoPipeline"]
+        if family == "ltxvideo" and components.get("LTXVideoPipeline") is not None:
+            return components["LTXVideoPipeline"]
+        if family == "sanavideo" and components.get("SanaVideoPipeline") is not None:
+            return components["SanaVideoPipeline"]
+        if family == "animatediff" and components.get("AnimateDiffPipeline") is not None:
+            return components["AnimateDiffPipeline"]
+        return components["DiffusionPipeline"]
+
+    # image-to-video
+    if class_name == "WanImageToVideoPipeline" and components.get("WanImageToVideoPipeline") is not None:
+        return components["WanImageToVideoPipeline"]
+    if family == "wan" and components.get("WanImageToVideoPipeline") is not None:
+        return components["WanImageToVideoPipeline"]
+    if family == "cogvideox" and components.get("CogVideoXImageToVideoPipeline") is not None:
+        return components["CogVideoXImageToVideoPipeline"]
+    if family == "hunyuanvideo" and components.get("HunyuanVideoImageToVideoPipeline") is not None:
+        return components["HunyuanVideoImageToVideoPipeline"]
+    if family == "ltxvideo" and components.get("LTXImageToVideoPipeline") is not None:
+        return components["LTXImageToVideoPipeline"]
+    if family == "stablevideodiffusion" and components.get("StableVideoDiffusionPipeline") is not None:
+        return components["StableVideoDiffusionPipeline"]
+    if family in {"text2videosd", "sanavideo", "animatediff"}:
+        raise RuntimeError(f"Selected model family '{family}' has no Image-to-Video pipeline class in current runtime.")
+    return components["I2VGenXLPipeline"]
 
 
 def is_single_file_model(path: Path) -> bool:
@@ -1816,10 +2131,10 @@ def build_loader_max_memory(settings: Dict[str, Any], hardware_profile: Any) -> 
 
     server = settings.get("server", {}) if isinstance(settings, dict) else {}
     try:
-        cpu_cap_gb = float(server.get("max_memory_cpu_gb", 8.0))
+        cpu_cap_gb = float(server.get("max_memory_cpu_gb", 4.0))
     except Exception:
         cpu_cap_gb = 8.0
-    cpu_cap_gb = max(2.0, min(cpu_cap_gb, 64.0))
+    cpu_cap_gb = max(2.0, min(cpu_cap_gb, 4.0))
 
     total_vram_bytes = int(getattr(hardware_profile, "gpu_total_bytes", 0) or 0)
     total_vram_gb = float(total_vram_bytes) / float(1024**3) if total_vram_bytes > 0 else 0.0
@@ -1964,7 +2279,7 @@ def load_pipeline_from_pretrained_with_strategy(
         base_kwargs: Dict[str, Any] = {
             "torch_dtype": dtype,
             "low_cpu_mem_usage": True,
-            "device_map": "cuda",
+            "device_map": {"": "cuda:0"},
             "use_safetensors": True,
             "max_memory": max_memory_caps,
             "offload_folder": None,
@@ -1984,37 +2299,65 @@ def load_pipeline_from_pretrained_with_strategy(
             base_kwargs.get("device_map"),
             base_kwargs.get("max_memory"),
         )
-        log_memory_snapshot("before", kind=kind, source=source, strategy="full_vram_device_map_cuda")
-        strategy_name = "full_vram_device_map_cuda"
-        strategy_message = "VRAMにロード中 (device_map='cuda')"
+        log_memory_snapshot("before", kind=kind, source=source, strategy="full_vram_device_map_cuda0_dict")
+        strategy_name = "full_vram_device_map_cuda0_dict"
+        strategy_message = "VRAMにロード中 (device_map={'': 'cuda:0'})"
         try:
             pipe = loader(source, **base_kwargs)
-        except TypeError as exc:
+        except (TypeError, ValueError) as exc:
             fallback_keys = {"max_memory", "offload_folder", "offload_state_dict"}
             fallback_kwargs = {key: value for key, value in base_kwargs.items() if key not in fallback_keys}
-            LOGGER.warning(
-                "pipeline loader rejected optional kwargs; retrying without %s kind=%s source=%s error=%s",
-                ",".join(sorted(fallback_keys)),
-                kind,
-                source,
-                str(exc),
-            )
+            # 96GB strategy fallback: never keep a mapped device_map when we
+            # plan to call pipe.to("cuda") afterward, otherwise diffusers
+            # blocks explicit placement with "device mapping strategy" errors.
+            if "device_map" in str(exc).lower():
+                fallback_kwargs.pop("device_map", None)
+                LOGGER.warning(
+                    "pipeline loader rejected device_map dict; retrying with device_map omitted kind=%s source=%s error=%s",
+                    kind,
+                    source,
+                    str(exc),
+                )
+            else:
+                LOGGER.warning(
+                    "pipeline loader rejected optional kwargs; retrying without %s kind=%s source=%s error=%s",
+                    ",".join(sorted(fallback_keys)),
+                    kind,
+                    source,
+                    str(exc),
+                )
             pipe = loader(source, **fallback_kwargs)
             base_kwargs = fallback_kwargs
+        if base_kwargs.get("device_map") is None:
+            strategy_name = "full_vram_no_device_map"
+            strategy_message = "VRAMにロード中 (device_map omitted)"
 
         meta_names = pipeline_meta_tensor_names(pipe)
         if meta_names:
-            raise RuntimeError(
-                "Meta tensor detected in full VRAM strategy after from_pretrained. "
-                f"samples={','.join(meta_names[:8])}"
-            )
+            raise RuntimeError("Meta tensor detected in full VRAM strategy after from_pretrained. " f"samples={','.join(meta_names[:8])}")
 
         if status_callback is not None:
             with contextlib.suppress(Exception):
                 status_callback("model_load_gpu", "Moving pipeline to VRAM (pipe.to('cuda'))")
         LOGGER.info("Moving pipeline to VRAM (pipe.to('cuda')) kind=%s source=%s", kind, source)
+        if hasattr(pipe, "reset_device_map"):
+            with contextlib.suppress(Exception):
+                pipe.reset_device_map()
+                LOGGER.info("reset device_map before explicit .to('cuda') kind=%s source=%s", kind, source)
         if hasattr(pipe, "to"):
-            pipe = pipe.to(torch.device("cuda"))
+            try:
+                pipe = pipe.to(torch.device("cuda"))
+            except ValueError as exc:
+                if "device mapping strategy" not in str(exc).lower() or not hasattr(pipe, "reset_device_map"):
+                    raise
+                LOGGER.warning(
+                    "explicit .to('cuda') was blocked by mapped pipeline state; resetting map and retrying kind=%s source=%s",
+                    kind,
+                    source,
+                )
+                with contextlib.suppress(Exception):
+                    pipe.reset_device_map()
+                pipe = pipe.to(torch.device("cuda"))
         with contextlib.suppress(Exception):
             setattr(pipe, "_videogen_device_placement_done", True)
         with contextlib.suppress(Exception):
@@ -2101,8 +2444,7 @@ def load_pipeline_from_pretrained_with_strategy(
             with contextlib.suppress(Exception):
                 status_callback(policy.task_step, policy.task_message)
         LOGGER.info(
-            "Loading pipeline (low_cpu_mem_usage=True) kind=%s source=%s strategy=%s safetensors_mode=%s "
-            "device_map=%s max_memory=%s",
+            "Loading pipeline (low_cpu_mem_usage=True) kind=%s source=%s strategy=%s safetensors_mode=%s " "device_map=%s max_memory=%s",
             kind,
             source,
             strategy_name,
@@ -2211,7 +2553,9 @@ def get_pipeline(
     status_callback: Optional[Callable[[str, str], None]] = None,
 ) -> Any:
     source = resolve_model_source(model_ref, settings)
+    source = resolve_missing_model_index_video_source(kind, source, model_ref, settings)
     source_path = Path(source)
+    ensure_local_pipeline_dir_compatible(kind, source_path, model_ref)
     source_is_single_file = is_single_file_model(source_path)
     cache_key = f"{kind}:{source}"
     with PIPELINES_LOCK:
@@ -2232,9 +2576,6 @@ def get_pipeline(
     StableDiffusionXLPipeline = components["StableDiffusionXLPipeline"]
     StableDiffusionXLImg2ImgPipeline = components["StableDiffusionXLImg2ImgPipeline"]
     TextToVideoSDPipeline = components["TextToVideoSDPipeline"]
-    DiffusionPipeline = components["DiffusionPipeline"]
-    I2VGenXLPipeline = components["I2VGenXLPipeline"]
-    WanImageToVideoPipeline = components["WanImageToVideoPipeline"]
     DPMSolverMultistepScheduler = components["DPMSolverMultistepScheduler"]
     load_started = time.perf_counter()
     LOGGER.info("pipeline load start kind=%s model_ref=%s source=%s device=%s dtype=%s", kind, model_ref, source, device, dtype)
@@ -2298,8 +2639,15 @@ def get_pipeline(
                     status_callback=status_callback,
                 )
             if kind == "text-to-video":
+                family = infer_video_model_family(model_ref=model_ref, source=source, kind="text-to-video")
+                loader_class = resolve_video_pipeline_loader(
+                    components=components,
+                    kind="text-to-video",
+                    family=family,
+                    class_name="",
+                )
                 loaded = load_pipeline_from_pretrained_with_strategy(
-                    loader=lambda src, **kwargs: DiffusionPipeline.from_pretrained(src, **kwargs),
+                    loader=lambda src, **kwargs: loader_class.from_pretrained(src, **kwargs),
                     source=source,
                     dtype=dtype,
                     prefer_gpu_device_map=True,
@@ -2315,19 +2663,15 @@ def get_pipeline(
             if source_path.exists() and source_path.is_dir():
                 model_index = load_local_model_index(source_path)
                 class_name = str((model_index or {}).get("_class_name") or "").strip()
-            if class_name == "WanImageToVideoPipeline":
-                return load_pipeline_from_pretrained_with_strategy(
-                    loader=lambda src, **kwargs: WanImageToVideoPipeline.from_pretrained(src, **kwargs),
-                    source=source,
-                    dtype=dtype,
-                    prefer_gpu_device_map=True,
-                    kind=kind,
-                    settings=settings,
-                    cache_key=cache_key,
-                    status_callback=status_callback,
-                )
+            family = infer_video_model_family(model_ref=model_ref, source=source, class_name=class_name, kind="image-to-video")
+            loader_class = resolve_video_pipeline_loader(
+                components=components,
+                kind="image-to-video",
+                family=family,
+                class_name=class_name,
+            )
             return load_pipeline_from_pretrained_with_strategy(
-                loader=lambda src, **kwargs: I2VGenXLPipeline.from_pretrained(src, **kwargs),
+                loader=lambda src, **kwargs: loader_class.from_pretrained(src, **kwargs),
                 source=source,
                 dtype=dtype,
                 prefer_gpu_device_map=True,
@@ -2393,6 +2737,7 @@ def get_pipeline(
         with PIPELINES_LOCK:
             with contextlib.suppress(Exception):
                 pipe._videogen_cache_key = cache_key
+                pipe._videogen_source = source
             PIPELINES[cache_key] = pipe
             if acquire_usage:
                 _increment_pipeline_usage_locked(cache_key)
@@ -2774,7 +3119,7 @@ def build_step_progress_kwargs(
         state["last_step"] = step
         ratio = step / total
         progress = float(start_progress) + span * ratio
-        update_task(task_id, progress=progress, message=f"{message} ({step}/{total})")
+        update_task(task_id, progress=progress, step="inference", message=f"{message} ({step}/{total})")
         LOGGER.debug("task progress step task_id=%s message=%s step=%s total=%s progress=%.4f", task_id, message, step, total, progress)
 
     def callback_legacy(step: int, _timestep: Any, _latents: Any) -> None:
@@ -2949,6 +3294,26 @@ def is_local_model_compatible(task: Literal["text-to-image", "image-to-image", "
     return class_name in allowed
 
 
+def is_local_base_model_apply_supported(task_api: str, item_path: Path) -> bool:
+    task = str(task_api or "").strip().lower()
+    if task not in LOCAL_TREE_API_TO_TASK:
+        return False
+    if item_path.is_file():
+        return task in single_file_model_compatible_tasks(item_path)
+    if not item_path.is_dir():
+        return False
+    # Diffusers directory must have model_index.json to be loadable via from_pretrained.
+    if (item_path / "model_index.json").exists():
+        return True
+    if task in ("text-to-video", "image-to-video"):
+        repo_id = extract_repo_id_from_local_model_dir(item_path) or desanitize_repo_id(item_path.name)
+        return bool(build_diffusers_repo_candidates(repo_id))
+    meta = detect_local_model_meta(item_path)
+    if task in meta.compatible_tasks:
+        return True
+    return False
+
+
 def extract_model_size_bytes_from_siblings(siblings: Any) -> Optional[int]:
     total = 0
     found = False
@@ -3025,10 +3390,22 @@ def infer_base_model_label(*parts: Any) -> str:
         return "AuraFlow"
     if "i2vgen" in text:
         return "I2VGenXL"
+    if "stable-video-diffusion" in text or "stablevideodiffusion" in text or "img2vid" in text:
+        return "StableVideoDiffusion"
     if "texttovideosd" in text or "text-to-video-ms" in text or "text-to-video" in text:
         return "TextToVideoSD"
     if "wan" in text:
         return "Wan"
+    if "cogvideox" in text or "cogvideo" in text:
+        return "CogVideoX"
+    if "ltx" in text:
+        return "LTX-Video"
+    if "hunyuan" in text:
+        return "HunyuanVideo"
+    if "sana" in text:
+        return "SanaVideo"
+    if "animatediff" in text:
+        return "AnimateDiff"
     return "Other"
 
 
@@ -3504,6 +3881,14 @@ def build_local_tree_item(
         civitai_id = parse_civitai_model_id(model_id)
         if civitai_id:
             model_url = f"https://civitai.com/models/{civitai_id}"
+    if category == "BaseModel":
+        apply_supported = bool(task_api and is_local_base_model_apply_supported(task_api, item_path))
+    elif category == "Lora":
+        apply_supported = bool(task_api)
+    elif category == "VAE":
+        apply_supported = bool(task_api in ("text-to-image", "image-to-image"))
+    else:
+        apply_supported = False
     return {
         "name": item_path.name,
         "display_name": item_path.stem if item_path.is_file() else item_path.name,
@@ -3515,9 +3900,7 @@ def build_local_tree_item(
         "category": category,
         "task_dir": task_dir,
         "task_api": task_api,
-        "apply_supported": bool(
-            task_api and (category in ("BaseModel", "Lora") or (category == "VAE" and task_api in ("text-to-image", "image-to-image")))
-        ),
+        "apply_supported": apply_supported,
         "model_id": model_id,
         "preview_url": model_item_preview_url(item_path, model_root),
         "model_url": model_url,
@@ -4546,7 +4929,7 @@ def text2image_worker(task_id: str, payload: Text2ImageRequest) -> None:
     try:
         ensure_task_not_cancelled(task_id)
         cleanup_before_generation_load(kind="text-to-image", model_ref=model_ref, settings=settings, clear_vaes=True)
-        update_task(task_id, status="running", progress=0.05, message="Loading model")
+        update_task(task_id, status="running", progress=0.05, step="model_load", message="Loading model")
         with GPU_GENERATION_SEMAPHORE:
             ensure_task_not_cancelled(task_id)
             pipe = get_pipeline_for_inference(
@@ -4707,6 +5090,7 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
     semaphore_acquired = False
     try:
         ensure_task_not_cancelled(task_id)
+        update_task(task_id, status="running", progress=0.02, step="runtime_diagnostics", message="環境診断中")
         if effective_backend == "npu":
             if lora_refs:
                 raise RuntimeError("NPU backend for text-to-video does not support LoRA yet.")
@@ -4743,7 +5127,7 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
         GPU_GENERATION_SEMAPHORE.acquire()
         semaphore_acquired = True
         cleanup_before_generation_load(kind="text-to-video", model_ref=model_ref, settings=settings, clear_vaes=True)
-        update_task(task_id, status="running", progress=0.05, message="Loading model")
+        update_task(task_id, status="running", progress=0.05, step="model_load", message="Loading model")
         try:
             pipe = get_pipeline_for_inference(
                 "text-to-video",
@@ -4756,7 +5140,19 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
                 raise RuntimeError(f"Failed to load selected text-to-video model on GPU due to out-of-memory: {model_ref}") from load_error
             raise
         pipeline_cache_key = str(getattr(pipe, "_videogen_cache_key", "") or "")
-        update_task(task_id, progress=0.15, message="Applying LoRA")
+        adapter = resolve_adapter_for_pipeline(
+            pipe=pipe,
+            source=str(getattr(pipe, "_videogen_source", "") or model_ref),
+            model_ref=model_ref,
+        )
+        LOGGER.info(
+            "text2video adapter selected task_id=%s model=%s adapter=%s support=%s",
+            task_id,
+            model_ref,
+            adapter.key,
+            adapter.spec.support_level,
+        )
+        update_task(task_id, progress=0.15, step="lora_apply", message="Applying LoRA")
         try:
             apply_loras_to_pipeline(pipe, lora_refs, payload.lora_scale, settings)
         except Exception as exc:
@@ -4769,10 +5165,10 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
                     str(exc),
                 )
                 lora_refs = []
-                update_task(task_id, progress=0.18, message="Applying LoRA (skipped)")
+                update_task(task_id, progress=0.18, step="lora_apply", message="Applying LoRA (skipped)")
             else:
                 raise
-        update_task(task_id, progress=0.26, message=f"Preparing video stream (0/{total_frames} frames)")
+        update_task(task_id, progress=0.26, step="prepare", message=f"Preparing video stream (0/{total_frames} frames)")
         device, dtype = get_device_and_dtype()
         output_name = f"text2video_{task_id}.mp4"
         output_path = resolve_path(settings["paths"]["outputs_dir"]) / output_name
@@ -4797,6 +5193,7 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
                 update_task(
                     task_id,
                     progress=chunk_start,
+                    step="inference",
                     message=f"Generating framepack {segment_index}/{pack_count} ({total_written}/{total_frames} frames)",
                 )
                 generator = None
@@ -4810,18 +5207,22 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
                     end_progress=max(chunk_start, chunk_end - 0.02),
                     message=f"Generating framepack {segment_index}/{pack_count}",
                 )
-                request_payload: Dict[str, Any] = {
-                    "prompt": payload.prompt,
-                    "negative_prompt": payload.negative_prompt or None,
-                    "num_inference_steps": payload.num_inference_steps,
-                    "num_frames": request_frames,
-                    "guidance_scale": payload.guidance_scale,
-                    "generator": generator,
-                    "cross_attention_kwargs": {"scale": payload.lora_scale} if len(lora_refs) == 1 else None,
-                    **step_progress_kwargs,
-                }
-                if carry_image is not None and framepack_context_arg:
-                    request_payload[framepack_context_arg] = carry_image
+                request_payload: Dict[str, Any] = adapter.prepare_inputs(
+                    task="text-to-video",
+                    payload={
+                        "prompt": payload.prompt,
+                        "negative_prompt": payload.negative_prompt,
+                        "num_inference_steps": payload.num_inference_steps,
+                        "guidance_scale": payload.guidance_scale,
+                        "_lora_count": len(lora_refs),
+                    },
+                    num_frames=request_frames,
+                    generator=generator,
+                    step_progress_kwargs=step_progress_kwargs,
+                    lora_scale=payload.lora_scale,
+                    framepack_context_arg=framepack_context_arg,
+                    carry_image=carry_image,
+                )
                 LOGGER.info(
                     "text2video framepack start task_id=%s segment=%s/%s request_frames=%s trim_head=%s context_arg=%s callback_keys=%s",
                     task_id,
@@ -4838,7 +5239,7 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
                         pipe,
                         request_payload,
                     )
-                chunk_frames = out.frames[0]
+                chunk_frames = adapter.extract_frames(out)
                 appended, chunk_shape, chunk_dtype = append_frames_to_video_writer(
                     writer,
                     normalize_frame,
@@ -4866,6 +5267,7 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
                 update_task(
                     task_id,
                     progress=chunk_end,
+                    step="encode",
                     message=f"Encoded framepack {segment_index}/{pack_count} ({total_written}/{total_frames} frames)",
                 )
                 del out
@@ -4987,6 +5389,7 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
     semaphore_acquired = False
     try:
         ensure_task_not_cancelled(task_id)
+        update_task(task_id, status="running", progress=0.02, step="runtime_diagnostics", message="環境診断中")
         GPU_GENERATION_SEMAPHORE.acquire()
         semaphore_acquired = True
         cleanup_before_generation_load(kind="image-to-video", model_ref=model_ref, settings=settings, clear_vaes=True)
@@ -4998,7 +5401,19 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
             status_callback=build_model_load_status_callback(task_id),
         )
         pipeline_cache_key = str(getattr(pipe, "_videogen_cache_key", "") or "")
-        update_task(task_id, progress=0.15, message="Applying LoRA")
+        adapter = resolve_adapter_for_pipeline(
+            pipe=pipe,
+            source=str(getattr(pipe, "_videogen_source", "") or model_ref),
+            model_ref=model_ref,
+        )
+        LOGGER.info(
+            "image2video adapter selected task_id=%s model=%s adapter=%s support=%s",
+            task_id,
+            model_ref,
+            adapter.key,
+            adapter.spec.support_level,
+        )
+        update_task(task_id, progress=0.15, step="lora_apply", message="Applying LoRA")
         try:
             apply_loras_to_pipeline(pipe, lora_refs, lora_scale, settings)
         except Exception as exc:
@@ -5011,10 +5426,10 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
                     str(exc),
                 )
                 lora_refs = []
-                update_task(task_id, progress=0.18, message="Applying LoRA (skipped)")
+                update_task(task_id, progress=0.18, step="lora_apply", message="Applying LoRA (skipped)")
             else:
                 raise
-        update_task(task_id, progress=0.35, message="Preparing image")
+        update_task(task_id, progress=0.35, step="prepare", message="Preparing image")
         image = Image.open(image_path).convert("RGB")
         width = int(payload["width"])
         height = int(payload["height"])
@@ -5023,7 +5438,7 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
         device, dtype = get_device_and_dtype()
         gen_device = "cuda" if device == "cuda" else "cpu"
         step_count = int(payload["num_inference_steps"])
-        update_task(task_id, progress=0.3, message=f"Preparing video stream (0/{total_frames} frames)")
+        update_task(task_id, progress=0.3, step="prepare", message=f"Preparing video stream (0/{total_frames} frames)")
         output_name = f"image2video_{task_id}.mp4"
         output_path = resolve_path(settings["paths"]["outputs_dir"]) / output_name
         writer: Any = None
@@ -5045,6 +5460,7 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
                 update_task(
                     task_id,
                     progress=chunk_start,
+                    step="inference",
                     message=f"Generating framepack {segment_index}/{pack_count} ({total_written}/{total_frames} frames)",
                 )
                 chunk_generator = None
@@ -5067,26 +5483,31 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
                     trim_head_frames,
                     ",".join(sorted(step_progress_kwargs.keys())) if step_progress_kwargs else "(none)",
                 )
+                request_payload = adapter.prepare_inputs(
+                    task="image-to-video",
+                    payload={
+                        "prompt": payload["prompt"],
+                        "negative_prompt": payload["negative_prompt"],
+                        "height": height,
+                        "width": width,
+                        "fps": int(payload["fps"]),
+                        "num_inference_steps": step_count,
+                        "guidance_scale": float(payload["guidance_scale"]),
+                        "_lora_count": len(lora_refs),
+                    },
+                    num_frames=request_frames,
+                    generator=chunk_generator,
+                    step_progress_kwargs=step_progress_kwargs,
+                    lora_scale=lora_scale,
+                    current_image=current_image,
+                )
                 gen_started = time.perf_counter()
                 with inference_execution_context(device, dtype):
                     out = call_with_supported_kwargs(
                         pipe,
-                        {
-                            "prompt": payload["prompt"],
-                            "negative_prompt": payload["negative_prompt"] or None,
-                            "image": current_image,
-                            "height": height,
-                            "width": width,
-                            "target_fps": int(payload["fps"]),
-                            "num_inference_steps": step_count,
-                            "num_frames": request_frames,
-                            "guidance_scale": float(payload["guidance_scale"]),
-                            "generator": chunk_generator,
-                            "cross_attention_kwargs": {"scale": lora_scale} if len(lora_refs) == 1 else None,
-                            **step_progress_kwargs,
-                        },
+                        request_payload,
                     )
-                chunk_frames = out.frames[0]
+                chunk_frames = adapter.extract_frames(out)
                 appended, chunk_shape, chunk_dtype = append_frames_to_video_writer(
                     writer,
                     normalize_frame,
@@ -5114,6 +5535,7 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
                 update_task(
                     task_id,
                     progress=chunk_end,
+                    step="encode",
                     message=f"Encoded framepack {segment_index}/{pack_count} ({total_written}/{total_frames} frames)",
                 )
                 del out
@@ -5777,6 +6199,34 @@ def runtime_info() -> Dict[str, Any]:
     return detect_runtime()
 
 
+@app.get("/api/video/runtime")
+def video_runtime_info() -> Dict[str, Any]:
+    return detect_video_runtime()
+
+
+@app.get("/api/video/models")
+def video_models(task: Optional[Literal["text-to-video", "image-to-video"]] = None) -> Dict[str, Any]:
+    if task:
+        specs = [spec.to_dict() for spec in model_specs_for_task(task)]
+    else:
+        specs = [spec.to_dict() for spec in VIDEO_MODEL_REGISTRY.values()]
+    effective = detect_video_model_statuses()
+    effective_map = {str(item.get("key")): item for item in effective}
+    merged: list[Dict[str, Any]] = []
+    for item in specs:
+        key = str(item.get("key"))
+        status = effective_map.get(key, {})
+        merged.append(
+            {
+                **item,
+                "effective_support_level": status.get("effective_support_level", item.get("support_level")),
+                "status_reason": status.get("status_reason", ""),
+                "task_support": status.get("task_support", {}),
+            }
+        )
+    return {"items": merged}
+
+
 @app.get("/api/system/preload")
 def system_preload_state() -> Dict[str, Any]:
     return get_preload_state()
@@ -6121,6 +6571,8 @@ def model_catalog(task: Literal["text-to-image", "image-to-image", "text-to-vide
     seen_paths: set[str] = set()
     for item in ordered_items:
         if str(item.get("category") or "") != "BaseModel":
+            continue
+        if not bool(item.get("apply_supported", True)):
             continue
         value = str(item.get("path") or "")
         if not value or value in seen_paths:

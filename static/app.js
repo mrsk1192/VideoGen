@@ -413,6 +413,7 @@ const I18N = {
     labelTaskStep: "Step",
     taskStepUnknown: "Step: idle",
     stepQueued: "queued",
+    stepRuntimeDiagnostics: "environment diagnostics",
     stepModelLoad: "loading model",
     stepModelLoadGpu: "loading to VRAM",
     stepModelLoadAutoMap: "loading with auto device_map",
@@ -428,6 +429,13 @@ const I18N = {
     stepDone: "done",
     stepFailed: "failed",
     stepCancelled: "cancelled",
+    modelSupportLabel: "support",
+    modelSupportReady: "ready",
+    modelSupportLimited: "limited",
+    modelSupportRequiresPatch: "requires patch",
+    modelSupportNotSupported: "not supported",
+    msgVideoModelTaskUnsupported: "Model '{model}' does not support task '{task}'.",
+    msgVideoModelRuntimeUnsupported: "Model '{model}' cannot run on current runtime: {reason}",
     statusCancelled: "cancelled",
     btnCancelTask: "Cancel Task",
     msgTaskCancelRequested: "Cancellation requested for task={id}",
@@ -876,6 +884,7 @@ const I18N = {
     labelTaskStep: "ステップ",
     taskStepUnknown: "ステップ: 待機",
     stepQueued: "待機中",
+    stepRuntimeDiagnostics: "環境診断中",
     stepModelLoad: "モデル読込中",
     stepModelLoadGpu: "VRAMへロード中",
     stepModelLoadAutoMap: "auto device_mapでロード中",
@@ -891,6 +900,13 @@ const I18N = {
     stepDone: "完了",
     stepFailed: "失敗",
     stepCancelled: "キャンセル",
+    modelSupportLabel: "対応",
+    modelSupportReady: "対応",
+    modelSupportLimited: "制限あり",
+    modelSupportRequiresPatch: "パッチ必要",
+    modelSupportNotSupported: "未対応",
+    msgVideoModelTaskUnsupported: "モデル '{model}' はタスク '{task}' に対応していません。",
+    msgVideoModelRuntimeUnsupported: "モデル '{model}' は現在の実行環境で利用できません: {reason}",
     statusCancelled: "キャンセル",
     btnCancelTask: "タスクをキャンセル",
     msgTaskCancelRequested: "タスクのキャンセルを要求しました: {id}",
@@ -1081,6 +1097,7 @@ const state = {
   outputs: [],
   outputsBaseDir: "",
   runtimeInfo: null,
+  videoModelSpecs: {},
   searchPage: 1,
   searchNextCursor: null,
   searchPrevCursor: null,
@@ -1760,6 +1777,7 @@ function translateTaskStatus(status) {
 function translateTaskStep(step) {
   const stepMap = {
     queued: t("stepQueued"),
+    runtime_diagnostics: t("stepRuntimeDiagnostics"),
     model_load: t("stepModelLoad"),
     model_load_gpu: t("stepModelLoadGpu"),
     model_load_auto_map: t("stepModelLoadAutoMap"),
@@ -1878,6 +1896,78 @@ async function loadRuntimeInfo() {
     state.runtimeInfo = null;
     el("runtimeInfo").textContent = t("runtimeLoadFailed", { error: error.message });
     applyNpuAvailability(null);
+  }
+}
+
+async function loadVideoModelSpecs() {
+  try {
+    const payload = await api("/api/video/models");
+    const specs = {};
+    for (const item of payload?.items || []) {
+      if (!item?.key) continue;
+      specs[String(item.key)] = item;
+    }
+    state.videoModelSpecs = specs;
+    renderModelPreview("text-to-video");
+    renderModelPreview("image-to-video");
+  } catch (_error) {
+    state.videoModelSpecs = {};
+  }
+}
+
+function inferVideoModelKeyFromRef(modelRef) {
+  const text = String(modelRef || "").toLowerCase();
+  if (!text) return "";
+  if (text.includes("wan")) return "wan";
+  if (text.includes("stable-video-diffusion") || text.includes("stablevideodiffusion") || text.includes("img2vid")) {
+    return "stablevideodiffusion";
+  }
+  if (text.includes("cogvideox") || text.includes("cogvideo")) return "cogvideox";
+  if (text.includes("ltx")) return "ltxvideo";
+  if (text.includes("hunyuan")) return "hunyuanvideo";
+  if (text.includes("sana")) return "sanavideo";
+  if (text.includes("animatediff")) return "animatediff";
+  if (text.includes("text-to-video-ms") || text.includes("texttovideosd")) return "text2videosd";
+  return "";
+}
+
+function supportLevelText(level) {
+  const normalized = String(level || "").trim().toLowerCase();
+  if (normalized === "ready") return t("modelSupportReady");
+  if (normalized === "limited") return t("modelSupportLimited");
+  if (normalized === "requires_patch") return t("modelSupportRequiresPatch");
+  if (normalized === "not_supported") return t("modelSupportNotSupported");
+  return normalized || t("modelSupportLimited");
+}
+
+function videoSpecForTaskModel(task, modelRef) {
+  if (task !== "text-to-video" && task !== "image-to-video") return null;
+  const key = inferVideoModelKeyFromRef(modelRef);
+  if (!key) return null;
+  const spec = state.videoModelSpecs[key];
+  if (!spec) return null;
+  const tasks = Array.isArray(spec.tasks) ? spec.tasks : [];
+  if (tasks.length > 0 && !tasks.includes(task)) return spec;
+  return spec;
+}
+
+function assertVideoModelUsable(task, modelRef) {
+  const spec = videoSpecForTaskModel(task, modelRef);
+  if (!spec) return;
+  const key = inferVideoModelKeyFromRef(modelRef);
+  const tasks = Array.isArray(spec.tasks) ? spec.tasks : [];
+  if (tasks.length > 0 && !tasks.includes(task)) {
+    throw new Error(t("msgVideoModelTaskUnsupported", { model: modelRef || spec.display_name || key, task }));
+  }
+  const taskSupport = spec.task_support || {};
+  if (Object.prototype.hasOwnProperty.call(taskSupport, task) && taskSupport[task] === false) {
+    const reason = String(spec.status_reason || spec.rocm_notes || "required pipeline class is missing");
+    throw new Error(t("msgVideoModelRuntimeUnsupported", { model: spec.display_name || key, reason }));
+  }
+  const level = String(spec.effective_support_level || spec.support_level || "ready");
+  if (level === "not_supported" || level === "requires_patch") {
+    const reason = String(spec.status_reason || spec.rocm_notes || "unsupported model on current runtime");
+    throw new Error(t("msgVideoModelRuntimeUnsupported", { model: spec.display_name || key, reason }));
   }
 }
 
@@ -2203,11 +2293,23 @@ function renderModelPreview(task) {
     sizeText === "n/a"
       ? escapeHtml(chosen.source || "model")
       : `${escapeHtml(chosen.source || "model")} | ${escapeHtml(t("modelSize"))}: ${escapeHtml(sizeText)}`;
+  const resolvedRef = selectedValue || chosen.value || chosen.id || defaultId || "";
+  const videoSpec = videoSpecForTaskModel(task, resolvedRef);
+  let supportHtml = "";
+  if (videoSpec) {
+    const level = String(videoSpec.effective_support_level || videoSpec.support_level || "ready").trim().toLowerCase();
+    const supportClass = `support-${escapeHtml(level.replaceAll("_", "-"))}`;
+    const reason = String(videoSpec.status_reason || videoSpec.rocm_notes || "").trim();
+    const reasonHtml = reason ? `<small>${escapeHtml(reason)}</small>` : "";
+    supportHtml = `<div class="model-support-note ${supportClass}">${escapeHtml(t("modelSupportLabel"))}: ${escapeHtml(
+      supportLevelText(level),
+    )}${reasonHtml}</div>`;
+  }
 
   preview.innerHTML = `
     <div class="model-picked-card">
       ${imageHtml}
-      <div class="model-picked-meta">${infoHtml}<span>${metaText}</span></div>
+      <div class="model-picked-meta">${infoHtml}<span>${metaText}</span>${supportHtml}</div>
     </div>
   `;
 }
@@ -2396,6 +2498,9 @@ function normalizeLocalCategory(item) {
 
 function canApplyLocalItem(task, item) {
   if (!task) return false;
+  if (Object.prototype.hasOwnProperty.call(item || {}, "apply_supported") && item?.apply_supported === false) {
+    return false;
+  }
   const category = normalizeLocalCategory(item);
   if (category === "BaseModel") return true;
   if (category === "Lora") return true;
@@ -3525,6 +3630,8 @@ async function generateText2Video(event) {
   event.preventDefault();
   setGenerationBusy(true);
   const selectedModel = el("t2vModelSelect").value.trim();
+  const validationModel = selectedModel || state.defaultModels["text-to-video"] || "";
+  assertVideoModelUsable("text-to-video", validationModel);
   const loraIds = getSelectedValues("t2vLoraSelect");
   const payload = {
     prompt: el("t2vPrompt").value.trim(),
@@ -3559,12 +3666,15 @@ async function generateImage2Video(event) {
   const imageFile = el("i2vImage").files[0];
   if (!imageFile) throw new Error(t("msgInputImageRequired"));
   setGenerationBusy(true);
+  const selectedModel = el("i2vModelSelect").value.trim();
+  const validationModel = selectedModel || state.defaultModels["image-to-video"] || "";
+  assertVideoModelUsable("image-to-video", validationModel);
   const formData = new FormData();
   const loraIds = getSelectedValues("i2vLoraSelect");
   formData.append("image", imageFile);
   formData.append("prompt", el("i2vPrompt").value.trim());
   formData.append("negative_prompt", el("i2vNegative").value.trim());
-  formData.append("model_id", el("i2vModelSelect").value.trim());
+  formData.append("model_id", selectedModel);
   formData.append("lora_id", loraIds[0] || "");
   loraIds.forEach((value) => formData.append("lora_ids", value));
   formData.append("lora_scale", String(Number(el("i2vLoraScale").value)));
@@ -4157,7 +4267,7 @@ async function bootstrap() {
     setDownloadsPopoverOpen(false);
   });
   try {
-    await Promise.all([loadRuntimeInfo(), loadSettings()]);
+    await Promise.all([loadRuntimeInfo(), loadSettings(), loadVideoModelSpecs()]);
     await Promise.all([loadLocalModels(), loadOutputs()]);
     await Promise.all([
       loadModelCatalog("text-to-image", false),

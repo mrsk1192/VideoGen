@@ -1,73 +1,41 @@
-# Migration Guide (旧 -> 新)
+# Migration Guide (old -> redesigned video stack)
 
-## 1) 設定ファイル移行
+## 1) New video diagnostics endpoints
 
-既存 `data/settings.json` はそのまま読み込み可能です。  
-起動時に不足キーは自動補完されます。
+- `GET /api/video/runtime`
+  - video-specific hardware profile and selected load policy
+- `GET /api/video/models`
+  - model registry entries + effective support level for current runtime
+  - new `task_support` field per model (`text-to-video`/`image-to-video`)
 
-### 新規推奨キー
+Recommended:
+1. call `/api/video/runtime` at startup
+2. call `/api/video/models` and filter model selection by `effective_support_level`
 
-```json
-{
-  "server": {
-    "preferred_dtype": "bf16",
-    "vram_gpu_direct_load_threshold_gb": 48,
-    "enable_device_map_auto": true,
-    "enable_model_cpu_offload": true,
-    "gpu_max_concurrency": 1,
-    "allow_software_video_fallback": false,
-    "request_timeout_sec": 20,
-    "request_retry_count": 2,
-    "request_retry_backoff_sec": 1.0
-  },
-  "storage": {
-    "cleanup_enabled": true,
-    "cleanup_max_age_days": 7,
-    "cleanup_max_outputs_count": 200,
-    "cleanup_max_tmp_count": 300,
-    "cleanup_max_cache_size_gb": 30
-  }
-}
-```
+## 2) Model selection behavior change
 
-## 2) API移行
+- Local non-Diffusers video model directories (missing `model_index.json`) are no longer treated as hard stop by default.
+- Runtime attempts fallback resolution to `*-Diffusers` repo IDs.
 
-### 追加 / 拡張
+Operationally:
+1. if local folder has no `model_index.json`, keep metadata (`videogen_meta.json` / `model_meta.json`)
+2. ensure matching `*-Diffusers` repo is downloadable
 
-- `GET /api/runtime`
-  - ROCm/torch/dtype/VRAM/RAM/同時実行設定を確認可能
-  - 新規確認項目:
-    - `hardware_profile`
-    - `load_policy_preview`
-    - `last_load_policy`
-- `POST /api/cleanup`
-  - `outputs/tmp/cache` の整理を手動実行
+## 3) Adapter-based generation
 
-### タスクJSON
+T2V/I2V generation now routes through adapter abstraction.
 
-- `/api/tasks*` の `status` に `cancelled` が追加済み
-- 今回 `task.step` が追加されました
-  - `model_load_gpu`, `model_load_auto_map`, `inference`, `encode`, `memory_cleanup` など
+- Ready families: `TextToVideoSD`, `Wan`, `CogVideoX`
+- Limited families: `LTX-Video`, `HunyuanVideo`, `AnimateDiff`
+- Requires patch: `SanaVideo`
 
-## 3) UI移行ポイント
+If you previously hardcoded kwargs per pipeline in external scripts, move those customizations behind adapter logic.
 
-1. Durationのラベル・説明は i18n キー化済み。
-   - `labelDurationSeconds`
-   - `helpDurationSeconds`
-2. 追加UI:
-   - 現在タスクのキャンセルボタン
-   - Downloads内キャンセル
-   - Task Log 折りたたみ
-   - Cleanup実行ボタン
-   - Task Step + スピナー表示
-   - ロードポリシー設定（VRAMしきい値、auto map、CPU offload）
+## 4) Settings considerations
 
-## 4) 運用移行ポイント（ROCm）
+Video loading is now more aggressive on ROCm-safe defaults:
 
-1. 既定は `preferred_dtype=bf16` です。`/api/runtime` の `dtype` と `dtype_warning` を確認してください。
-2. OOMが出る場合は以下を優先調整:
-   - Duration / Frames / Width / Height / Steps
-   - `server.vram_gpu_direct_load_threshold_gb`（direct load条件）
-   - `server.enable_device_map_auto` / `server.enable_model_cpu_offload`
-   - `server.gpu_max_concurrency` を 1 に固定
-3. AOTriton設定が反映されているか `GET /api/runtime` の `aotriton_mismatch` で確認してください。
+- GPU-first load policy remains default on large VRAM
+- CPU memory cap path is tighter for video workload safety
+
+If migration requires more CPU slack, explicitly override server memory caps in settings.

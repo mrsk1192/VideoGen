@@ -27,7 +27,7 @@ DEFAULT_SETTINGS: Dict[str, Any] = {
         "vram_gpu_direct_load_threshold_gb": 48.0,
         "vram_full_load_threshold_gb": 80.0,
         "max_memory_gpu_gb": 90.0,
-        "max_memory_cpu_gb": 8.0,
+        "max_memory_cpu_gb": 4.0,
         "force_full_vram_load": False,
         "disable_cpu_offload": False,
         "disable_vae_tiling": True,
@@ -159,10 +159,10 @@ def sanitize_settings(payload: Dict[str, Any]) -> Dict[str, Any]:
         max_memory_gpu_gb = 90.0
     server["max_memory_gpu_gb"] = max(4.0, min(max_memory_gpu_gb, 256.0))
     try:
-        max_memory_cpu_gb = float(server.get("max_memory_cpu_gb", 8.0))
+        max_memory_cpu_gb = float(server.get("max_memory_cpu_gb", 4.0))
     except Exception:
-        max_memory_cpu_gb = 8.0
-    server["max_memory_cpu_gb"] = max(2.0, min(max_memory_cpu_gb, 64.0))
+        max_memory_cpu_gb = 4.0
+    server["max_memory_cpu_gb"] = max(2.0, min(max_memory_cpu_gb, 4.0))
 
     try:
         timeout_sec = float(server.get("request_timeout_sec", 20))
