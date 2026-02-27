@@ -280,6 +280,312 @@ button:hover {
   gap: 0.55rem;
 }
 
+.model-search-topbar {
+  margin-bottom: 0.7rem;
+}
+
+.model-search-query-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.55rem;
+  align-items: end;
+}
+
+.model-search-control-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.55rem 0.75rem;
+  align-items: end;
+}
+
+.model-browser {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.9fr) minmax(420px, 2fr) minmax(280px, 1.15fr);
+  gap: 0.7rem;
+  align-items: start;
+}
+
+.model-filter-pane,
+.model-results-pane,
+.model-detail-pane {
+  border: 1px solid rgba(130, 174, 208, 0.35);
+  border-radius: 10px;
+  background: rgba(4, 8, 15, 0.45);
+  padding: 0.65rem;
+}
+
+.model-filter-pane h4 {
+  margin: 0 0 0.55rem 0;
+  color: #bfe8ff;
+}
+
+.model-filter-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  position: sticky;
+  top: 0.5rem;
+}
+
+.model-filter-note {
+  color: var(--sub);
+  font-size: 0.8rem;
+  border-top: 1px dashed rgba(130, 174, 208, 0.35);
+  padding-top: 0.45rem;
+}
+
+.model-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 0.65rem;
+}
+
+.model-card-grid.list-mode {
+  grid-template-columns: 1fr;
+}
+
+.model-card {
+  border: 1px solid rgba(130, 174, 208, 0.35);
+  border-radius: 10px;
+  background: rgba(3, 7, 14, 0.75);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+}
+
+.model-card.list-mode {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  min-height: 160px;
+}
+
+.model-card-cover-wrap {
+  position: relative;
+  width: 100%;
+  height: 150px;
+  border-bottom: 1px solid rgba(130, 174, 208, 0.35);
+  background: rgba(4, 8, 15, 0.9);
+}
+
+.model-card-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: rgba(4, 8, 15, 0.9);
+}
+
+.model-card-cover-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.6rem;
+  color: var(--sub);
+  font-size: 0.82rem;
+  font-family: "IBM Plex Mono", monospace;
+  border-top: 1px dashed rgba(130, 174, 208, 0.35);
+}
+
+.model-card.list-mode .model-card-cover-wrap {
+  height: 100%;
+  min-height: 160px;
+  border-right: 1px solid rgba(130, 174, 208, 0.35);
+  border-bottom: none;
+}
+
+.model-card.list-mode .model-card-cover-empty {
+  border-top: none;
+}
+
+.model-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.6rem;
+}
+
+.model-card-title {
+  color: #c7efff;
+  font-size: 0.94rem;
+  font-weight: 700;
+  word-break: break-word;
+  margin: 0;
+}
+
+.model-card-id {
+  color: var(--sub);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.77rem;
+  word-break: break-all;
+}
+
+.model-meta-line {
+  color: var(--sub);
+  font-size: 0.78rem;
+  font-family: "IBM Plex Mono", monospace;
+  word-break: break-word;
+}
+
+.model-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.model-card-actions button,
+.model-card-actions a {
+  font-size: 0.79rem;
+}
+
+.model-status-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(130, 174, 208, 0.45);
+  padding: 0.22rem 0.52rem;
+  font-size: 0.73rem;
+  font-family: "IBM Plex Mono", monospace;
+  color: #d7eaf9;
+  background: rgba(130, 174, 208, 0.12);
+}
+
+.model-status-badge.downloaded {
+  border-color: rgba(20, 197, 175, 0.8);
+  color: #8ff3de;
+  background: rgba(20, 197, 175, 0.12);
+}
+
+.model-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  margin-top: 0.65rem;
+}
+
+.model-pagination span {
+  color: var(--sub);
+  font-size: 0.82rem;
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.model-detail-pane {
+  min-height: 320px;
+  max-height: 78vh;
+  overflow: auto;
+}
+
+.model-detail-empty {
+  color: var(--sub);
+  font-size: 0.9rem;
+}
+
+.model-detail-content {
+  display: none;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.model-detail-content.active {
+  display: flex;
+}
+
+.model-detail-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.model-detail-title {
+  margin: 0;
+  color: #d9f3ff;
+  font-size: 1rem;
+  word-break: break-word;
+}
+
+.model-detail-id {
+  color: var(--sub);
+  font-size: 0.8rem;
+  font-family: "IBM Plex Mono", monospace;
+  word-break: break-all;
+}
+
+.model-detail-meta {
+  color: var(--sub);
+  font-size: 0.8rem;
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.model-detail-text {
+  border: 1px solid rgba(130, 174, 208, 0.35);
+  border-radius: 8px;
+  padding: 0.55rem;
+  background: rgba(4, 8, 15, 0.6);
+  max-height: 220px;
+  overflow: auto;
+  white-space: pre-wrap;
+  color: #d7eaf9;
+  font-size: 0.84rem;
+}
+
+.model-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.model-detail-tag {
+  font-size: 0.73rem;
+  border: 1px solid rgba(130, 174, 208, 0.45);
+  border-radius: 999px;
+  padding: 0.18rem 0.5rem;
+  color: #c9e8ff;
+}
+
+.model-detail-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(98px, 1fr));
+  gap: 0.45rem;
+}
+
+.model-detail-gallery img {
+  width: 100%;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 7px;
+  border: 1px solid rgba(130, 174, 208, 0.35);
+}
+
+.model-detail-gallery-empty {
+  width: 100%;
+  min-height: 70px;
+  border: 1px dashed rgba(130, 174, 208, 0.35);
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--sub);
+  font-size: 0.82rem;
+  font-family: "IBM Plex Mono", monospace;
+  padding: 0.4rem;
+}
+
+.model-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+}
+
+.model-detail-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
 .row {
   display: flex;
   justify-content: space-between;
@@ -592,5 +898,21 @@ button:hover {
   }
   .model-preview-inline {
     width: 100%;
+  }
+  .model-search-query-row {
+    grid-template-columns: 1fr;
+  }
+  .model-browser {
+    grid-template-columns: 1fr;
+  }
+  .model-filter-pane {
+    position: static;
+  }
+  .model-card.list-mode {
+    grid-template-columns: 1fr;
+  }
+  .model-card.list-mode .model-card-cover-wrap {
+    border-right: none;
+    border-bottom: 1px solid rgba(130, 174, 208, 0.35);
   }
 }

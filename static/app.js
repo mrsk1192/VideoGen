@@ -46,6 +46,10 @@ const I18N = {
     labelTask: "Task",
     labelSearchSource: "Source",
     labelSearchBaseModel: "Base Model",
+    labelSearchSort: "Sort",
+    labelSearchNsfw: "NSFW",
+    labelSearchModelKind: "Model Kind",
+    labelSearchViewMode: "View",
     labelQuery: "Query",
     labelLimit: "Limit",
     btnSearchModels: "Search Models",
@@ -174,6 +178,14 @@ const I18N = {
       "Impact: Narrows search results to models matching keywords; empty shows popular models.\nExample: i2vgen",
     helpLimit:
       "Impact: Controls number of search results shown; larger values increase list size and fetch time.\nExample: 30",
+    helpSearchSort:
+      "Impact: Changes ranking of search results by metric/time.\nExample: downloads",
+    helpSearchNsfw:
+      "Impact: Includes or excludes NSFW models from provider search (provider support dependent).\nExample: exclude",
+    helpSearchModelKind:
+      "Impact: Filters model type such as checkpoint/LoRA/VAE when provider supports it.\nExample: checkpoint",
+    helpSearchViewMode:
+      "Impact: Changes only the card layout (grid/list), not search results.\nExample: grid",
     helpLocalModelsPath:
       "Impact: Changes which folder is scanned and shown in the Local Models screen.\nExample: D:\\ModelStore\\VideoGen",
     helpLocalLineage:
@@ -261,6 +273,20 @@ const I18N = {
     msgPortChangeSaved: "Listen port saved. Restart `start.bat` to apply new port.",
     msgServerSettingRestartRequired: "Server setting saved. Restart `start.bat` to apply changes.",
     msgNoModelsFound: "No models found.",
+    msgModelDetailEmpty: "Select a model to view detail.",
+    msgModelDetailLoading: "Loading model detail...",
+    msgModelDetailLoadFailed: "Model detail failed: {error}",
+    msgModelInstalled: "Downloaded",
+    msgModelNotInstalled: "Not downloaded",
+    msgSearchPage: "Page {page}",
+    msgApply: "Apply",
+    msgDetail: "Detail",
+    msgDetailDescription: "Description",
+    msgDetailTags: "Tags",
+    msgDetailVersions: "Version",
+    msgDetailFiles: "File",
+    msgDetailRevision: "Revision",
+    msgSearchModelApplied: "Model set for {task}: {model}",
     msgDefaultModelOption: "Use default model ({model})",
     msgDefaultModelNoMeta: "Use default model",
     msgNoModelCatalog: "No models available.",
@@ -276,6 +302,8 @@ const I18N = {
     msgNoFolders: "No subfolders found.",
     msgOpen: "Open",
     btnDownload: "Download",
+    btnPrev: "Prev",
+    btnNext: "Next",
     btnDeleteModel: "Delete",
     msgAlreadyDownloaded: "Downloaded",
     msgModelPreviewAlt: "Model preview",
@@ -404,6 +432,10 @@ const I18N = {
     labelTask: "タスク",
     labelSearchSource: "検索元",
     labelSearchBaseModel: "ベースモデル",
+    labelSearchSort: "並び替え",
+    labelSearchNsfw: "NSFW",
+    labelSearchModelKind: "モデル種別",
+    labelSearchViewMode: "表示",
     labelQuery: "検索語",
     labelLimit: "件数",
     btnSearchModels: "モデル検索",
@@ -532,6 +564,14 @@ const I18N = {
       "影響: キーワード一致で検索結果を絞ります。空欄では人気モデルを表示します。\n例: i2vgen",
     helpLimit:
       "影響: 表示件数を調整します。値が大きいほど表示数が増え、取得時間も増える場合があります。\n例: 30",
+    helpSearchSort:
+      "影響: 検索結果の並び順（DL数・いいね・更新時刻など）を変更します。\n例: downloads",
+    helpSearchNsfw:
+      "影響: NSFWモデルを含める/除外する指定です（提供元対応に依存）。\n例: exclude",
+    helpSearchModelKind:
+      "影響: checkpoint/LoRA/VAEなどモデル種別で絞り込みます（提供元対応に依存）。\n例: checkpoint",
+    helpSearchViewMode:
+      "影響: 結果の表示レイアウトのみを切り替えます（検索結果自体は変わりません）。\n例: grid",
     helpLocalModelsPath:
       "影響: ローカルモデル画面で一覧表示するフォルダを切り替えます。\n例: D:\\ModelStore\\VideoGen",
     helpLocalLineage:
@@ -619,6 +659,20 @@ const I18N = {
     msgPortChangeSaved: "リッスンポートを保存しました。反映には `start.bat` の再起動が必要です。",
     msgServerSettingRestartRequired: "サーバー設定を保存しました。反映には `start.bat` の再起動が必要です。",
     msgNoModelsFound: "モデルが見つかりません。",
+    msgModelDetailEmpty: "モデルを選択すると詳細を表示します。",
+    msgModelDetailLoading: "モデル詳細を読み込み中...",
+    msgModelDetailLoadFailed: "モデル詳細の取得に失敗: {error}",
+    msgModelInstalled: "ダウンロード済み",
+    msgModelNotInstalled: "未ダウンロード",
+    msgSearchPage: "ページ {page}",
+    msgApply: "適用",
+    msgDetail: "詳細",
+    msgDetailDescription: "説明",
+    msgDetailTags: "タグ",
+    msgDetailVersions: "バージョン",
+    msgDetailFiles: "ファイル",
+    msgDetailRevision: "リビジョン",
+    msgSearchModelApplied: "{task} にモデルを設定: {model}",
     msgDefaultModelOption: "既定モデルを使用 ({model})",
     msgDefaultModelNoMeta: "既定モデルを使用",
     msgNoModelCatalog: "利用可能なモデルがありません。",
@@ -634,6 +688,8 @@ const I18N = {
     msgNoFolders: "サブフォルダがありません。",
     msgOpen: "開く",
     btnDownload: "ダウンロード",
+    btnPrev: "前へ",
+    btnNext: "次へ",
     btnDeleteModel: "削除",
     msgAlreadyDownloaded: "ダウンロード済み",
     msgModelPreviewAlt: "モデルプレビュー",
@@ -863,6 +919,11 @@ const state = {
   outputs: [],
   outputsBaseDir: "",
   runtimeInfo: null,
+  searchPage: 1,
+  searchNextCursor: null,
+  searchPrevCursor: null,
+  searchViewMode: "grid",
+  searchDetail: null,
 };
 
 const SEARCH_BASE_MODEL_OPTIONS_BY_TASK = {
@@ -977,7 +1038,34 @@ function normalizeModelId(value) {
 }
 
 function getInstalledModelIdSet() {
-  return new Set((state.localModels || []).map((item) => normalizeModelId(item.repo_hint)));
+  const installed = new Set();
+  (state.localModels || []).forEach((item) => {
+    installed.add(normalizeModelId(item.repo_hint));
+    installed.add(normalizeModelId(item.name));
+  });
+  return installed;
+}
+
+function parseCivitaiId(value) {
+  const raw = String(value || "").trim();
+  const match = raw.match(/^civitai\/(\d+)/i) || raw.match(/^(\d+)$/);
+  if (!match) return null;
+  const parsed = Number(match[1]);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+}
+
+function openExternalUrl(url) {
+  const target = String(url || "").trim();
+  if (!target || target === "#") return;
+  window.open(target, "_blank", "noopener,noreferrer");
+}
+
+function taskShortName(task) {
+  if (task === "text-to-image") return "T2I";
+  if (task === "image-to-image") return "I2I";
+  if (task === "text-to-video") return "T2V";
+  if (task === "image-to-video") return "I2V";
+  return task;
 }
 
 function detectInitialLanguage() {
@@ -1021,8 +1109,15 @@ function applyI18n() {
   renderLocalLineageOptions(state.localModels || []);
   renderLocalModels(state.localModels || [], state.localModelsBaseDir || "");
   renderOutputs(state.outputs || [], state.outputsBaseDir || "");
+  const detailEmpty = el("modelDetailEmpty");
+  if (detailEmpty && !state.searchDetail) {
+    detailEmpty.textContent = t("msgModelDetailEmpty");
+  }
+  if (el("searchPrevBtn")) el("searchPrevBtn").textContent = t("btnPrev");
+  if (el("searchNextBtn")) el("searchNextBtn").textContent = t("btnNext");
   if ((state.lastSearchResults || []).length) {
     renderSearchResults(state.lastSearchResults);
+    renderSearchPagination({ page: state.searchPage, has_prev: Boolean(state.searchPrevCursor), has_next: Boolean(state.searchNextCursor) });
   }
 }
 
@@ -1892,52 +1987,328 @@ async function deleteOutput(item) {
   showTaskMessage(t("msgOutputDeleted", { name }));
 }
 
+function searchItemInstalled(item) {
+  if (item?.installed === true) return true;
+  const installed = getInstalledModelIdSet();
+  return installed.has(normalizeModelId(item?.id));
+}
+
+function renderSearchPagination(pageInfo = null) {
+  const prevBtn = el("searchPrevBtn");
+  const nextBtn = el("searchNextBtn");
+  const label = el("searchPageInfo");
+  const page = Number(pageInfo?.page || state.searchPage || 1);
+  if (label) {
+    label.textContent = t("msgSearchPage", { page });
+  }
+  if (prevBtn) prevBtn.disabled = !(pageInfo?.has_prev || state.searchPrevCursor);
+  if (nextBtn) nextBtn.disabled = !(pageInfo?.has_next || state.searchNextCursor);
+}
+
+function selectedDetailDownloadOptions(item) {
+  const detail = state.searchDetail;
+  if (!detail || normalizeModelId(detail.item?.id) !== normalizeModelId(item?.id)) {
+    return {};
+  }
+  if (detail.item.source === "huggingface") {
+    const revisionInput = el("detailHfRevisionInput");
+    const revisionSelect = el("detailHfRevision");
+    const revision = (revisionInput?.value || revisionSelect?.value || "main").trim() || "main";
+    return {
+      source: "huggingface",
+      hf_revision: revision,
+    };
+  }
+  if (detail.item.source === "civitai") {
+    const modelId = parseCivitaiId(detail.item.id);
+    const versionId = Number(el("detailVersionSelect")?.value || "");
+    const fileId = Number(el("detailFileSelect")?.value || "");
+    return {
+      source: "civitai",
+      civitai_model_id: modelId || null,
+      civitai_version_id: Number.isInteger(versionId) && versionId > 0 ? versionId : null,
+      civitai_file_id: Number.isInteger(fileId) && fileId > 0 ? fileId : null,
+    };
+  }
+  return {};
+}
+
+function buildDetailFiles(version) {
+  const files = Array.isArray(version?.files) ? version.files : [];
+  if (!files.length) return `<option value="">-</option>`;
+  return files
+    .map((file) => `<option value="${escapeHtml(file.id)}">${escapeHtml(file.name)} (${escapeHtml(formatModelSize(file.size))})</option>`)
+    .join("");
+}
+
+function renderModelDetail(item, detail) {
+  const empty = el("modelDetailEmpty");
+  const content = el("modelDetailContent");
+  if (!content || !empty) return;
+  empty.style.display = "none";
+  const previews = Array.isArray(detail.previews) ? detail.previews.filter(Boolean) : [];
+  const tags = Array.isArray(detail.tags) ? detail.tags : [];
+  const versions = Array.isArray(detail.versions) ? detail.versions : [];
+  const defaultVersionId = detail.default_version_id != null ? String(detail.default_version_id) : "";
+  let selectedVersion = versions.find((v) => String(v.id) === defaultVersionId) || versions[0] || null;
+  const hfRevision = selectedVersion?.name || "main";
+  const description = String(detail.description || "").trim();
+  const sourceUrl = item.model_url || detail.model_url || "#";
+  const modelId = String(item.id || detail.id || "");
+  content.classList.add("active");
+  content.innerHTML = `
+    <div class="model-detail-head">
+      <h4 class="model-detail-title">${escapeHtml(detail.title || item.title || item.id || "")}</h4>
+      <div class="model-detail-id">${escapeHtml(modelId)}</div>
+      <div class="model-detail-meta">${escapeHtml(t("modelSource"))}: ${escapeHtml(item.source || detail.source || "")}</div>
+    </div>
+    <div class="model-detail-actions">
+      <button id="detailOpenBtn" type="button">${escapeHtml(t("msgOpen"))}</button>
+      <button id="detailDownloadBtn" type="button">${escapeHtml(t("btnDownload"))}</button>
+      <button id="detailApplyBtn" type="button">${escapeHtml(t("msgApply"))}</button>
+    </div>
+    <div>
+      <strong>${escapeHtml(t("msgDetailDescription"))}</strong>
+      <div class="model-detail-text">${escapeHtml(description || "-")}</div>
+    </div>
+    <div>
+      <strong>${escapeHtml(t("msgDetailTags"))}</strong>
+      <div class="model-detail-tags">${tags.slice(0, 30).map((tag) => `<span class="model-detail-tag">${escapeHtml(tag)}</span>`).join("") || "-"}</div>
+    </div>
+    <div>
+      <strong>${escapeHtml(t("msgModelPreviewAlt"))}</strong>
+      <div class="model-detail-gallery">${
+        previews.length
+          ? previews
+              .slice(0, 12)
+              .map((url) => `<img src="${escapeHtml(url)}" alt="${escapeHtml(t("msgModelPreviewAlt"))}" loading="lazy" onerror="this.style.display='none'" />`)
+              .join("")
+          : `<div class="model-detail-gallery-empty">${escapeHtml(t("msgModelNoPreview"))}</div>`
+      }</div>
+    </div>
+    <div class="model-detail-grid">
+      ${
+        item.source === "huggingface"
+          ? `
+      <label>
+        <span>${escapeHtml(t("msgDetailRevision"))}</span>
+        <select id="detailHfRevision">${versions
+          .map((version) => `<option value="${escapeHtml(version.name)}">${escapeHtml(version.name)}</option>`)
+          .join("")}</select>
+      </label>
+      <label>
+        <span>${escapeHtml(t("msgDetailRevision"))} (manual)</span>
+        <input id="detailHfRevisionInput" value="${escapeHtml(hfRevision)}" />
+      </label>
+      `
+          : `
+      <label>
+        <span>${escapeHtml(t("msgDetailVersions"))}</span>
+        <select id="detailVersionSelect">${versions
+          .map((version) => `<option value="${escapeHtml(version.id)}">${escapeHtml(version.name || version.id)}</option>`)
+          .join("")}</select>
+      </label>
+      <label>
+        <span>${escapeHtml(t("msgDetailFiles"))}</span>
+        <select id="detailFileSelect">${buildDetailFiles(selectedVersion)}</select>
+      </label>
+      `
+      }
+    </div>
+  `;
+
+  bindClick("detailOpenBtn", async () => {
+    openExternalUrl(sourceUrl);
+  });
+  if (item.source === "huggingface") {
+    const revisionSelect = el("detailHfRevision");
+    const revisionInput = el("detailHfRevisionInput");
+    if (revisionSelect) {
+      revisionSelect.value = hfRevision;
+      revisionSelect.addEventListener("change", () => {
+        if (revisionInput) revisionInput.value = revisionSelect.value;
+      });
+    }
+  } else {
+    const versionSelect = el("detailVersionSelect");
+    const fileSelect = el("detailFileSelect");
+    if (versionSelect) {
+      versionSelect.value = selectedVersion ? String(selectedVersion.id) : "";
+      versionSelect.addEventListener("change", () => {
+        const nextVersion = versions.find((version) => String(version.id) === versionSelect.value) || null;
+        selectedVersion = nextVersion;
+        if (fileSelect) {
+          fileSelect.innerHTML = buildDetailFiles(nextVersion);
+        }
+      });
+    }
+  }
+  bindClick("detailDownloadBtn", async () => {
+    await startModelDownload(item.id, selectedDetailDownloadOptions(item));
+  });
+  bindClick("detailApplyBtn", async () => {
+    await applySearchResultModel(item);
+  });
+}
+
+async function openModelDetail(item) {
+  const empty = el("modelDetailEmpty");
+  const content = el("modelDetailContent");
+  if (empty) {
+    empty.style.display = "block";
+    empty.textContent = t("msgModelDetailLoading");
+  }
+  if (content) {
+    content.classList.remove("active");
+    content.innerHTML = "";
+  }
+  const source = item?.source === "civitai" ? "civitai" : "huggingface";
+  try {
+    const params = new URLSearchParams({
+      source,
+      id: String(item.id || ""),
+    });
+    const detail = await api(`/api/models/detail?${params.toString()}`);
+    state.searchDetail = { item, detail };
+    renderModelDetail(item, detail);
+  } catch (error) {
+    state.searchDetail = null;
+    if (empty) {
+      empty.style.display = "block";
+      empty.textContent = t("msgModelDetailLoadFailed", { error: error.message });
+    }
+  }
+}
+
+async function applySearchResultModel(item) {
+  const task = el("searchTask").value;
+  const modelDom = getModelDom(task);
+  const select = el(modelDom.selectId);
+  if (!select) return;
+  const catalog = state.modelCatalog[task] || [];
+  const value = String(item.id || "").trim();
+  if (!value) return;
+  if (!catalog.some((entry) => entry.value === value)) {
+    catalog.push({
+      source: item.source || "remote",
+      label: `[${item.source || "remote"}] ${item.id}`,
+      value,
+      id: item.id,
+      size_bytes: item.size_bytes || null,
+      preview_url: item.preview_url || null,
+      model_url: item.model_url || null,
+    });
+  }
+  state.modelCatalog[task] = catalog;
+  renderModelSelect(task, value);
+  try {
+    await loadLoraCatalog(task, false);
+    if (task === "text-to-image" || task === "image-to-image") {
+      await loadVaeCatalog(task, false);
+    }
+  } catch (error) {
+    showTaskMessage(t("msgSearchFailed", { error: error.message }));
+  }
+  showTaskMessage(t("msgSearchModelApplied", { task: taskShortName(task), model: item.id }));
+}
+
 function renderSearchResults(items) {
-  const container = el("searchResults");
+  const cards = el("searchCards");
+  const viewMode = (el("searchViewMode")?.value || "grid").trim();
+  state.searchViewMode = viewMode === "list" ? "list" : "grid";
+  if (!cards) return;
+  cards.classList.toggle("list-mode", state.searchViewMode === "list");
   if (!items.length) {
-    container.innerHTML = `<p>${t("msgNoModelsFound")}</p>`;
+    cards.innerHTML = `<p>${escapeHtml(t("msgNoModelsFound"))}</p>`;
+    renderSearchPagination({ page: state.searchPage, has_prev: false, has_next: false });
     return;
   }
-  const installed = getInstalledModelIdSet();
-  container.innerHTML = items
-    .map(
-      (item) => {
-        const supportsDownload = item.download_supported !== false;
-        const isInstalled = supportsDownload && installed.has(normalizeModelId(item.id));
-        const actionHtml = !supportsDownload
-          ? `<a href="${item.model_url || "#"}" target="_blank" rel="noopener noreferrer">${t("msgOpen")}</a>`
-          : isInstalled
-            ? `<span class="downloaded-flag">${t("msgAlreadyDownloaded")}</span>`
-            : `<button type="button" class="download-btn" data-repo="${item.id}">${t("btnDownload")}</button>`;
-        return `
-      <div class="row model-row">
-        <div class="model-main">
+
+  cards.innerHTML = items
+    .map((item, index) => {
+      const installed = searchItemInstalled(item);
+      const supportsDownload = item.download_supported !== false;
+      const preview = `
+        <div class="model-card-cover-wrap">
           ${
             item.preview_url
-              ? `<img class="model-preview" src="${item.preview_url}" alt="${t("msgModelPreviewAlt")}" loading="lazy" onerror="this.style.display='none'" />`
+              ? `<img class="model-card-cover" src="${escapeHtml(item.preview_url)}" alt="${escapeHtml(t("msgModelPreviewAlt"))}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />`
               : ""
           }
-          <div>
-            <strong><a href="${item.model_url || "#"}" target="_blank" rel="noopener noreferrer">${item.id}</a></strong>
-            <span>${t("modelTag")}=${item.pipeline_tag || "n/a"} | ${t("modelBase")}=${item.base_model || "n/a"} | ${t("modelSource")}=${item.source || "unknown"} | ${t("modelDownloads")}=${item.downloads ?? "n/a"} | ${t("modelLikes")}=${item.likes ?? "n/a"} | ${t("modelSize")}=${formatModelSize(item.size_bytes)}</span>
-          </div>
+          <div class="model-card-cover-empty" style="${item.preview_url ? "display:none;" : ""}">${escapeHtml(t("msgModelNoPreview"))}</div>
         </div>
-        ${actionHtml}
-      </div>`;
-      },
-    )
+      `;
+      const statusBadge = installed
+        ? `<span class="model-status-badge downloaded">${escapeHtml(t("msgModelInstalled"))}</span>`
+        : `<span class="model-status-badge">${escapeHtml(t("msgModelNotInstalled"))}</span>`;
+      return `
+        <article class="model-card ${state.searchViewMode === "list" ? "list-mode" : ""}" data-index="${index}">
+          ${preview}
+          <div class="model-card-body">
+            <h4 class="model-card-title">${escapeHtml(item.title || item.name || item.id || "-")}</h4>
+            <div class="model-card-id">${escapeHtml(item.id || "-")}</div>
+            <div class="model-meta-line">${escapeHtml(t("modelSource"))}: ${escapeHtml(item.source || "unknown")} | ${escapeHtml(t("modelBase"))}: ${escapeHtml(
+              item.base_model || "n/a",
+            )}</div>
+            <div class="model-meta-line">${escapeHtml(t("modelDownloads"))}: ${escapeHtml(item.downloads ?? "n/a")} | ${escapeHtml(
+              t("modelLikes"),
+            )}: ${escapeHtml(item.likes ?? "n/a")} | ${escapeHtml(t("modelSize"))}: ${escapeHtml(formatModelSize(item.size_bytes))}</div>
+            <div>${statusBadge}</div>
+            <div class="model-card-actions">
+              <button type="button" class="search-open-btn" data-index="${index}">${escapeHtml(t("msgOpen"))}</button>
+              <button type="button" class="search-detail-btn" data-index="${index}">${escapeHtml(t("msgDetail"))}</button>
+              <button type="button" class="search-download-btn" data-index="${index}" ${!supportsDownload || installed ? "disabled" : ""}>${escapeHtml(
+                t("btnDownload"),
+              )}</button>
+              <button type="button" class="search-apply-btn" data-index="${index}">${escapeHtml(t("msgApply"))}</button>
+            </div>
+          </div>
+        </article>
+      `;
+    })
     .join("");
-  container.querySelectorAll(".download-btn").forEach((button) => {
+
+  cards.querySelectorAll(".search-open-btn").forEach((button) => {
     button.addEventListener("click", async () => {
-      await startModelDownload(button.dataset.repo);
+      const idx = Number(button.dataset.index || "-1");
+      if (!Number.isInteger(idx) || idx < 0 || idx >= items.length) return;
+      openExternalUrl(items[idx]?.model_url || "");
+    });
+  });
+  cards.querySelectorAll(".search-detail-btn").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const idx = Number(button.dataset.index || "-1");
+      if (!Number.isInteger(idx) || idx < 0 || idx >= items.length) return;
+      await openModelDetail(items[idx]);
+    });
+  });
+  cards.querySelectorAll(".search-download-btn").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const idx = Number(button.dataset.index || "-1");
+      if (!Number.isInteger(idx) || idx < 0 || idx >= items.length) return;
+      const item = items[idx];
+      await startModelDownload(item.id, selectedDetailDownloadOptions(item));
+    });
+  });
+  cards.querySelectorAll(".search-apply-btn").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const idx = Number(button.dataset.index || "-1");
+      if (!Number.isInteger(idx) || idx < 0 || idx >= items.length) return;
+      await applySearchResultModel(items[idx]);
     });
   });
 }
 
-async function searchModels(event) {
+async function searchModels(event, options = {}) {
   if (event) event.preventDefault();
+  const resetPage = options.resetPage !== false;
+  if (resetPage) {
+    state.searchPage = 1;
+  } else if (Number.isInteger(options.page) && options.page > 0) {
+    state.searchPage = options.page;
+  }
   const rawLimit = Number(el("searchLimit").value || "30");
-  const limit = Math.min(50, Math.max(1, Number.isFinite(rawLimit) ? Math.floor(rawLimit) : 30));
+  const limit = Math.min(100, Math.max(1, Number.isFinite(rawLimit) ? Math.floor(rawLimit) : 30));
   el("searchLimit").value = String(limit);
   const baseModel = (el("searchBaseModel")?.value || "all").trim();
   const params = new URLSearchParams({
@@ -1945,22 +2316,50 @@ async function searchModels(event) {
     source: el("searchSource").value || "all",
     query: el("searchQuery").value.trim(),
     limit: String(limit),
+    page: String(state.searchPage),
+    sort: el("searchSort")?.value || "downloads",
+    nsfw: el("searchNsfw")?.value || "exclude",
+    model_kind: (el("searchModelKind")?.value || "").trim(),
   });
   if (baseModel && baseModel !== "all") {
     params.set("base_model", baseModel);
   }
-  const data = await api(`/api/models/search?${params.toString()}`);
+  const data = await api(`/api/models/search2?${params.toString()}`);
   state.lastSearchResults = data.items || [];
+  state.searchNextCursor = data.next_cursor || null;
+  state.searchPrevCursor = data.prev_cursor || null;
+  state.searchPage = Number(data.page_info?.page || state.searchPage || 1);
+  state.searchDetail = null;
+  const detailContent = el("modelDetailContent");
+  const detailEmpty = el("modelDetailEmpty");
+  if (detailContent) {
+    detailContent.classList.remove("active");
+    detailContent.innerHTML = "";
+  }
+  if (detailEmpty) {
+    detailEmpty.style.display = "block";
+    detailEmpty.textContent = t("msgModelDetailEmpty");
+  }
   renderSearchResults(state.lastSearchResults);
+  renderSearchPagination(data.page_info || null);
+  const note = el("searchFilterNote");
+  if (note) {
+    note.textContent = `${t("modelSource")}: ${params.get("source")} | ${t("labelSearchSort")}: ${params.get("sort")} | ${t("labelLimit")}: ${limit}`;
+  }
 }
 
-async function startModelDownload(repoId) {
+async function startModelDownload(repoId, extra = {}) {
   const targetDir = el("downloadTargetDir").value.trim();
   const data = await api("/api/models/download", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       repo_id: repoId,
+      source: extra.source || null,
+      hf_revision: extra.hf_revision || null,
+      civitai_model_id: extra.civitai_model_id || null,
+      civitai_version_id: extra.civitai_version_id || null,
+      civitai_file_id: extra.civitai_file_id || null,
       target_dir: targetDir || null,
     }),
   });
@@ -2355,21 +2754,61 @@ async function bootstrap() {
     refreshSearchSourceOptions();
     renderSearchBaseModelOptions();
     try {
-      await searchModels();
+      await searchModels(null, { resetPage: true });
     } catch (error) {
       showTaskMessage(t("msgSearchFailed", { error: error.message }));
     }
   });
   el("searchSource").addEventListener("change", async () => {
     try {
-      await searchModels();
+      await searchModels(null, { resetPage: true });
     } catch (error) {
       showTaskMessage(t("msgSearchFailed", { error: error.message }));
     }
   });
   el("searchBaseModel").addEventListener("change", async () => {
     try {
-      await searchModels();
+      await searchModels(null, { resetPage: true });
+    } catch (error) {
+      showTaskMessage(t("msgSearchFailed", { error: error.message }));
+    }
+  });
+  el("searchSort").addEventListener("change", async () => {
+    try {
+      await searchModels(null, { resetPage: true });
+    } catch (error) {
+      showTaskMessage(t("msgSearchFailed", { error: error.message }));
+    }
+  });
+  el("searchNsfw").addEventListener("change", async () => {
+    try {
+      await searchModels(null, { resetPage: true });
+    } catch (error) {
+      showTaskMessage(t("msgSearchFailed", { error: error.message }));
+    }
+  });
+  el("searchModelKind").addEventListener("change", async () => {
+    try {
+      await searchModels(null, { resetPage: true });
+    } catch (error) {
+      showTaskMessage(t("msgSearchFailed", { error: error.message }));
+    }
+  });
+  el("searchViewMode").addEventListener("change", () => {
+    renderSearchResults(state.lastSearchResults || []);
+  });
+  el("searchPrevBtn").addEventListener("click", async () => {
+    const page = Math.max(1, Number(state.searchPage || 1) - 1);
+    try {
+      await searchModels(null, { resetPage: false, page });
+    } catch (error) {
+      showTaskMessage(t("msgSearchFailed", { error: error.message }));
+    }
+  });
+  el("searchNextBtn").addEventListener("click", async () => {
+    const page = Math.max(1, Number(state.searchPage || 1) + 1);
+    try {
+      await searchModels(null, { resetPage: false, page });
     } catch (error) {
       showTaskMessage(t("msgSearchFailed", { error: error.message }));
     }
@@ -2415,7 +2854,7 @@ async function bootstrap() {
       loadModelCatalog("text-to-video", false),
       loadModelCatalog("image-to-video", false),
     ]);
-    await searchModels();
+    await searchModels(null, { resetPage: true });
     await restoreLastTask();
   } catch (error) {
     showTaskMessage(t("msgInitFailed", { error: error.message }));
