@@ -204,16 +204,6 @@ def build_load_policies(
     if prefer_gpu_device_map and hardware.cuda_available and hardware.gpu_total_bytes >= threshold_bytes:
         policies.append(
             LoadPolicy(
-                name="gpu_direct_map_dict",
-                task_step="model_load_gpu",
-                task_message="VRAMにロード中 (device_map={'': 'cuda'})",
-                device_map={"": "cuda"},
-                use_safetensors=True,
-                offload_folder=str(offload_dir),
-            )
-        )
-        policies.append(
-            LoadPolicy(
                 name="gpu_direct_map_string",
                 task_step="model_load_gpu",
                 task_message="VRAMにロード中 (device_map='cuda')",

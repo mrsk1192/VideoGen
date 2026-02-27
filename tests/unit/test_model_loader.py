@@ -35,8 +35,8 @@ def test_build_load_policies_prefers_gpu_direct_for_high_vram() -> None:
         offload_dir=Path("tmp"),
     )
     assert policies
-    assert policies[0].name == "gpu_direct_map_dict"
-    assert policies[0].device_map == {"": "cuda"}
+    assert policies[0].name == "gpu_direct_map_string"
+    assert policies[0].device_map == "cuda"
     kwargs = policies[0].loader_kwargs(dtype="float16")
     assert kwargs["low_cpu_mem_usage"] is True
 
