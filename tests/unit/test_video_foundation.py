@@ -49,3 +49,48 @@ def test_adapter_extract_frames_accepts_videos_nested_list() -> None:
     adapter = resolve_adapter_for_pipeline(WanPipeline(), source="Wan-AI/Wan2.1-T2V-1.3B-Diffusers", model_ref="wan")
     frames = adapter.extract_frames(Out())
     assert frames == [1, 2, 3]
+
+
+def test_adapter_extract_frames_accepts_video_attr() -> None:
+    class WanPipeline:
+        pass
+
+    class Out:
+        video = [[10, 20, 30]]
+
+    adapter = resolve_adapter_for_pipeline(WanPipeline(), source="Wan-AI/Wan2.1-T2V-1.3B-Diffusers", model_ref="wan")
+    frames = adapter.extract_frames(Out())
+    assert frames == [10, 20, 30]
+    assert adapter.last_extract_route == "video"
+
+
+def test_adapter_extract_frames_fallback_getitem() -> None:
+    class WanPipeline:
+        pass
+
+    class Out:
+        def __getitem__(self, index: int):
+            if index == 0:
+                return [[7, 8]]
+            raise IndexError(index)
+
+    adapter = resolve_adapter_for_pipeline(WanPipeline(), source="Wan-AI/Wan2.1-T2V-1.3B-Diffusers", model_ref="wan")
+    frames = adapter.extract_frames(Out())
+    assert frames == [7, 8]
+    assert adapter.last_extract_route == "getitem[0]"
+
+
+def test_adapter_extract_frames_error_has_debug_fields() -> None:
+    class WanPipeline:
+        pass
+
+    class Out:
+        foo = "bar"
+
+    adapter = resolve_adapter_for_pipeline(WanPipeline(), source="Wan-AI/Wan2.1-T2V-1.3B-Diffusers", model_ref="wan")
+    with pytest.raises(RuntimeError) as exc:
+        adapter.extract_frames(Out())
+    message = str(exc.value)
+    assert "Failed to extract frames" in message
+    assert "type=" in message
+    assert "attrs=" in message

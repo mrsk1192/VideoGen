@@ -14,6 +14,8 @@ class VideoPipelineAdapter:
 
     key: str
     spec: VideoModelSpec
+    last_extract_route: str = "unknown"
+    last_extract_summary: str = ""
 
     def load(
         self,
@@ -121,26 +123,135 @@ class VideoPipelineAdapter:
             **step_progress_kwargs,
         }
 
-    def extract_frames(self, output: Any) -> list[Any]:
-        # Most diffusers video pipelines expose one of:
-        # - output.frames (list[list[PIL|ndarray]])
-        # - output.videos (tensor/ndarray with batch dimension)
-        # - output.images (legacy naming for frame lists)
-        frames = getattr(output, "frames", None)
-        if isinstance(frames, list) and frames:
-            if isinstance(frames[0], list):
-                return list(frames[0])
-            return list(frames)
-        images = getattr(output, "images", None)
-        if isinstance(images, list) and images:
-            if isinstance(images[0], list):
-                return list(images[0])
-            return list(images)
-        videos = getattr(output, "videos", None)
-        extracted = self._extract_frames_from_videos(videos)
+    def _record_extract_route(self, route: str, output: Any) -> None:
+        self.last_extract_route = str(route or "unknown")
+        self.last_extract_summary = self._output_debug_summary(output)
+
+    def _is_frame_like(self, value: Any) -> bool:
+        if value is None:
+            return False
+        if isinstance(value, (str, bytes, bytearray, dict)):
+            return False
+        module_name = str(getattr(type(value), "__module__", "")).lower()
+        class_name = str(getattr(type(value), "__name__", "")).lower()
+        if "pil" in module_name and "image" in class_name:
+            return True
+        ndim = getattr(value, "ndim", None)
+        if isinstance(ndim, int):
+            return 2 <= int(ndim) <= 4
+        shape = getattr(value, "shape", None)
+        if isinstance(shape, tuple):
+            return 2 <= len(shape) <= 4
+        return False
+
+    def _extract_frame_list_candidate(self, value: Any, route: str, depth: int = 0) -> Optional[list[Any]]:
+        if value is None:
+            return None
+        if depth > 4:
+            return None
+
+        # Frame sequence: [frame0, frame1, ...]
+        if isinstance(value, (list, tuple)):
+            sequence = list(value)
+            if not sequence:
+                return []
+            first = sequence[0]
+            if self._is_frame_like(first):
+                return sequence
+            # Nested list from some pipelines: [[frame0, frame1, ...]]
+            nested = self._extract_frame_list_candidate(first, f"{route}[0]", depth + 1)
+            if nested is not None and len(nested) > 0:
+                return nested
+            # list/tuple can also be a batched tensor-like structure represented by arrays
+            extracted = self._extract_frames_from_videos(value)
+            if extracted:
+                return extracted
+            return None
+
+        # Tensor / ndarray-like container (e.g. output.video / output.videos)
+        extracted = self._extract_frames_from_videos(value)
         if extracted:
             return extracted
-        raise RuntimeError("Pipeline output has no frames field")
+
+        if self._is_frame_like(value):
+            return [value]
+        return None
+
+    def _output_debug_summary(self, output: Any) -> str:
+        output_type = f"{type(output).__module__}.{type(output).__name__}"
+        attrs = [name for name in dir(output) if not name.startswith("_")]
+        attrs_preview = ", ".join(attrs[:40])
+        extra: list[str] = []
+        if isinstance(output, (list, tuple)):
+            extra.append(f"len={len(output)}")
+            if output:
+                extra.append(f"first_type={type(output[0]).__module__}.{type(output[0]).__name__}")
+        return f"type={output_type}; attrs=[{attrs_preview}]" + (f"; {', '.join(extra)}" if extra else "")
+
+    def extract_frames(self, output: Any) -> list[Any]:
+        """
+        Extract frames from heterogeneous pipeline outputs.
+
+        Why this shape:
+        - Wan/Cog/SVD/Diffusers versions return different output containers.
+        - We resolve by capability order (frames/video/videos/list/getitem) instead of
+          model-specific branching so future pipeline variants keep working.
+        """
+        if output is None:
+            self._record_extract_route("none", output)
+            raise RuntimeError("Pipeline output is None; cannot extract frames.")
+
+        # 1) out.frames
+        frames_attr = getattr(output, "frames", None)
+        if frames_attr is not None:
+            frames = self._extract_frame_list_candidate(frames_attr, "frames")
+            if frames:
+                self._record_extract_route("frames", output)
+                return frames
+
+        # 2) out.video
+        video_attr = getattr(output, "video", None)
+        if video_attr is not None:
+            frames = self._extract_frame_list_candidate(video_attr, "video")
+            if frames:
+                self._record_extract_route("video", output)
+                return frames
+
+        # 3) out.videos
+        videos_attr = getattr(output, "videos", None)
+        if videos_attr is not None:
+            frames = self._extract_frame_list_candidate(videos_attr, "videos")
+            if frames:
+                self._record_extract_route("videos", output)
+                return frames
+
+        # 4) output itself list/tuple
+        if isinstance(output, (list, tuple)):
+            frames = self._extract_frame_list_candidate(output, "list")
+            if frames:
+                self._record_extract_route("list", output)
+                return frames
+            if len(output) > 0:
+                nested = self._extract_frame_list_candidate(output[0], "list[0]")
+                if nested:
+                    self._record_extract_route("list[0]", output)
+                    return nested
+
+        # 5) generic indexable fallback: out[0]
+        if hasattr(output, "__getitem__"):
+            with_index = None
+            try:
+                with_index = output[0]
+            except Exception:
+                with_index = None
+            if with_index is not None:
+                frames = self._extract_frame_list_candidate(with_index, "getitem[0]")
+                if frames:
+                    self._record_extract_route("getitem[0]", output)
+                    return frames
+
+        self._record_extract_route("unresolved", output)
+        raise RuntimeError("Failed to extract frames from pipeline output. " f"{self._output_debug_summary(output)}")
 
     @staticmethod
     def _to_numpy(value: Any) -> Any:
@@ -165,10 +276,20 @@ class VideoPipelineAdapter:
             first = videos[0]
             if isinstance(first, list):
                 return list(first)
+            if self._is_frame_like(first):
+                return list(videos)
+            nested = self._extract_frames_from_videos(first)
+            if nested:
+                return nested
             return list(videos)
         arr = self._to_numpy(videos)
         shape = tuple(getattr(arr, "shape", ()) or ())
         ndim = int(getattr(arr, "ndim", 0) or 0)
+        if ndim == 3:
+            if len(shape) == 3 and shape[-1] in (1, 3, 4):
+                return [arr]
+            if len(shape) == 3 and shape[0] in (1, 3, 4):
+                return [arr.transpose(1, 2, 0)]
         if ndim == 5:
             # [B, F, H, W, C]
             if len(shape) == 5 and shape[-1] in (1, 3, 4):

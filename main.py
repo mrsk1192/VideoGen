@@ -986,6 +986,7 @@ def detect_runtime() -> Dict[str, Any]:
     runtime_info.setdefault("device_map_used", None)
     runtime_info.setdefault("cpu_offload_used", False)
     runtime_info.setdefault("tiling_enabled", None)
+    runtime_info.setdefault("sdp_kernel_applied", None)
     last_policy = latest_load_policy()
     if last_policy:
         runtime_info["last_load_policy"] = last_policy
@@ -994,6 +995,15 @@ def detect_runtime() -> Dict[str, Any]:
             runtime_info["device_map_used"] = policy_payload.get("device_map_used", policy_payload.get("device_map"))
             runtime_info["cpu_offload_used"] = bool(policy_payload.get("cpu_offload_used", policy_payload.get("enable_model_cpu_offload")))
             runtime_info["tiling_enabled"] = policy_payload.get("vae_tiling_enabled")
+            if "sdp_kernel_applied" in policy_payload:
+                runtime_info["sdp_kernel_applied"] = policy_payload.get("sdp_kernel_applied")
+    if runtime_info.get("vram_profile") == "96gb_class":
+        # 96GB profile always prioritizes direct VRAM execution; CPU offload is
+        # forcibly disabled regardless of legacy settings values.
+        runtime_info["cpu_offload_used"] = False
+        runtime_info["cpu_offload_forced_disabled"] = True
+        if runtime_info.get("tiling_enabled") is None:
+            runtime_info["tiling_enabled"] = False
     runtime_info["pre_torch_env"] = PRE_TORCH_ENV
     runtime_info["pytorch_hip_alloc_conf"] = str(os.environ.get("PYTORCH_HIP_ALLOC_CONF", "")).strip()
     runtime_info["python_version"] = sys.version
@@ -1498,6 +1508,14 @@ def infer_task_step_from_message(message: str) -> str:
         return "prepare"
     if "generating" in text:
         return "inference"
+    if "extracting pipeline output" in text or "extracting output" in text:
+        return "extracting_output"
+    if "decoding frames" in text:
+        return "decoding_frames"
+    if "post-processing" in text or "post processing" in text:
+        return "postprocessing"
+    if "encoding video" in text:
+        return "encoding_video"
     if "decoding" in text:
         return "decode"
     if "encoding" in text or "encoded framepack" in text:
@@ -1550,11 +1568,11 @@ def update_task(task_id: str, **updates: Any) -> None:
 
 def build_model_load_status_callback(task_id: str) -> Callable[[str, str], None]:
     step_progress = {
-        "model_load": 0.06,
-        "model_load_gpu": 0.08,
-        "model_load_auto_map": 0.10,
-        "model_load_cpu_offload": 0.12,
-        "model_load_cpu": 0.11,
+        "model_load": 0.12,
+        "model_load_gpu": 0.24,
+        "model_load_auto_map": 0.26,
+        "model_load_cpu_offload": 0.28,
+        "model_load_cpu": 0.20,
     }
 
     def _callback(step: str, message: str) -> None:
@@ -2941,11 +2959,15 @@ def append_frames_to_video_writer(
     normalize_frame: Callable[[Any], Any],
     frames: Any,
     skip_head_frames: int = 0,
+    progress_hook: Optional[Callable[[int, int], None]] = None,
 ) -> tuple[int, Optional[tuple[int, ...]], Optional[str]]:
     appended = 0
     sample_shape: Optional[tuple[int, ...]] = None
     sample_dtype: Optional[str] = None
     skip = max(0, int(skip_head_frames))
+    total_frames_hint = 0
+    with contextlib.suppress(Exception):
+        total_frames_hint = max(0, int(len(frames)))
     for frame_index, frame in enumerate(frames):
         if frame_index < skip:
             continue
@@ -2955,6 +2977,9 @@ def append_frames_to_video_writer(
             sample_shape = tuple(int(v) for v in norm.shape)
             sample_dtype = str(norm.dtype)
         appended += 1
+        if progress_hook is not None:
+            with contextlib.suppress(Exception):
+                progress_hook(appended, total_frames_hint)
     return appended, sample_shape, sample_dtype
 
 
@@ -3099,6 +3124,62 @@ def call_with_supported_kwargs(pipe: Any, kwargs: Dict[str, Any]) -> Any:
     return pipe(**current_kwargs)
 
 
+def call_video_pipeline_with_optimizations(
+    *,
+    pipe: Any,
+    kwargs: Dict[str, Any],
+    device: str,
+    vram_profile: str,
+) -> Any:
+    """
+    Execute a video pipeline call with ROCm-safe optional SDP optimization.
+
+    Why this wrapper exists:
+    - 96GB class should use a single fast-path configuration and explicitly log
+      whether SDP kernel optimization was applied.
+    - If SDP context is unavailable in this runtime, we must fall back safely
+      without aborting generation.
+    """
+    profile = str(vram_profile or "").strip().lower()
+    if device != "cuda" or profile != "96gb_class":
+        with contextlib.suppress(Exception):
+            setattr(pipe, "_videogen_sdp_kernel_applied", False)
+            setattr(pipe, "_videogen_sdp_kernel_reason", "disabled_for_profile")
+        return call_with_supported_kwargs(pipe, kwargs)
+    cuda_backend = getattr(getattr(torch, "backends", None), "cuda", None)
+    sdp_kernel = getattr(cuda_backend, "sdp_kernel", None) if cuda_backend is not None else None
+    if not callable(sdp_kernel):
+        LOGGER.info("SDP kernel optimization not applied reason=missing_sdp_kernel_api")
+        with contextlib.suppress(Exception):
+            setattr(pipe, "_videogen_sdp_kernel_applied", False)
+            setattr(pipe, "_videogen_sdp_kernel_reason", "missing_sdp_kernel_api")
+        return call_with_supported_kwargs(pipe, kwargs)
+    try:
+        sdp_context = sdp_kernel(enable_flash=True, enable_math=False, enable_mem_efficient=True)
+    except Exception as exc:
+        LOGGER.info("SDP kernel optimization not applied reason=%s", str(exc))
+        with contextlib.suppress(Exception):
+            setattr(pipe, "_videogen_sdp_kernel_applied", False)
+            setattr(pipe, "_videogen_sdp_kernel_reason", str(exc))
+        return call_with_supported_kwargs(pipe, kwargs)
+    try:
+        with sdp_context:
+            with contextlib.suppress(Exception):
+                setattr(pipe, "_videogen_sdp_kernel_applied", True)
+                setattr(pipe, "_videogen_sdp_kernel_reason", "applied")
+            return call_with_supported_kwargs(pipe, kwargs)
+    except Exception as exc:
+        reason = str(exc)
+        # Only downgrade when this looks like an SDP backend compatibility issue.
+        if any(token in reason.lower() for token in ("sdp", "scaled_dot_product", "flash", "mem_efficient")):
+            LOGGER.info("SDP kernel optimization not applied reason=%s", reason)
+            with contextlib.suppress(Exception):
+                setattr(pipe, "_videogen_sdp_kernel_applied", False)
+                setattr(pipe, "_videogen_sdp_kernel_reason", reason)
+            return call_with_supported_kwargs(pipe, kwargs)
+        raise
+
+
 def build_step_progress_kwargs(
     pipe: Any,
     task_id: str,
@@ -3106,6 +3187,7 @@ def build_step_progress_kwargs(
     start_progress: float,
     end_progress: float,
     message: str,
+    task_step: str = "inference",
 ) -> Dict[str, Any]:
     total = max(int(num_inference_steps), 1)
     span = max(0.0, float(end_progress) - float(start_progress))
@@ -3119,7 +3201,7 @@ def build_step_progress_kwargs(
         state["last_step"] = step
         ratio = step / total
         progress = float(start_progress) + span * ratio
-        update_task(task_id, progress=progress, step="inference", message=f"{message} ({step}/{total})")
+        update_task(task_id, progress=progress, step=task_step, message=f"{message} ({step}/{total})")
         LOGGER.debug("task progress step task_id=%s message=%s step=%s total=%s progress=%.4f", task_id, message, step, total, progress)
 
     def callback_legacy(step: int, _timestep: Any, _latents: Any) -> None:
@@ -4929,7 +5011,7 @@ def text2image_worker(task_id: str, payload: Text2ImageRequest) -> None:
     try:
         ensure_task_not_cancelled(task_id)
         cleanup_before_generation_load(kind="text-to-image", model_ref=model_ref, settings=settings, clear_vaes=True)
-        update_task(task_id, status="running", progress=0.05, step="model_load", message="Loading model")
+        update_task(task_id, status="running", progress=0.10, step="model_load", message="Loading model")
         with GPU_GENERATION_SEMAPHORE:
             ensure_task_not_cancelled(task_id)
             pipe = get_pipeline_for_inference(
@@ -5152,7 +5234,7 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
             adapter.key,
             adapter.spec.support_level,
         )
-        update_task(task_id, progress=0.15, step="lora_apply", message="Applying LoRA")
+        update_task(task_id, progress=0.30, step="lora_apply", message="Applying LoRA")
         try:
             apply_loras_to_pipeline(pipe, lora_refs, payload.lora_scale, settings)
         except Exception as exc:
@@ -5165,11 +5247,26 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
                     str(exc),
                 )
                 lora_refs = []
-                update_task(task_id, progress=0.18, step="lora_apply", message="Applying LoRA (skipped)")
+                update_task(task_id, progress=0.31, step="lora_apply", message="Applying LoRA (skipped)")
             else:
                 raise
-        update_task(task_id, progress=0.26, step="prepare", message=f"Preparing video stream (0/{total_frames} frames)")
+        update_task(task_id, progress=0.34, step="prepare", message=f"Preparing video stream (0/{total_frames} frames)")
         device, dtype = get_device_and_dtype()
+        vram_profile = str(getattr(pipe, "_videogen_vram_profile", "")).strip().lower() or "unknown"
+        cpu_offload_used = bool(getattr(pipe, "_videogen_enable_cpu_offload", False))
+        vae_tiling_enabled = getattr(pipe, "_videogen_vae_tiling_enabled", None)
+        use_sdp_kernel = device == "cuda" and vram_profile == "96gb_class"
+        LOGGER.info(
+            "video inference profile task_id=%s model=%s adapter=%s vram_profile=%s dtype=%s cpu_offload=%s tiling=%s sdp_kernel_requested=%s",
+            task_id,
+            model_ref,
+            adapter.key,
+            vram_profile,
+            str(dtype),
+            cpu_offload_used,
+            vae_tiling_enabled,
+            use_sdp_kernel,
+        )
         output_name = f"text2video_{task_id}.mp4"
         output_path = resolve_path(settings["paths"]["outputs_dir"]) / output_name
         writer: Any = None
@@ -5188,12 +5285,12 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
                 segment_index = int(segment["index"])
                 request_frames = int(segment["request_frames"])
                 trim_head_frames = int(segment["trim_head_frames"])
-                chunk_start = 0.3 + (0.62 * ((segment_index - 1) / max(pack_count, 1)))
-                chunk_end = 0.3 + (0.62 * (segment_index / max(pack_count, 1)))
+                chunk_start = 0.35 + (0.55 * ((segment_index - 1) / max(pack_count, 1)))
+                chunk_end = 0.35 + (0.55 * (segment_index / max(pack_count, 1)))
                 update_task(
                     task_id,
                     progress=chunk_start,
-                    step="inference",
+                    step="generating",
                     message=f"Generating framepack {segment_index}/{pack_count} ({total_written}/{total_frames} frames)",
                 )
                 generator = None
@@ -5206,6 +5303,7 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
                     start_progress=chunk_start,
                     end_progress=max(chunk_start, chunk_end - 0.02),
                     message=f"Generating framepack {segment_index}/{pack_count}",
+                    task_step="generating",
                 )
                 request_payload: Dict[str, Any] = adapter.prepare_inputs(
                     task="text-to-video",
@@ -5235,16 +5333,69 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
                 )
                 gen_started = time.perf_counter()
                 with inference_execution_context(device, dtype):
-                    out = call_with_supported_kwargs(
-                        pipe,
-                        request_payload,
+                    out = call_video_pipeline_with_optimizations(
+                        pipe=pipe,
+                        kwargs=request_payload,
+                        device=device,
+                        vram_profile=vram_profile,
+                    )
+                LOGGER.info(
+                    "text2video inference call finished task_id=%s segment=%s/%s sdp_kernel_applied=%s sdp_reason=%s",
+                    task_id,
+                    segment_index,
+                    pack_count,
+                    getattr(pipe, "_videogen_sdp_kernel_applied", None),
+                    getattr(pipe, "_videogen_sdp_kernel_reason", ""),
+                )
+                if segment_index == pack_count:
+                    update_task(task_id, progress=0.91, step="extracting_output", message="Extracting pipeline output")
+                else:
+                    update_task(
+                        task_id,
+                        progress=max(chunk_start, chunk_end - 0.03),
+                        step="extracting_output",
+                        message=f"Extracting pipeline output ({segment_index}/{pack_count})",
                     )
                 chunk_frames = adapter.extract_frames(out)
+                LOGGER.info(
+                    "text2video output parsed task_id=%s segment=%s/%s parser_route=%s frame_count=%s",
+                    task_id,
+                    segment_index,
+                    pack_count,
+                    getattr(adapter, "last_extract_route", "unknown"),
+                    len(chunk_frames) if isinstance(chunk_frames, list) else "(unknown)",
+                )
+                decode_start = 0.94 if segment_index == pack_count else max(chunk_start, chunk_end - 0.02)
+                decode_end = 0.96 if segment_index == pack_count else max(decode_start, chunk_end - 0.01)
+                update_task(
+                    task_id,
+                    progress=decode_start,
+                    step="decoding_frames",
+                    message=f"Decoding frames (0/{max(len(chunk_frames), 1)})",
+                )
+                progress_state = {"last_ts": 0.0}
+
+                def _decode_progress(done: int, total_hint: int) -> None:
+                    now = time.perf_counter()
+                    if done < max(total_hint, 1) and (now - float(progress_state["last_ts"])) < 1.0:
+                        return
+                    progress_state["last_ts"] = now
+                    total_local = max(int(total_hint), 1)
+                    ratio = min(1.0, float(done) / float(total_local))
+                    progress_value = float(decode_start) + (float(decode_end) - float(decode_start)) * ratio
+                    update_task(
+                        task_id,
+                        progress=progress_value,
+                        step="decoding_frames",
+                        message=f"Decoding frames ({done}/{total_local})",
+                    )
+
                 appended, chunk_shape, chunk_dtype = append_frames_to_video_writer(
                     writer,
                     normalize_frame,
                     chunk_frames,
                     skip_head_frames=trim_head_frames,
+                    progress_hook=_decode_progress,
                 )
                 if appended <= 0:
                     raise RuntimeError(f"No frames generated for framepack {segment_index}/{pack_count}")
@@ -5264,10 +5415,19 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
                     total_written,
                     (time.perf_counter() - gen_started) * 1000,
                 )
+                if segment_index == pack_count:
+                    update_task(task_id, progress=0.97, step="postprocessing", message="Post-processing frames")
+                else:
+                    update_task(
+                        task_id,
+                        progress=max(chunk_start, chunk_end - 0.005),
+                        step="postprocessing",
+                        message=f"Post-processing framepack {segment_index}/{pack_count}",
+                    )
                 update_task(
                     task_id,
-                    progress=chunk_end,
-                    step="encode",
+                    progress=0.99 if segment_index == pack_count else chunk_end,
+                    step="encoding_video",
                     message=f"Encoded framepack {segment_index}/{pack_count} ({total_written}/{total_frames} frames)",
                 )
                 del out
@@ -5281,8 +5441,18 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
                         torch.cuda.empty_cache()
         finally:
             if writer is not None:
-                with contextlib.suppress(Exception):
-                    writer.close()
+                update_task(task_id, progress=0.99, step="encoding_video", message="Encoding video with ffmpeg")
+                with task_progress_heartbeat(
+                    task_id,
+                    start_progress=0.99,
+                    end_progress=0.999,
+                    message="Encoding video with ffmpeg",
+                    interval_sec=1.0,
+                    estimated_duration_sec=20.0,
+                ):
+                    with contextlib.suppress(Exception):
+                        writer.close()
+                writer = None
         if total_written <= 0:
             raise RuntimeError("No frames were generated to encode")
         if total_written != total_frames:
@@ -5301,6 +5471,7 @@ def text2video_worker(task_id: str, payload: Text2VideoRequest) -> None:
             sample_shape,
             sample_dtype,
         )
+        update_task(task_id, progress=0.999, step="saving", message="Saving output metadata")
         update_task(
             task_id,
             status="completed",
@@ -5393,7 +5564,7 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
         GPU_GENERATION_SEMAPHORE.acquire()
         semaphore_acquired = True
         cleanup_before_generation_load(kind="image-to-video", model_ref=model_ref, settings=settings, clear_vaes=True)
-        update_task(task_id, status="running", progress=0.05, message="Loading model")
+        update_task(task_id, status="running", progress=0.10, step="model_load", message="Loading model")
         pipe = get_pipeline_for_inference(
             "image-to-video",
             model_ref,
@@ -5413,7 +5584,7 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
             adapter.key,
             adapter.spec.support_level,
         )
-        update_task(task_id, progress=0.15, step="lora_apply", message="Applying LoRA")
+        update_task(task_id, progress=0.30, step="lora_apply", message="Applying LoRA")
         try:
             apply_loras_to_pipeline(pipe, lora_refs, lora_scale, settings)
         except Exception as exc:
@@ -5426,7 +5597,7 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
                     str(exc),
                 )
                 lora_refs = []
-                update_task(task_id, progress=0.18, step="lora_apply", message="Applying LoRA (skipped)")
+                update_task(task_id, progress=0.31, step="lora_apply", message="Applying LoRA (skipped)")
             else:
                 raise
         update_task(task_id, progress=0.35, step="prepare", message="Preparing image")
@@ -5436,9 +5607,24 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
         if width > 0 and height > 0:
             image = image.resize((width, height))
         device, dtype = get_device_and_dtype()
+        vram_profile = str(getattr(pipe, "_videogen_vram_profile", "")).strip().lower() or "unknown"
+        cpu_offload_used = bool(getattr(pipe, "_videogen_enable_cpu_offload", False))
+        vae_tiling_enabled = getattr(pipe, "_videogen_vae_tiling_enabled", None)
+        use_sdp_kernel = device == "cuda" and vram_profile == "96gb_class"
+        LOGGER.info(
+            "video inference profile task_id=%s model=%s adapter=%s vram_profile=%s dtype=%s cpu_offload=%s tiling=%s sdp_kernel_requested=%s",
+            task_id,
+            model_ref,
+            adapter.key,
+            vram_profile,
+            str(dtype),
+            cpu_offload_used,
+            vae_tiling_enabled,
+            use_sdp_kernel,
+        )
         gen_device = "cuda" if device == "cuda" else "cpu"
         step_count = int(payload["num_inference_steps"])
-        update_task(task_id, progress=0.3, step="prepare", message=f"Preparing video stream (0/{total_frames} frames)")
+        update_task(task_id, progress=0.34, step="prepare", message=f"Preparing video stream (0/{total_frames} frames)")
         output_name = f"image2video_{task_id}.mp4"
         output_path = resolve_path(settings["paths"]["outputs_dir"]) / output_name
         writer: Any = None
@@ -5455,12 +5641,12 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
                 segment_index = int(segment["index"])
                 request_frames = int(segment["request_frames"])
                 trim_head_frames = int(segment["trim_head_frames"])
-                chunk_start = 0.34 + (0.58 * ((segment_index - 1) / max(pack_count, 1)))
-                chunk_end = 0.34 + (0.58 * (segment_index / max(pack_count, 1)))
+                chunk_start = 0.35 + (0.55 * ((segment_index - 1) / max(pack_count, 1)))
+                chunk_end = 0.35 + (0.55 * (segment_index / max(pack_count, 1)))
                 update_task(
                     task_id,
                     progress=chunk_start,
-                    step="inference",
+                    step="generating",
                     message=f"Generating framepack {segment_index}/{pack_count} ({total_written}/{total_frames} frames)",
                 )
                 chunk_generator = None
@@ -5473,6 +5659,7 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
                     start_progress=chunk_start,
                     end_progress=max(chunk_start, chunk_end - 0.02),
                     message=f"Generating framepack {segment_index}/{pack_count}",
+                    task_step="generating",
                 )
                 LOGGER.info(
                     "image2video framepack start task_id=%s segment=%s/%s request_frames=%s trim_head=%s callback_keys=%s",
@@ -5503,16 +5690,69 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
                 )
                 gen_started = time.perf_counter()
                 with inference_execution_context(device, dtype):
-                    out = call_with_supported_kwargs(
-                        pipe,
-                        request_payload,
+                    out = call_video_pipeline_with_optimizations(
+                        pipe=pipe,
+                        kwargs=request_payload,
+                        device=device,
+                        vram_profile=vram_profile,
+                    )
+                LOGGER.info(
+                    "image2video inference call finished task_id=%s segment=%s/%s sdp_kernel_applied=%s sdp_reason=%s",
+                    task_id,
+                    segment_index,
+                    pack_count,
+                    getattr(pipe, "_videogen_sdp_kernel_applied", None),
+                    getattr(pipe, "_videogen_sdp_kernel_reason", ""),
+                )
+                if segment_index == pack_count:
+                    update_task(task_id, progress=0.91, step="extracting_output", message="Extracting pipeline output")
+                else:
+                    update_task(
+                        task_id,
+                        progress=max(chunk_start, chunk_end - 0.03),
+                        step="extracting_output",
+                        message=f"Extracting pipeline output ({segment_index}/{pack_count})",
                     )
                 chunk_frames = adapter.extract_frames(out)
+                LOGGER.info(
+                    "image2video output parsed task_id=%s segment=%s/%s parser_route=%s frame_count=%s",
+                    task_id,
+                    segment_index,
+                    pack_count,
+                    getattr(adapter, "last_extract_route", "unknown"),
+                    len(chunk_frames) if isinstance(chunk_frames, list) else "(unknown)",
+                )
+                decode_start = 0.94 if segment_index == pack_count else max(chunk_start, chunk_end - 0.02)
+                decode_end = 0.96 if segment_index == pack_count else max(decode_start, chunk_end - 0.01)
+                update_task(
+                    task_id,
+                    progress=decode_start,
+                    step="decoding_frames",
+                    message=f"Decoding frames (0/{max(len(chunk_frames), 1)})",
+                )
+                progress_state = {"last_ts": 0.0}
+
+                def _decode_progress(done: int, total_hint: int) -> None:
+                    now = time.perf_counter()
+                    if done < max(total_hint, 1) and (now - float(progress_state["last_ts"])) < 1.0:
+                        return
+                    progress_state["last_ts"] = now
+                    total_local = max(int(total_hint), 1)
+                    ratio = min(1.0, float(done) / float(total_local))
+                    progress_value = float(decode_start) + (float(decode_end) - float(decode_start)) * ratio
+                    update_task(
+                        task_id,
+                        progress=progress_value,
+                        step="decoding_frames",
+                        message=f"Decoding frames ({done}/{total_local})",
+                    )
+
                 appended, chunk_shape, chunk_dtype = append_frames_to_video_writer(
                     writer,
                     normalize_frame,
                     chunk_frames,
                     skip_head_frames=trim_head_frames,
+                    progress_hook=_decode_progress,
                 )
                 if appended <= 0:
                     raise RuntimeError(f"No frames generated for framepack {segment_index}/{pack_count}")
@@ -5532,10 +5772,19 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
                     total_written,
                     (time.perf_counter() - gen_started) * 1000,
                 )
+                if segment_index == pack_count:
+                    update_task(task_id, progress=0.97, step="postprocessing", message="Post-processing frames")
+                else:
+                    update_task(
+                        task_id,
+                        progress=max(chunk_start, chunk_end - 0.005),
+                        step="postprocessing",
+                        message=f"Post-processing framepack {segment_index}/{pack_count}",
+                    )
                 update_task(
                     task_id,
-                    progress=chunk_end,
-                    step="encode",
+                    progress=0.99 if segment_index == pack_count else chunk_end,
+                    step="encoding_video",
                     message=f"Encoded framepack {segment_index}/{pack_count} ({total_written}/{total_frames} frames)",
                 )
                 del out
@@ -5547,8 +5796,18 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
                         torch.cuda.empty_cache()
         finally:
             if writer is not None:
-                with contextlib.suppress(Exception):
-                    writer.close()
+                update_task(task_id, progress=0.99, step="encoding_video", message="Encoding video with ffmpeg")
+                with task_progress_heartbeat(
+                    task_id,
+                    start_progress=0.99,
+                    end_progress=0.999,
+                    message="Encoding video with ffmpeg",
+                    interval_sec=1.0,
+                    estimated_duration_sec=20.0,
+                ):
+                    with contextlib.suppress(Exception):
+                        writer.close()
+                writer = None
         if total_written <= 0:
             raise RuntimeError("No frames were generated to encode")
         if total_written != total_frames:
@@ -5567,6 +5826,7 @@ def image2video_worker(task_id: str, payload: Dict[str, Any]) -> None:
             sample_shape,
             sample_dtype,
         )
+        update_task(task_id, progress=0.999, step="saving", message="Saving output metadata")
         update_task(
             task_id,
             status="completed",
